@@ -2,16 +2,12 @@
 
 module.exports = function(grunt, args) {
 
-    grunt.config.set('connect', {
-        test: {
-            options: {
-                hostname: 'localhost',
-                port: 7000
-            }
-        },
-        local: {
-            options: {
-                keepalive: true
+    grunt.config.merge({
+        connect: {
+            local: {
+                options: {
+                    keepalive: true
+                }
             }
         }
     });
