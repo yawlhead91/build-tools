@@ -8,37 +8,17 @@
 
 'use strict';
 
-
 module.exports = function(grunt) {
 
-    grunt.config.set('bump', {
-        options: {
-            files: ['package.json', 'bower.json'],
-            commit: false,
-            createTag: false,
-            tagName: 'v%VERSION%',
-            tagMessage: 'v%VERSION%',
-            push: false,
-            pushTo: 'origin',
-            updateConfigs: ['pkg']
-        }
-    });
-
-    require('grunt-bump')(grunt);
-
     grunt.registerTask('bt', 'Set of custom build tools.', function() {
-
-        if (arguments[0] === 'release') {
-            release(arguments[1]);
+        var command = arguments[0];
+        if (command) {
+            require('./../src/' + command)(grunt, Array.prototype.slice(arguments, 1));
+        } else if (!command) {
+            grunt.log.error('you must specify a bt command');
+        } else {
+            grunt.log.error('there is no bt command named ' + command + '.');
         }
     });
-
-    function release (type) {
-        grunt.task.run([
-            'bump:' + (type || 'patch'),
-            'build'
-        ]);
-    }
-
 
 };

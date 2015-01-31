@@ -51,37 +51,25 @@ module.exports = function (grunt) {
         // Unit tests.
         nodeunit: {
             tests: ['test/*_test.js']
-        },
+        }
 
     });
 
     // Load THIS plugin's task(s).
-    //grunt.loadTasks('grunt-tasks');
+    grunt.loadTasks('tasks');
 
     // These plugins provide necessary tasks.
     // Load grunt tasks from node modules
     require("load-grunt-tasks")(grunt);
 
 
-    grunt.registerTask( "build-files", [
-        "clean",
-        "copy",
-        "uglify",
-        "usebanner:all"
-    ]);
-
-    grunt.registerTask( "build", [
-        "build-files",
-        "connect:test",
-        "qunit:local"
-    ]);
-
-
     // Whenever the "test" task is run, first clean the "tmp" dir, then run this
     // plugin's task(s), then test the result.
-    grunt.registerTask('test', ['clean', 'build_tools', 'nodeunit']);
+    //grunt.registerTask('test', ['clean', 'build_tools', 'nodeunit']);
+    //
+    //// By default, lint and run all tests.
+    //grunt.registerTask('default', ['jshint', 'test']);
 
-    // By default, lint and run all tests.
-    grunt.registerTask('default', ['jshint', 'test']);
+
 
 };
