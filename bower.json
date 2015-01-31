@@ -1,0 +1,17 @@
+{
+  "name": "build-tools",
+  "version": "0.1.2",
+  "homepage": "https://github.com/mkay581/build-tools",
+  "authors": [
+    "Mark Kennedy <mark.kennedy@akqa.com>"
+  ],
+  "license": "MIT",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}
