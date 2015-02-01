@@ -1,5 +1,7 @@
 'use strict';
 
+var rootPath = process.cwd();
+
 module.exports = function(grunt, args) {
     var btConfig = grunt.config.get('bt') || {};
     var dist = btConfig.dist || ['dist'];
@@ -45,10 +47,10 @@ module.exports = function(grunt, args) {
         }
     });
 
-    require('./../node_modules/grunt-contrib-clean/tasks/clean')(grunt);
-    require('./../node_modules/grunt-contrib-copy/tasks/copy')(grunt);
-    require('./../node_modules/grunt-contrib-uglify/tasks/uglify')(grunt);
-    require('./../node_modules/grunt-banner/tasks/usebanner')(grunt);
+    require(rootPath + 'node_modules/grunt-contrib-clean/tasks/clean')(grunt);
+    require(rootPath + 'node_modules/grunt-contrib-copy/tasks/copy')(grunt);
+    require(rootPath + 'node_modules/grunt-contrib-uglify/tasks/uglify')(grunt);
+    require(rootPath + 'node_modules/grunt-banner/tasks/usebanner')(grunt);
 
     var tasks = ['clean:dist', 'copy'];
 
