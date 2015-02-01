@@ -1,11 +1,3 @@
-/*
- * grunt-build-tools
- * https://github.com/mkay581/build-tools
- *
- * Copyright (c) 2015 Mark Kennedy
- * Licensed under the MIT license.
- */
-
 'use strict';
 
 module.exports = function (grunt) {
@@ -13,17 +5,6 @@ module.exports = function (grunt) {
     // Project configuration.
     grunt.initConfig({
         pkg: grunt.file.readJSON("package.json"),
-        jshint: {
-            all: [
-                'Gruntfile.js',
-                'tasks/*.js',
-                '<%= nodeunit.tests %>'
-            ],
-            options: {
-                jshintrc: '.jshintrc'
-            }
-        },
-
         // Before generating any new files, remove any previously-created files.
         clean: {
             tests: ['tmp']
@@ -51,20 +32,15 @@ module.exports = function (grunt) {
                     }
                 ]
             }
-        },
-
-        // Unit tests.
-        nodeunit: {
-            tests: ['test/*_test.js']
         }
-
     });
-
-    // Load THIS plugin's task(s).
-    grunt.loadTasks('tasks');
 
     // These plugins provide necessary tasks.
     // Load grunt tasks from node modules
     require("load-grunt-tasks")(grunt);
+
+    // Load THIS plugin's task(s).
+    grunt.loadTasks('tasks');
+
 
 };
