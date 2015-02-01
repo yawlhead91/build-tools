@@ -45,10 +45,10 @@ module.exports = function(grunt, args) {
         }
     });
 
-    require('./../node_modules/grunt-contrib-clean/tasks/clean')(grunt);
-    require('./../node_modules/grunt-contrib-copy/tasks/copy')(grunt);
-    require('./../node_modules/grunt-contrib-uglify/tasks/uglify')(grunt);
-    require('./../node_modules/grunt-banner/tasks/usebanner')(grunt);
+    require('node_modules/grunt-contrib-clean/tasks/clean')(grunt);
+    require('node_modules/grunt-contrib-copy/tasks/copy')(grunt);
+    require('node_modules/grunt-contrib-uglify/tasks/uglify')(grunt);
+    require('node_modules/grunt-banner/tasks/usebanner')(grunt);
 
     var tasks = ['clean:dist', 'copy'];
 
