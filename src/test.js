@@ -106,12 +106,12 @@ module.exports = function(grunt, args) {
         }
     });
 
-    require(rootPath + 'node_modules/grunt-contrib-qunit/tasks/qunit')(grunt);
-    require(rootPath + 'node_modules/grunt-contrib-connect/tasks/connect')(grunt);
-    require(rootPath + 'node_modules/grunt-contrib-watch/tasks/watch')(grunt);
-    require(rootPath + 'node_modules/grunt-contrib-clean/tasks/clean')(grunt);
-    require(rootPath + 'node_modules/grunt-contrib-copy/tasks/copy')(grunt);
-    require(rootPath + 'node_modules/grunt-text-replace/tasks/text-replace')(grunt);
+    require(rootPath + '/node_modules/grunt-contrib-qunit/tasks/qunit')(grunt);
+    require(rootPath + '/node_modules/grunt-contrib-connect/tasks/connect')(grunt);
+    require(rootPath + '/node_modules/grunt-contrib-watch/tasks/watch')(grunt);
+    require(rootPath + '/node_modules/grunt-contrib-clean/tasks/clean')(grunt);
+    require(rootPath + '/node_modules/grunt-contrib-copy/tasks/copy')(grunt);
+    require(rootPath + '/node_modules/grunt-text-replace/tasks/text-replace')(grunt);
 
     if (args[0] === 'server') {
         // make alias

@@ -11,7 +11,7 @@ module.exports = function(grunt, args) {
             }
         }
     });
-    require(process.cwd() + 'node_modules/grunt-contrib-connect/tasks/connect')(grunt);
+    require(process.cwd() + '/node_modules/grunt-contrib-connect/tasks/connect')(grunt);
 
     grunt.task.run(['connect:local']);
 

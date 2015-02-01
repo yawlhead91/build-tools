@@ -47,10 +47,10 @@ module.exports = function(grunt, args) {
         }
     });
 
-    require(rootPath + 'node_modules/grunt-contrib-clean/tasks/clean')(grunt);
-    require(rootPath + 'node_modules/grunt-contrib-copy/tasks/copy')(grunt);
-    require(rootPath + 'node_modules/grunt-contrib-uglify/tasks/uglify')(grunt);
-    require(rootPath + 'node_modules/grunt-banner/tasks/usebanner')(grunt);
+    require(rootPath + '/node_modules/grunt-contrib-clean/tasks/clean')(grunt);
+    require(rootPath + '/node_modules/grunt-contrib-copy/tasks/copy')(grunt);
+    require(rootPath + '/node_modules/grunt-contrib-uglify/tasks/uglify')(grunt);
+    require(rootPath + '/node_modules/grunt-banner/tasks/usebanner')(grunt);
 
     var tasks = ['clean:dist', 'copy'];
 
