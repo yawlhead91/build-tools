@@ -22,6 +22,8 @@ module.exports = function(grunt, args) {
         return replaceStr;
     }
 
+    // deletes a folder and its contents
+    // @todo: make this function asynchonous, it's blocking the Ctrl+C SIGINT triggering!
     var deleteFolderRecursive = function(path) {
         if( fs.existsSync(path) ) {
             fs.readdirSync(path).forEach(function(file,index){
@@ -106,7 +108,6 @@ module.exports = function(grunt, args) {
                             // remove tmp directory
                             deleteFolderRecursive('tmp');
                         });
-
                     }
                 }
             }
@@ -139,7 +140,7 @@ module.exports = function(grunt, args) {
         watch: {
             'test-files': {
                 files: ['tests/**/*.js'],
-                tasks: ['copy:test-files', 'replace:add-test-files'],
+                tasks: ['copy:test-files'],
                 options: {
                     spawn: false
                 }
