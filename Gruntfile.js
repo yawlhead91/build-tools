@@ -28,25 +28,30 @@ module.exports = function (grunt) {
         clean: {
             tests: ['tmp']
         },
-
-        // Configuration to be run (and then tested).
-        //build_tools: {
-        //    default_options: {
-        //        options: {},
-        //        files: {
-        //            'tmp/default_options': ['test/fixtures/testing', 'test/fixtures/123']
-        //        }
-        //    },
-        //    custom_options: {
-        //        options: {
-        //            separator: ': ',
-        //            punctuation: ' !!!'
-        //        },
-        //        files: {
-        //            'tmp/custom_options': ['test/fixtures/testing', 'test/fixtures/123']
-        //        }
-        //    }
-        //},
+        copy: {
+            'test-libs': {
+                files: [
+                    {
+                        expand: true,
+                        cwd: 'bower_components/requirejs',
+                        dest: 'tests/libs/requirejs',
+                        src: ['require.js']
+                    },
+                    {
+                        expand: true,
+                        cwd: 'bower_components/qunit/qunit',
+                        dest: 'tests/libs/qunit',
+                        src: ['**/*']
+                    },
+                    {
+                        expand: true,
+                        cwd: 'bower_components/sinonjs',
+                        dest: 'tests/libs/sinon',
+                        src: ['sinon.js']
+                    }
+                ]
+            }
+        },
 
         // Unit tests.
         nodeunit: {
@@ -61,15 +66,5 @@ module.exports = function (grunt) {
     // These plugins provide necessary tasks.
     // Load grunt tasks from node modules
     require("load-grunt-tasks")(grunt);
-
-
-    // Whenever the "test" task is run, first clean the "tmp" dir, then run this
-    // plugin's task(s), then test the result.
-    //grunt.registerTask('test', ['clean', 'build_tools', 'nodeunit']);
-    //
-    //// By default, lint and run all tests.
-    //grunt.registerTask('default', ['jshint', 'test']);
-
-
 
 };

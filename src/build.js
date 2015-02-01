@@ -5,7 +5,9 @@ module.exports = function(grunt, args) {
     var uglifyFiles = btConfig.uglifyFiles;
 
     grunt.config.merge({
-        clean: btConfig.dist || ['dist'],
+        clean: {
+            dist: btConfig.dist || ['dist']
+        },
         copy: {
             build: {
                 files: [
@@ -31,7 +33,7 @@ module.exports = function(grunt, args) {
     require('./../node_modules/grunt-contrib-copy/tasks/copy')(grunt);
     require('./../node_modules/grunt-contrib-uglify/tasks/uglify')(grunt);
     
-    var tasks = ['clean', 'copy'];
+    var tasks = ['clean:dist', 'copy'];
     
     if (uglifyFiles) {
         tasks.push('uglify');

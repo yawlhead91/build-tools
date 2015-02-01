@@ -13,7 +13,7 @@ module.exports = function(grunt) {
     grunt.registerTask('bt', 'Set of custom build tools.', function() {
         var command = arguments[0];
         if (command) {
-            require('./../src/' + command)(grunt, Array.prototype.slice(arguments, 1));
+            require('./../src/' + command)(grunt, Array.prototype.slice.call(arguments, 1));
         } else if (!command) {
             grunt.log.error('you must specify a bt command');
         } else {
