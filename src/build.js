@@ -39,7 +39,7 @@ module.exports = function(grunt, args) {
                     linebreak: false
                 },
                 files: {
-                    src: ['dist/**/*']
+                    src: [dist[0] + '/**/*.js']
                 }
             }
         }
