@@ -32,6 +32,18 @@ module.exports = function (grunt) {
                     }
                 ]
             }
+        },
+        bump: {
+            options: {
+                files: ['package.json', 'bower.json'],
+                commit: false,
+                createTag: false,
+                tagName: 'v%VERSION%',
+                tagMessage: 'v%VERSION%',
+                push: false,
+                pushTo: 'origin',
+                updateConfigs: ['pkg']
+            }
         }
     });
 
