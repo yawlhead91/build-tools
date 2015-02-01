@@ -28,29 +28,22 @@ module.exports = function(grunt, args) {
         }
     };
 
-    grunt.config.set('qunit', {
-        local: {
-            options: {
-                urls: [
-                    'http://localhost:7000/tests/index.html'
-                ]
-            }
-        }
-    });
     grunt.config.merge({
-        connect: {
-            test: {
+        qunit: {
+            local: {
                 options: {
-                    hostname: 'localhost',
-                    port: 7000
+                    urls: [
+                        'http://localhost:7755/index.html'
+                    ]
                 }
-            },
+            }
+        },
+        connect: {
             'test-server': {
                 options: {
-                    port: 7000,
+                    port: 7755,
                     hostname: '*',
                     base: ['.', 'tmp', 'tmp/tests'],
-                    keepalive: true,
                     onCreateServer: function(server) {
                         // when server is killed on UNIX-like systems, call close, so we can remove tmp directory
                         process.on('SIGINT', function() {
@@ -124,13 +117,17 @@ module.exports = function(grunt, args) {
             'clean:tmp',
             'copy:test-files',
             'replace:add_test_files',
-            'connect:test-server',
+            'connect:test-server:keepalive',
             'watch:test-files'
         ]);
     } else {
         grunt.task.run([
-            'connect:test',
-            'qunit:local'
+            'clean:tmp',
+            'copy:test-files',
+            'replace:add_test_files',
+            'connect:test-server',
+            'qunit:local',
+            'clean:tmp'
         ]);
     }
 
