@@ -4,18 +4,22 @@ var rootPath = process.cwd();
 
 module.exports = function(grunt, args) {
     var testFiles = grunt.file.expand({filter: "isFile"}, ["tests/*"]);
+    var fs = require('fs');
 
     // turn testfiles into an string array for replace operation
     function convertToReplaceString(files) {
         var replaceStr = '[';
-        files.forEach(function (str) {
+        files.forEach(function (str, idx) {
+            if (idx > 0) {
+                replaceStr += ','
+            }
             replaceStr += '\'' + str + '\'';
+
         });
         replaceStr += ']';
         return replaceStr;
     }
 
-    var fs = require('fs');
     var deleteFolderRecursive = function(path) {
         if( fs.existsSync(path) ) {
             fs.readdirSync(path).forEach(function(file,index){
