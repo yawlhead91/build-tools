@@ -3,8 +3,10 @@
 var rootPath = process.cwd();
 
 module.exports = function(grunt, args) {
-    var testFiles = grunt.file.expand({filter: "isFile", cwd: 'tests/'}, ["**/*.js"]);
-    var fs = require('fs');
+    var testFiles = grunt.file.expand({filter: "isFile", cwd: 'tests/'}, ["**/*.js"]),
+        fs = require('fs'),
+        btConfig = grunt.config.get('bt') || {},
+        testRequireConfig = btConfig.testRequireConfig || {};
 
     // turn testfiles into an string array for replace operation
     function convertToReplaceString(files) {
@@ -33,6 +35,51 @@ module.exports = function(grunt, args) {
             fs.rmdirSync(path);
         }
     };
+
+    /**
+     * Merges the contents of two or more objects.
+     * @param {object} obj - The target object
+     * @param {...object} - Additional objects who's properties will be merged in
+     */
+    function extend(target) {
+        var merged = target,
+            source, i;
+        for (i = 1; i < arguments.length; i++) {
+            source = arguments[i];
+            for (var prop in source) {
+                if (source.hasOwnProperty(prop)) {
+                    merged[prop] = source[prop];
+                }
+            }
+        }
+        return merged;
+    }
+
+    // compiles the tests.js file that is run
+    function compileTestFileContent() {
+        var config = {
+            baseUrl: '../',
+            paths: extend({}, testRequireConfig.paths, {
+                qunit: 'tests/qunit-require',
+                sinon: 'tests/libs/sinon/sinon',
+                'test-utils': 'tests/test-utils'
+            }),
+            shim: extend({}, testRequireConfig.shim, {
+                sinon: {
+                    exports: 'sinon'
+                }
+            })
+        };
+
+        var content = '"use strict"; ' +
+            'require.config(' + JSON.stringify(config) + ');' +
+        'require(' + convertToReplaceString(testFiles) + ', function() {' +
+            'QUnit.config.requireExpects = true;' +
+            'QUnit.start();' +
+        '});';
+
+        return content;
+    }
 
     grunt.config.merge({
         qunit: {
@@ -97,16 +144,6 @@ module.exports = function(grunt, args) {
                     spawn: false
                 }
             }
-        },
-        replace: {
-            add_test_files: {
-                src: ['tmp/tests/tests.js'],
-                dest: 'tmp/tests/tests.js',
-                replacements: [{
-                    from: '[TEST_FILES]',
-                    to: convertToReplaceString(testFiles)
-                }]
-            }
         }
     });
 
@@ -117,12 +154,16 @@ module.exports = function(grunt, args) {
     require(rootPath + '/node_modules/grunt-contrib-copy/tasks/copy')(grunt);
     require(rootPath + '/node_modules/grunt-text-replace/tasks/text-replace')(grunt);
 
+    grunt.registerTask('compile_test_content', 'custom file compiler', function () {
+        grunt.file.write('tmp/tests/tests.js', compileTestFileContent());
+    });
+
     if (args[0] === 'server') {
         // make alias
         grunt.task.run([
             'clean:tmp',
             'copy:test-files',
-            'replace:add_test_files',
+            'compile_test_content',
             'connect:test-server:keepalive',
             'watch:test-files'
         ]);
@@ -130,7 +171,7 @@ module.exports = function(grunt, args) {
         grunt.task.run([
             'clean:tmp',
             'copy:test-files',
-            'replace:add_test_files',
+            'compile_test_content',
             'connect:test-server',
             'qunit:local',
             'clean:tmp'
