@@ -3,7 +3,7 @@
 var rootPath = process.cwd();
 
 module.exports = function(grunt, args) {
-    var testFiles = grunt.file.expand({filter: "isFile"}, ["tests/**/*.js"]);
+    var testFiles = grunt.file.expand({filter: "isFile", cwd: 'tests/'}, ["**/*.js"]);
     var fs = require('fs');
 
     // turn testfiles into an string array for replace operation
@@ -13,7 +13,7 @@ module.exports = function(grunt, args) {
             if (idx > 0) {
                 replaceStr += ','
             }
-            replaceStr += '\'' + str + '\'';
+            replaceStr += '\'' + 'files/' + str + '\'';
 
         });
         replaceStr += ']';
@@ -73,7 +73,7 @@ module.exports = function(grunt, args) {
                     {
                         expand: true,
                         cwd: 'tests',
-                        dest: 'tmp/tests',
+                        dest: 'tmp/tests/files',
                         src: [
                             '**/*.js'
                         ]
