@@ -18,7 +18,7 @@ module.exports = function(grunt, args) {
 
     grunt.task.run([
         'bump:' + (args[0] || 'patch'),
-        'build'
+        'bt:build'
     ]);
 
 };
