@@ -8,42 +8,6 @@ module.exports = function (grunt) {
         // Before generating any new files, remove any previously-created files.
         clean: {
             tests: ['tmp']
-        },
-        copy: {
-            'test-libs': {
-                files: [
-                    {
-                        expand: true,
-                        cwd: 'bower_components/requirejs',
-                        dest: 'tests/libs/requirejs',
-                        src: ['require.js']
-                    },
-                    {
-                        expand: true,
-                        cwd: 'bower_components/qunit/qunit',
-                        dest: 'tests/libs/qunit',
-                        src: ['**/*']
-                    },
-                    {
-                        expand: true,
-                        cwd: 'bower_components/sinonjs',
-                        dest: 'tests/libs/sinon',
-                        src: ['sinon.js']
-                    }
-                ]
-            }
-        },
-        bump: {
-            options: {
-                files: ['package.json', 'bower.json'],
-                commit: false,
-                createTag: false,
-                tagName: 'v%VERSION%',
-                tagMessage: 'v%VERSION%',
-                push: false,
-                pushTo: 'origin',
-                updateConfigs: ['pkg']
-            }
         }
     });
 
