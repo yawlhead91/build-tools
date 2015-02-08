@@ -62,7 +62,7 @@ module.exports = function(grunt, args) {
         var config = {
             baseUrl: '../',
             paths: extend({}, testRequireConfig.paths, {
-                qunit: 'tests/qunit-require',
+                qunit: 'tests/libs/qunit/qunit-require',
                 sinon: 'tests/libs/sinon/sinon',
                 'test-utils': 'tests/test-utils'
             }),
