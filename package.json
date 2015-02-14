@@ -45,7 +45,6 @@
     "grunt-contrib-symlink": "^0.3.0",
     "grunt-contrib-requirejs": "0.4.4",
     "grunt-contrib-uglify": "^0.6.0",
-    "grunt-contrib-watch": "^0.6.1",
     "grunt-text-replace": "^0.4.0",
     "qunitjs": "1.14.0"
   },

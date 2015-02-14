@@ -143,33 +143,25 @@ module.exports = function(grunt, args) {
                     }
                 ]
             }
-        },
-        watch: {
-            'test-files': {
-                files: ['tests/**/*.js'],
-                tasks: ['symlink:test-files']
-            }
         }
     });
 
     // must load all tasks manually for user
     require(rootPath + '/node_modules/grunt-contrib-qunit/tasks/qunit')(grunt);
     require(rootPath + '/node_modules/grunt-contrib-connect/tasks/connect')(grunt);
-    require(rootPath + '/node_modules/grunt-contrib-watch/tasks/watch')(grunt);
     require(rootPath + '/node_modules/grunt-contrib-clean/tasks/clean')(grunt);
     require(rootPath + '/node_modules/grunt-contrib-copy/tasks/copy')(grunt);
     require(rootPath + '/node_modules/grunt-contrib-symlink/tasks/symlink')(grunt);
     require(rootPath + '/node_modules/grunt-text-replace/tasks/text-replace')(grunt);
 
     grunt.registerTask('compile_test_content', 'custom file compiler', function () {
-        grunt.task.run(['copy:test-files', 'symlink:test-files']);
         grunt.file.write('tmp/tests/tests.js', compileTestFileContent());
     });
 
-    var tasks = ['clean:tmp', 'compile_test_content'];
+    var tasks = ['clean:tmp', 'copy:test-files', 'symlink:test-files', 'compile_test_content'];
     if (args[0] === 'server') {
         // run test server!
-        tasks.push('connect:test-server');
+        tasks.push('connect:test-server:keepalive');
     } else {
         tasks = tasks.concat(['qunit:local', 'clean:tmp']);
     }
