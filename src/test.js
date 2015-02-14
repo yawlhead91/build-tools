@@ -169,7 +169,7 @@ module.exports = function(grunt, args) {
     var tasks = ['clean:tmp', 'compile_test_content'];
     if (args[0] === 'server') {
         // run test server!
-        tasks.push(['connect:test-server']);
+        tasks.push('connect:test-server');
     } else {
         tasks = tasks.concat(['qunit:local', 'clean:tmp']);
     }
