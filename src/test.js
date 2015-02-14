@@ -149,7 +149,7 @@ module.exports = function(grunt, args) {
         watch: {
             'test-files': {
                 files: ['tests/**/*.js'],
-                tasks: ['copy:test-files']
+                tasks: ['symlink:test-files']
             }
         }
     });
@@ -165,7 +165,7 @@ module.exports = function(grunt, args) {
     require(rootPath + '/node_modules/grunt-text-replace/tasks/text-replace')(grunt);
 
     grunt.registerTask('compile_test_content', 'custom file compiler', function () {
-        grunt.task.run(['copy:test-files']);
+        grunt.task.run(['symlink:test-files']);
         grunt.file.write('tmp/tests/tests.js', compileTestFileContent());
     });
 
