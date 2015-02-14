@@ -160,7 +160,7 @@ module.exports = function(grunt, args) {
     require(rootPath + '/node_modules/grunt-contrib-watch/tasks/watch')(grunt);
     require(rootPath + '/node_modules/grunt-contrib-clean/tasks/clean')(grunt);
     require(rootPath + '/node_modules/grunt-contrib-copy/tasks/copy')(grunt);
-    require('grunt-contrib-symlink')(grunt);
+    require(rootPath + '/node_modules/grunt-contrib-symlink/tasks/symlink')(grunt);
     require(rootPath + '/node_modules/grunt-concurrent/tasks/concurrent')(grunt);
     require(rootPath + '/node_modules/grunt-text-replace/tasks/text-replace')(grunt);
 
