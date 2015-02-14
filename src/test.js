@@ -113,16 +113,22 @@ module.exports = function(grunt, args) {
                 }
             }
         },
-        concurrent: {
-            server: {
-                tasks: ['connect:test-server', 'watch:test-files'],
-                options: {
-                    logConcurrentOutput: true
-                }
-            }
-        },
         clean: {
             tmp: ['tmp']
+        },
+        copy: {
+            'test-files': {
+                files: [
+                    {
+                        expand: true,
+                        cwd: 'node_modules/grunt-build-tools/tests',
+                        dest: 'tmp/tests',
+                        src: [
+                            '**/*'
+                        ]
+                    }
+                ]
+            }
         },
         symlink: {
             'test-files': {
@@ -133,14 +139,6 @@ module.exports = function(grunt, args) {
                         dest: 'tmp/tests/files',
                         src: [
                             '**/*.js'
-                        ]
-                    },
-                    {
-                        expand: true,
-                        cwd: 'node_modules/grunt-build-tools/tests',
-                        dest: 'tmp/tests',
-                        src: [
-                            '**/*'
                         ]
                     }
                 ]
@@ -161,22 +159,20 @@ module.exports = function(grunt, args) {
     require(rootPath + '/node_modules/grunt-contrib-clean/tasks/clean')(grunt);
     require(rootPath + '/node_modules/grunt-contrib-copy/tasks/copy')(grunt);
     require(rootPath + '/node_modules/grunt-contrib-symlink/tasks/symlink')(grunt);
-    require(rootPath + '/node_modules/grunt-concurrent/tasks/concurrent')(grunt);
     require(rootPath + '/node_modules/grunt-text-replace/tasks/text-replace')(grunt);
 
     grunt.registerTask('compile_test_content', 'custom file compiler', function () {
-        grunt.task.run(['symlink:test-files']);
+        grunt.task.run(['copy:test-files', 'symlink:test-files']);
         grunt.file.write('tmp/tests/tests.js', compileTestFileContent());
     });
 
     var tasks = ['clean:tmp', 'compile_test_content'];
     if (args[0] === 'server') {
         // run test server!
-        tasks.push('concurrent:server');
+        tasks.push(['connect:test-server']);
     } else {
         tasks = tasks.concat(['qunit:local', 'clean:tmp']);
     }
-    console.log(grunt.tasks);
     grunt.task.run(tasks);
 
 
