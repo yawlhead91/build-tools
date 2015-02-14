@@ -66,6 +66,7 @@ module.exports = function(grunt, args) {
                 sinon: 'tests/libs/sinon/sinon',
                 'test-utils': 'tests/test-utils'
             }),
+            deps: ['qunit', 'sinon', 'test-utils'],
             shim: extend({}, testRequireConfig.shim, {
                 sinon: {
                     exports: 'sinon'
@@ -100,22 +101,30 @@ module.exports = function(grunt, args) {
                     hostname: '*',
                     base: ['.', 'tmp', 'tmp/tests'],
                     onCreateServer: function(server) {
-                        // when server is killed on UNIX-like systems, call close, so we can remove tmp directory
-                        process.on('SIGINT', function() {
-                            server.close();
-                        });
                         server.on('close', function() {
                             // remove tmp directory
                             deleteFolderRecursive('tmp');
                         });
+                        // when server is killed on UNIX-like systems, call close, so we can remove tmp directory
+                        process.on('SIGINT', function() {
+                            server.close();
+                        });
                     }
+                }
+            }
+        },
+        concurrent: {
+            server: {
+                tasks: ['connect:test-server', 'watch:test-files'],
+                options: {
+                    logConcurrentOutput: true
                 }
             }
         },
         clean: {
             tmp: ['tmp']
         },
-        copy: {
+        symlink: {
             'test-files': {
                 files: [
                     {
@@ -140,44 +149,35 @@ module.exports = function(grunt, args) {
         watch: {
             'test-files': {
                 files: ['tests/**/*.js'],
-                tasks: ['copy:test-files'],
-                options: {
-                    spawn: false
-                }
+                tasks: ['copy:test-files']
             }
         }
     });
 
+    // must load all tasks manually for user
     require(rootPath + '/node_modules/grunt-contrib-qunit/tasks/qunit')(grunt);
     require(rootPath + '/node_modules/grunt-contrib-connect/tasks/connect')(grunt);
     require(rootPath + '/node_modules/grunt-contrib-watch/tasks/watch')(grunt);
     require(rootPath + '/node_modules/grunt-contrib-clean/tasks/clean')(grunt);
     require(rootPath + '/node_modules/grunt-contrib-copy/tasks/copy')(grunt);
+    require('grunt-contrib-symlink')(grunt);
+    require(rootPath + '/node_modules/grunt-concurrent/tasks/concurrent')(grunt);
     require(rootPath + '/node_modules/grunt-text-replace/tasks/text-replace')(grunt);
 
     grunt.registerTask('compile_test_content', 'custom file compiler', function () {
+        grunt.task.run(['copy:test-files']);
         grunt.file.write('tmp/tests/tests.js', compileTestFileContent());
     });
 
+    var tasks = ['clean:tmp', 'compile_test_content'];
     if (args[0] === 'server') {
-        // make alias
-        grunt.task.run([
-            'clean:tmp',
-            'copy:test-files',
-            'compile_test_content',
-            'connect:test-server:keepalive',
-            'watch:test-files'
-        ]);
+        // run test server!
+        tasks.push('concurrent:server');
     } else {
-        grunt.task.run([
-            'clean:tmp',
-            'copy:test-files',
-            'compile_test_content',
-            'connect:test-server',
-            'qunit:local',
-            'clean:tmp'
-        ]);
+        tasks = tasks.concat(['qunit:local', 'clean:tmp']);
     }
+    console.log(grunt.tasks);
+    grunt.task.run(tasks);
 
 
 };
