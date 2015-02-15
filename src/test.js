@@ -158,12 +158,22 @@ module.exports = function(grunt, args) {
         grunt.file.write('tmp/tests/tests.js', compileTestFileContent());
     });
 
-    var tasks = ['clean:tmp', 'copy:test-files', 'symlink:test-files', 'compile_test_content'];
+    var tasks = [
+        'clean:tmp',
+        'copy:test-files',
+        'symlink:test-files',
+        'compile_test_content'
+    ];
+    
     if (args[0] === 'server') {
         // run test server!
         tasks.push('connect:test-server:keepalive');
     } else {
-        tasks = tasks.concat(['qunit:local', 'clean:tmp']);
+        tasks = tasks.concat([
+            'connect:test-server',
+            'qunit:local',
+            'clean:tmp'
+        ]);
     }
     grunt.task.run(tasks);
 
