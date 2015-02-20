@@ -4,8 +4,7 @@ var rootPath = process.cwd();
 
 module.exports = function(grunt, args) {
     var btConfig = grunt.config.get('bt') || {};
-    var dist = btConfig.dist || ['dist'];
-    var uglifyFiles = btConfig.uglifyFiles;
+    var dist = btConfig.dist || 'dist';
 
     grunt.config.merge({
         clean: {
@@ -17,7 +16,7 @@ module.exports = function(grunt, args) {
                     {
                         expand: true,
                         cwd: 'src',
-                        dest: dist[0],
+                        dest: dist,
                         src: [
                             '**/*.js'
                         ]
@@ -25,9 +24,19 @@ module.exports = function(grunt, args) {
                 ]
             }
         },
+        concat: {
+            options: {
+                stripBanners: true
+            },
+            dist: {
+                dest: dist + '/<%= pkg.name %>.js',
+                src: ['src/**/*.js']
+            }
+        },
         uglify: {
-            my_target: {
-                files: uglifyFiles
+            dist: {
+                src: dist + '/<%= pkg.name %>.js',
+                dest: dist + '/<%= pkg.name %>.min.js'
             }
         },
         usebanner: {
@@ -41,7 +50,7 @@ module.exports = function(grunt, args) {
                     linebreak: false
                 },
                 files: {
-                    src: [dist[0] + '/**/*.js']
+                    src: [dist + '/**/*.js']
                 }
             }
         }
@@ -50,16 +59,10 @@ module.exports = function(grunt, args) {
     require(rootPath + '/node_modules/grunt-contrib-clean/tasks/clean')(grunt);
     require(rootPath + '/node_modules/grunt-contrib-copy/tasks/copy')(grunt);
     require(rootPath + '/node_modules/grunt-contrib-uglify/tasks/uglify')(grunt);
+    require(rootPath + '/node_modules/grunt-contrib-concat/tasks/concat')(grunt);
     require(rootPath + '/node_modules/grunt-banner/tasks/usebanner')(grunt);
 
-    var tasks = ['clean:dist', 'copy'];
-
-    if (uglifyFiles) {
-        tasks.push('uglify');
-    }
-    tasks.push('usebanner');
-
-    grunt.task.run(tasks);
+    grunt.task.run(['clean:dist', 'concat', 'uglify', 'usebanner']);
     // run tests
     require('./test')(grunt, args);
 
