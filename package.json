@@ -1,7 +1,7 @@
 {
   "name": "grunt-build-tools",
   "description": "Mark's build tools",
-  "version": "0.2.7",
+  "version": "0.3.0",
   "homepage": "https://github.com/mkay581/build-tools",
   "author": {
     "name": "Mark Kennedy",
