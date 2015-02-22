@@ -1,10 +1,30 @@
 'use strict';
+var glob = require('glob');
 
 var rootPath = process.cwd();
 
 module.exports = function(grunt, args) {
     var btConfig = grunt.config.get('bt') || {};
     var dist = btConfig.dist || 'dist';
+    var srcFiles = glob.sync('**/*.js', {cwd: 'src'});
+
+    var buildBrowserifyFiles = function () {
+        var paths = {};
+        srcFiles.forEach(function (filePath) {
+            paths[dist + '/' + filePath] = ['src/' + filePath];
+        });
+        return paths;
+    };
+
+    var buildUglifyFiles = function () {
+        var paths = {};
+        srcFiles.forEach(function (filePath) {
+            var frags = filePath.split('.js');
+            paths[dist + '/' + frags[0] + '-min.js'] = ['src/' + filePath];
+        });
+        return paths;
+    };
+
 
     grunt.config.merge({
         clean: {
@@ -24,19 +44,9 @@ module.exports = function(grunt, args) {
                 ]
             }
         },
-        concat: {
-            options: {
-                stripBanners: true
-            },
-            dist: {
-                dest: dist + '/<%= pkg.name %>.js',
-                src: ['src/**/*.js']
-            }
-        },
         uglify: {
             dist: {
-                src: dist + '/<%= pkg.name %>.js',
-                dest: dist + '/<%= pkg.name %>.min.js'
+                files: buildUglifyFiles()
             }
         },
         usebanner: {
@@ -53,6 +63,11 @@ module.exports = function(grunt, args) {
                     src: [dist + '/**/*.js']
                 }
             }
+        },
+        browserify: {
+            dist: {
+                files: buildBrowserifyFiles()
+            }
         }
     });
 
@@ -61,8 +76,9 @@ module.exports = function(grunt, args) {
     require(rootPath + '/node_modules/grunt-contrib-uglify/tasks/uglify')(grunt);
     require(rootPath + '/node_modules/grunt-contrib-concat/tasks/concat')(grunt);
     require(rootPath + '/node_modules/grunt-banner/tasks/usebanner')(grunt);
+    require(rootPath + '/node_modules/grunt-browserify/tasks/browserify')(grunt);
 
-    grunt.task.run(['clean:dist', 'concat', 'uglify', 'usebanner']);
+    grunt.task.run(['clean:dist', 'browserify', 'uglify', 'usebanner']);
     // run tests
     require('./test')(grunt, args);
 
