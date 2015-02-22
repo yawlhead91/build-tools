@@ -115,12 +115,12 @@ module.exports = function(grunt, args) {
     });
 
     // must load all tasks manually for user
-    require(extRootPath + '/node_modules/grunt-contrib-qunit/tasks/qunit')(grunt);
-    require(extRootPath + '/node_modules/grunt-contrib-connect/tasks/connect')(grunt);
-    require(extRootPath + '/node_modules/grunt-contrib-clean/tasks/clean')(grunt);
-    require(extRootPath + '/node_modules/grunt-contrib-copy/tasks/copy')(grunt);
-    require(extRootPath + '/node_modules/grunt-text-replace/tasks/text-replace')(grunt);
-    require(extRootPath + '/node_modules/grunt-browserify/tasks/browserify')(grunt);
+    require(intRootPath + '/node_modules/grunt-contrib-qunit/tasks/qunit')(grunt);
+    require(intRootPath + '/node_modules/grunt-contrib-connect/tasks/connect')(grunt);
+    require(intRootPath + '/node_modules/grunt-contrib-clean/tasks/clean')(grunt);
+    require(intRootPath + '/node_modules/grunt-contrib-copy/tasks/copy')(grunt);
+    require(intRootPath + '/node_modules/grunt-text-replace/tasks/text-replace')(grunt);
+    require(intRootPath + '/node_modules/grunt-browserify/tasks/browserify')(grunt);
 
     var tasks = [
         'clean:tmp',
