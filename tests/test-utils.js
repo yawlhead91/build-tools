@@ -1,4 +1,4 @@
-define(function () {
+module.exports = (function () {
 
     // add polyfill for Function.bind for phantomJS (running tests headlessly)
     if (!Function.prototype.bind) {
@@ -54,4 +54,4 @@ define(function () {
 
     return TestUtils;
 
-});
+})();

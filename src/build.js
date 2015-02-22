@@ -25,7 +25,6 @@ module.exports = function(grunt, args) {
         return paths;
     };
 
-
     grunt.config.merge({
         clean: {
             dist: dist
@@ -78,7 +77,7 @@ module.exports = function(grunt, args) {
     require(rootPath + '/node_modules/grunt-banner/tasks/usebanner')(grunt);
     require(rootPath + '/node_modules/grunt-browserify/tasks/browserify')(grunt);
 
-    grunt.task.run(['clean:dist', 'browserify', 'uglify', 'usebanner']);
+    grunt.task.run(['clean:dist', 'browserify:dist', 'uglify', 'usebanner']);
     // run tests
     require('./test')(grunt, args);
 
