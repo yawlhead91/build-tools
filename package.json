@@ -30,8 +30,9 @@
   "scripts": {
     "test": "grunt test"
   },
-  "devDependencies": {
+  "dependencies": {
     "load-grunt-tasks": "0.6.0",
+    "glob": "^4.4.0",
     "grunt-contrib-qunit": "^0.5.2",
     "phantomjs": "~1.9.7",
     "grunt": "~0.4.5",
@@ -45,12 +46,10 @@
     "grunt-contrib-requirejs": "0.4.4",
     "grunt-contrib-uglify": "^0.6.0",
     "grunt-text-replace": "^0.4.0",
+    "resolve": "^1.1.5",
     "sinon": "^1.12.2"
   },
   "keywords": [
     "gruntplugin"
-  ],
-  "dependencies": {
-    "glob": "^4.4.0"
-  }
+  ]
 }

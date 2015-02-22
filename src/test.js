@@ -2,6 +2,7 @@
 
 var glob = require('glob');
 var fs = require('fs');
+var resolve = require('resolve');
 
 var extRootPath = process.cwd();
 var intRootPath = extRootPath + '/node_modules/grunt-build-tools';
@@ -115,12 +116,14 @@ module.exports = function(grunt, args) {
     });
 
     // must load all tasks manually for user
-    require(intRootPath + '/node_modules/grunt-contrib-qunit/tasks/qunit')(grunt);
-    require(intRootPath + '/node_modules/grunt-contrib-connect/tasks/connect')(grunt);
-    require(intRootPath + '/node_modules/grunt-contrib-clean/tasks/clean')(grunt);
-    require(intRootPath + '/node_modules/grunt-contrib-copy/tasks/copy')(grunt);
-    require(intRootPath + '/node_modules/grunt-text-replace/tasks/text-replace')(grunt);
-    require(intRootPath + '/node_modules/grunt-browserify/tasks/browserify')(grunt);
+    grunt.task.loadNpmTasks('grunt-contrib-clean');
+    grunt.task.loadNpmTasks('grunt-contrib-qunit');
+    grunt.task.loadNpmTasks('grunt-contrib-connect');
+    grunt.task.loadNpmTasks('grunt-contrib-clean');
+    grunt.task.loadNpmTasks('grunt-contrib-copy');
+    grunt.task.loadNpmTasks('grunt-text-replace');
+    grunt.task.loadNpmTasks('grunt-browserify');
+
 
     var tasks = [
         'clean:tmp',

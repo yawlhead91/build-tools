@@ -76,12 +76,12 @@ module.exports = function(grunt, args) {
         }
     });
 
-    require(intRootPath + '/node_modules/grunt-contrib-clean/tasks/clean')(grunt);
-    require(intRootPath + '/node_modules/grunt-contrib-copy/tasks/copy')(grunt);
-    require(intRootPath + '/node_modules/grunt-contrib-uglify/tasks/uglify')(grunt);
-    require(intRootPath + '/node_modules/grunt-contrib-concat/tasks/concat')(grunt);
-    require(intRootPath + '/node_modules/grunt-banner/tasks/usebanner')(grunt);
-    require(intRootPath + '/node_modules/grunt-browserify/tasks/browserify')(grunt);
+    //require(intRootPath + '/node_modules/grunt-contrib-clean/tasks/clean')(grunt);
+    //require(intRootPath + '/node_modules/grunt-contrib-copy/tasks/copy')(grunt);
+    //require(intRootPath + '/node_modules/grunt-contrib-uglify/tasks/uglify')(grunt);
+    //require(intRootPath + '/node_modules/grunt-contrib-concat/tasks/concat')(grunt);
+    //require(intRootPath + '/node_modules/grunt-banner/tasks/usebanner')(grunt);
+    //require(intRootPath + '/node_modules/grunt-browserify/tasks/browserify')(grunt);
 
     grunt.task.run(['clean:dist', 'browserify:dist', 'uglify', 'usebanner']);
     // run tests
