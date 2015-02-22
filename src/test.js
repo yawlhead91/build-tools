@@ -4,7 +4,7 @@ var glob = require('glob');
 var fs = require('fs');
 
 var extRootPath = process.cwd();
-var intRootPath = 'node_modules/grunt-build-tools';
+var intRootPath = extRootPath + '/node_modules/grunt-build-tools';
 
 module.exports = function(grunt, args) {
     var config = grunt.config.get('bt') || {},
@@ -38,7 +38,7 @@ module.exports = function(grunt, args) {
     function getBrowserifyTestFilePaths() {
         var paths = {};
         testFilePaths.forEach(function (filePath) {
-            paths['tmp/tests/files/' + filePath] = [filePath];
+            paths['tmp/tests/qunit/files/' + filePath] = [filePath];
         });
         return paths;
     }
@@ -56,7 +56,7 @@ module.exports = function(grunt, args) {
             local: {
                 options: {
                     urls: [
-                        'http://localhost:7755/index.html'
+                        'http://localhost:7755/qunit/index.html'
                     ]
                 }
             }
@@ -85,16 +85,10 @@ module.exports = function(grunt, args) {
         },
         copy: {
             'test-files': {
-                files: [
-                    {
-                        expand: true,
-                        cwd: intRootPath + '/src/test/qunit',
-                        dest: 'tmp/tests/qunit',
-                        src: [
-                            '**/*'
-                        ]
-                    }
-                ]
+                expand: true,
+                cwd: intRootPath + '/src/test',
+                dest: 'tmp/tests',
+                src: ['**/*']
             }
         },
         browserify: {

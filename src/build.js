@@ -2,12 +2,13 @@
 var glob = require('glob');
 var path = require('path');
 
-var rootPath = process.cwd();
+var extRootPath = process.cwd();
+var intRootPath = 'node_modules/grunt-build-tools';
 
 module.exports = function(grunt, args) {
     var btConfig = grunt.config.get('bt') || {},
         dist = btConfig.dist || 'dist',
-        srcFileGlobPatterns = btConfig.src,
+        srcFileGlobPatterns = btConfig.src || [],
         srcFiles = [];
 
     srcFileGlobPatterns.forEach(function (pattern) {
@@ -19,7 +20,7 @@ module.exports = function(grunt, args) {
     var buildBrowserifyFiles = function () {
         var paths = {};
         srcFiles.forEach(function (filePath) {
-            paths[dist + '/' + path.basename(filePath)] = [filePath];
+            paths[extRootPath + '/' + dist + '/' + path.basename(filePath)] = [filePath];
         });
         return paths;
     };
@@ -28,7 +29,7 @@ module.exports = function(grunt, args) {
         var paths = {};
         srcFiles.forEach(function (filePath) {
             var baseFileName = path.basename(filePath).split('.js')[0];
-            paths[dist + '/' + baseFileName + '-min.js'] = [filePath];
+            paths[extRootPath + '/' + dist + '/' + baseFileName + '-min.js'] = [filePath];
         });
         return paths;
     };
@@ -41,12 +42,9 @@ module.exports = function(grunt, args) {
             build: {
                 files: [
                     {
-                        expand: true,
-                        cwd: 'src',
+                        flatten: true,
                         dest: dist,
-                        src: [
-                            '**/*.js'
-                        ]
+                        src: srcFiles
                     }
                 ]
             }
@@ -78,12 +76,12 @@ module.exports = function(grunt, args) {
         }
     });
 
-    require(rootPath + '/node_modules/grunt-contrib-clean/tasks/clean')(grunt);
-    require(rootPath + '/node_modules/grunt-contrib-copy/tasks/copy')(grunt);
-    require(rootPath + '/node_modules/grunt-contrib-uglify/tasks/uglify')(grunt);
-    require(rootPath + '/node_modules/grunt-contrib-concat/tasks/concat')(grunt);
-    require(rootPath + '/node_modules/grunt-banner/tasks/usebanner')(grunt);
-    require(rootPath + '/node_modules/grunt-browserify/tasks/browserify')(grunt);
+    require(intRootPath + '/node_modules/grunt-contrib-clean/tasks/clean')(grunt);
+    require(intRootPath + '/node_modules/grunt-contrib-copy/tasks/copy')(grunt);
+    require(intRootPath + '/node_modules/grunt-contrib-uglify/tasks/uglify')(grunt);
+    require(intRootPath + '/node_modules/grunt-contrib-concat/tasks/concat')(grunt);
+    require(intRootPath + '/node_modules/grunt-banner/tasks/usebanner')(grunt);
+    require(intRootPath + '/node_modules/grunt-browserify/tasks/browserify')(grunt);
 
     grunt.task.run(['clean:dist', 'browserify:dist', 'uglify', 'usebanner']);
     // run tests
