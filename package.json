@@ -34,7 +34,6 @@
     "load-grunt-tasks": "0.6.0",
     "grunt-contrib-qunit": "^0.5.2",
     "phantomjs": "~1.9.7",
-    "glob": "^4.4.0",
     "grunt": "~0.4.5",
     "grunt-banner": "^0.2.3",
     "grunt-browserify": "^3.3.0",
@@ -50,5 +49,8 @@
   },
   "keywords": [
     "gruntplugin"
-  ]
+  ],
+  "dependencies": {
+    "glob": "^4.4.0"
+  }
 }
