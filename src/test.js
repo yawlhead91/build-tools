@@ -3,8 +3,8 @@
 var glob = require('glob');
 var fs = require('fs');
 
-var externalPackagePath = process.cwd();
-var internalPackagePath = 'node_modules/grunt-build-tools';
+var extRootPath = process.cwd();
+var intRootPath = 'node_modules/grunt-build-tools';
 
 module.exports = function(grunt, args) {
     var config = grunt.config.get('bt') || {},
@@ -88,8 +88,8 @@ module.exports = function(grunt, args) {
                 files: [
                     {
                         expand: true,
-                        cwd: internalPackagePath + '/tests',
-                        dest: 'tmp/tests',
+                        cwd: intRootPath + '/src/test/qunit',
+                        dest: 'tmp/tests/qunit',
                         src: [
                             '**/*'
                         ]
@@ -102,7 +102,7 @@ module.exports = function(grunt, args) {
                 files: getBrowserifyTestFilePaths(),
                 options: {
                     alias: [
-                        './tmp/tests/libs/qunit/qunit.js:qunit',
+                        './tmp/tests/qunit/qunit.js:qunit',
                         './tmp/tests/test-utils.js:test-utils'
                     ]
                 }
@@ -110,8 +110,8 @@ module.exports = function(grunt, args) {
         },
         replace: {
             update_test_file: {
-                src: [internalPackagePath + '/tests/index.html'],
-                dest: 'tmp/tests/index.html',
+                src: [intRootPath + '/src/test/qunit/index.html'],
+                dest: 'tmp/tests/qunit/index.html',
                 replacements: [{
                     from: '[TESTS]',
                     to: getTestHtml()
@@ -121,13 +121,13 @@ module.exports = function(grunt, args) {
     });
 
     // must load all tasks manually for user
-    require(externalPackagePath + '/node_modules/grunt-contrib-qunit/tasks/qunit')(grunt);
-    require(externalPackagePath + '/node_modules/grunt-contrib-connect/tasks/connect')(grunt);
-    require(externalPackagePath + '/node_modules/grunt-contrib-clean/tasks/clean')(grunt);
-    require(externalPackagePath + '/node_modules/grunt-contrib-copy/tasks/copy')(grunt);
-    require(externalPackagePath + '/node_modules/grunt-contrib-symlink/tasks/symlink')(grunt);
-    require(externalPackagePath + '/node_modules/grunt-text-replace/tasks/text-replace')(grunt);
-    require(externalPackagePath + '/node_modules/grunt-browserify/tasks/browserify')(grunt);
+    require(intRootPath + '/node_modules/grunt-contrib-qunit/tasks/qunit')(grunt);
+    require(intRootPath + '/node_modules/grunt-contrib-connect/tasks/connect')(grunt);
+    require(intRootPath + '/node_modules/grunt-contrib-clean/tasks/clean')(grunt);
+    require(intRootPath + '/node_modules/grunt-contrib-copy/tasks/copy')(grunt);
+    require(intRootPath + '/node_modules/grunt-contrib-symlink/tasks/symlink')(grunt);
+    require(intRootPath + '/node_modules/grunt-text-replace/tasks/text-replace')(grunt);
+    require(intRootPath + '/node_modules/grunt-browserify/tasks/browserify')(grunt);
 
     var tasks = [
         'clean:tmp',
