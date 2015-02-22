@@ -119,7 +119,6 @@ module.exports = function(grunt, args) {
     require(extRootPath + '/node_modules/grunt-contrib-connect/tasks/connect')(grunt);
     require(extRootPath + '/node_modules/grunt-contrib-clean/tasks/clean')(grunt);
     require(extRootPath + '/node_modules/grunt-contrib-copy/tasks/copy')(grunt);
-    require(extRootPath + '/node_modules/grunt-contrib-symlink/tasks/symlink')(grunt);
     require(extRootPath + '/node_modules/grunt-text-replace/tasks/text-replace')(grunt);
     require(extRootPath + '/node_modules/grunt-browserify/tasks/browserify')(grunt);
 
