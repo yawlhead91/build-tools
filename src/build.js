@@ -1,17 +1,25 @@
 'use strict';
 var glob = require('glob');
+var path = require('path');
 
 var rootPath = process.cwd();
 
 module.exports = function(grunt, args) {
-    var btConfig = grunt.config.get('bt') || {};
-    var dist = btConfig.dist || 'dist';
-    var srcFiles = glob.sync('**/*.js', {cwd: 'src'});
+    var btConfig = grunt.config.get('bt') || {},
+        dist = btConfig.dist || 'dist',
+        srcFileGlobPatterns = btConfig.src,
+        srcFiles = [];
+
+    srcFileGlobPatterns.forEach(function (pattern) {
+        glob.sync(pattern).forEach(function (path) {
+            srcFiles.push(path);
+        });
+    });
 
     var buildBrowserifyFiles = function () {
         var paths = {};
         srcFiles.forEach(function (filePath) {
-            paths[dist + '/' + filePath] = ['src/' + filePath];
+            paths[dist + '/' + path.basename(filePath)] = [filePath];
         });
         return paths;
     };
@@ -19,8 +27,8 @@ module.exports = function(grunt, args) {
     var buildUglifyFiles = function () {
         var paths = {};
         srcFiles.forEach(function (filePath) {
-            var frags = filePath.split('.js');
-            paths[dist + '/' + frags[0] + '-min.js'] = ['src/' + filePath];
+            var baseFileName = path.basename(filePath).split('.js')[0];
+            paths[dist + '/' + baseFileName + '-min.js'] = [filePath];
         });
         return paths;
     };
