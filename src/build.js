@@ -9,7 +9,7 @@ module.exports = function(grunt, args) {
         dist = btConfig.dist || 'dist',
         srcFileGlobPatterns = btConfig.src || [],
         srcFiles = [];
-
+    
     srcFileGlobPatterns.forEach(function (pattern) {
         glob.sync(pattern).forEach(function (path) {
             srcFiles.push(path);
@@ -38,9 +38,7 @@ module.exports = function(grunt, args) {
             dist: dist
         },
         uglify: {
-            dist: {
-                files: buildUglifyFiles()
-            }
+            dist: btConfig.uglify
         },
         usebanner: {
             all: {
@@ -58,9 +56,7 @@ module.exports = function(grunt, args) {
             }
         },
         browserify: {
-            dist: {
-                files: buildBrowserifyFiles()
-            }
+            dist: btConfig.browserify
         }
     });
 

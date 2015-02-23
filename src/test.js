@@ -19,7 +19,7 @@ module.exports = function(grunt, args) {
             testFilePaths.push(filePath);
         });
     });
-    
+
     // deletes a folder and its contents
     // @todo: make this function asynchonous, it's blocking the Ctrl+C SIGINT triggering!
     var deleteFolderRecursive = function(path) {
