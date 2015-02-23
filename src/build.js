@@ -3,7 +3,6 @@ var glob = require('glob');
 var path = require('path');
 
 var extRootPath = process.cwd();
-var intRootPath = extRootPath + '/node_modules/grunt-build-tools';
 
 module.exports = function(grunt, args) {
     var btConfig = grunt.config.get('bt') || {},
@@ -76,12 +75,11 @@ module.exports = function(grunt, args) {
         }
     });
 
-    //require(intRootPath + '/node_modules/grunt-contrib-clean/tasks/clean')(grunt);
-    //require(intRootPath + '/node_modules/grunt-contrib-copy/tasks/copy')(grunt);
-    //require(intRootPath + '/node_modules/grunt-contrib-uglify/tasks/uglify')(grunt);
-    //require(intRootPath + '/node_modules/grunt-contrib-concat/tasks/concat')(grunt);
-    //require(intRootPath + '/node_modules/grunt-banner/tasks/usebanner')(grunt);
-    //require(intRootPath + '/node_modules/grunt-browserify/tasks/browserify')(grunt);
+    grunt.task.loadNpmTasks('grunt-contrib-clean');
+    grunt.task.loadNpmTasks('grunt-contrib-copy');
+    grunt.task.loadNpmTasks('grunt-contrib-uglify');
+    grunt.task.loadNpmTasks('grunt-banner');
+    grunt.task.loadNpmTasks('grunt-browserify');
 
     grunt.task.run(['clean:dist', 'browserify:dist', 'uglify', 'usebanner']);
     // run tests

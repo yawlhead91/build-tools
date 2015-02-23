@@ -2,7 +2,6 @@
 
 var glob = require('glob');
 var fs = require('fs');
-var resolve = require('resolve');
 
 var extRootPath = process.cwd();
 var intRootPath = extRootPath + '/node_modules/grunt-build-tools';
@@ -85,7 +84,7 @@ module.exports = function(grunt, args) {
             tmp: ['tmp']
         },
         copy: {
-            'test-files': {
+            'utility_test_files': {
                 expand: true,
                 cwd: intRootPath + '/src/test',
                 dest: 'tmp/tests',
@@ -94,23 +93,14 @@ module.exports = function(grunt, args) {
         },
         browserify: {
             tests: {
-                files: getBrowserifyTestFilePaths(),
+                src: testFilePaths,
+                dest: 'tmp/tests/qunit/tests.js',
                 options: {
                     alias: [
                         './tmp/tests/qunit/qunit.js:qunit',
                         './tmp/tests/test-utils.js:test-utils'
                     ]
                 }
-            }
-        },
-        replace: {
-            update_test_file: {
-                src: [intRootPath + '/src/test/qunit/index.html'],
-                dest: 'tmp/tests/qunit/index.html',
-                replacements: [{
-                    from: '[TESTS]',
-                    to: getTestHtml()
-                }]
             }
         }
     });
@@ -121,14 +111,12 @@ module.exports = function(grunt, args) {
     grunt.task.loadNpmTasks('grunt-contrib-connect');
     grunt.task.loadNpmTasks('grunt-contrib-clean');
     grunt.task.loadNpmTasks('grunt-contrib-copy');
-    grunt.task.loadNpmTasks('grunt-text-replace');
     grunt.task.loadNpmTasks('grunt-browserify');
 
 
     var tasks = [
         'clean:tmp',
-        'copy:test-files',
-        'replace:update_test_file',
+        'copy:utility_test_files',
         'browserify:tests'
     ];
     
