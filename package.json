@@ -30,7 +30,7 @@
   "scripts": {
     "test": "grunt test"
   },
-  "peerDependencies": {
+  "dependencies": {
     "load-grunt-tasks": ">=0.6.0",
     "glob": "^4.4.0",
     "grunt-contrib-qunit": "^0.5.2",
