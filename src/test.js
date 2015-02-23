@@ -9,8 +9,9 @@ var intRootPath = extRootPath + '/node_modules/grunt-build-tools';
 module.exports = function(grunt, args) {
     var config = grunt.config.get('bt') || {},
         testsConfig = config.tests || {},
-        testFileGlobPatterns = testsConfig.qunit || [],
+        testFileGlobPatterns = testsConfig.qunit.src || [],
         testFilePaths = [];
+
 
     // compile test file array
     testFileGlobPatterns.forEach(function (pattern) {
@@ -18,7 +19,7 @@ module.exports = function(grunt, args) {
             testFilePaths.push(filePath);
         });
     });
-
+    
     // deletes a folder and its contents
     // @todo: make this function asynchonous, it's blocking the Ctrl+C SIGINT triggering!
     var deleteFolderRecursive = function(path) {
@@ -35,20 +36,23 @@ module.exports = function(grunt, args) {
         }
     };
 
-    function getBrowserifyTestFilePaths() {
-        var paths = {};
-        testFilePaths.forEach(function (filePath) {
-            paths['tmp/tests/qunit/files/' + filePath] = [filePath];
-        });
-        return paths;
-    }
-
-    function getTestHtml() {
-        var html = '';
-        testFilePaths.forEach(function (filePath) {
-            html += '<script src="files/' + filePath + '"></script>';
-        });
-        return html;
+    /**
+     * Merges the contents of two or more objects.
+     * @param {object} obj - The target object
+     * @param {...object} - Additional objects who's properties will be merged in
+     */
+    function extend(target) {
+        var merged = target,
+            source, i;
+        for (i = 1; i < arguments.length; i++) {
+            source = arguments[i];
+            for (var prop in source) {
+                if (source.hasOwnProperty(prop)) {
+                    merged[prop] = source[prop];
+                }
+            }
+        }
+        return merged;
     }
 
     grunt.config.merge({
@@ -93,14 +97,13 @@ module.exports = function(grunt, args) {
         },
         browserify: {
             tests: {
-                src: testFilePaths,
-                dest: 'tmp/tests/qunit/tests.js',
-                options: {
+                files: {'tmp/tests/qunit/tests.js': testFilePaths},
+                options: extend({}, testsConfig.qunit.options, {
                     alias: [
                         './tmp/tests/qunit/qunit.js:qunit',
                         './tmp/tests/test-utils.js:test-utils'
                     ]
-                }
+                })
             }
         }
     });

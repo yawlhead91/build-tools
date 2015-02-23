@@ -37,17 +37,6 @@ module.exports = function(grunt, args) {
         clean: {
             dist: dist
         },
-        copy: {
-            build: {
-                files: [
-                    {
-                        flatten: true,
-                        dest: dist,
-                        src: srcFiles
-                    }
-                ]
-            }
-        },
         uglify: {
             dist: {
                 files: buildUglifyFiles()
@@ -76,7 +65,6 @@ module.exports = function(grunt, args) {
     });
 
     grunt.task.loadNpmTasks('grunt-contrib-clean');
-    grunt.task.loadNpmTasks('grunt-contrib-copy');
     grunt.task.loadNpmTasks('grunt-contrib-uglify');
     grunt.task.loadNpmTasks('grunt-banner');
     grunt.task.loadNpmTasks('grunt-browserify');
