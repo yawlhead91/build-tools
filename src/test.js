@@ -9,7 +9,7 @@ var intRootPath = extRootPath + '/node_modules/grunt-build-tools';
 module.exports = function(grunt, args) {
     var config = grunt.config.get('bt') || {},
         testsConfig = config.tests || {},
-        testType = args[0],
+        testType = Object.keys(testsConfig)[0],// only run the first test suite declared.. for now
         keepalive = args[1] === 'server';
 
     // deletes a folder and its contents
