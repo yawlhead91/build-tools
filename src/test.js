@@ -12,15 +12,6 @@ module.exports = function(grunt, args) {
         testType = args[0],
         keepalive = args[1] === 'server';
 
-    function mochaTestHtml() {
-        var html = '';
-        var testFilePaths = testsConfig.mocha ? testsConfig.mocha.src : [];
-        testFilePaths.forEach(function (filePath) {
-            html += '<script src="files/' + filePath + '"></script>';
-        });
-        return html;
-    }
-
     // deletes a folder and its contents
     // @todo: make this function asynchonous, it's blocking the Ctrl+C SIGINT triggering!
     var deleteFolderRecursive = function(path) {
