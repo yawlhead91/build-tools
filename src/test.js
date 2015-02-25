@@ -9,16 +9,17 @@ var intRootPath = extRootPath + '/node_modules/grunt-build-tools';
 module.exports = function(grunt, args) {
     var config = grunt.config.get('bt') || {},
         testsConfig = config.tests || {},
-        testFileGlobPatterns = testsConfig.qunit.src || [],
-        testFilePaths = [];
+        testType = args[0],
+        keepalive = args[1] === 'server';
 
-
-    // compile test file array
-    testFileGlobPatterns.forEach(function (pattern) {
-        glob.sync(pattern).forEach(function (filePath) {
-            testFilePaths.push(filePath);
+    function mochaTestHtml() {
+        var html = '';
+        var testFilePaths = testsConfig.mocha ? testsConfig.mocha.src : [];
+        testFilePaths.forEach(function (filePath) {
+            html += '<script src="files/' + filePath + '"></script>';
         });
-    });
+        return html;
+    }
 
     // deletes a folder and its contents
     // @todo: make this function asynchonous, it's blocking the Ctrl+C SIGINT triggering!
@@ -56,15 +57,6 @@ module.exports = function(grunt, args) {
     }
 
     grunt.config.merge({
-        qunit: {
-            local: {
-                options: {
-                    urls: [
-                        'http://localhost:7755/qunit/index.html'
-                    ]
-                }
-            }
-        },
         connect: {
             'test-server': {
                 options: {
@@ -96,14 +88,40 @@ module.exports = function(grunt, args) {
             }
         },
         browserify: {
-            tests: {
-                files: {'tmp/tests/qunit/tests.js': testFilePaths},
-                options: extend({}, testsConfig.qunit.options, {
+            'tests': {
+                files: [
+                    {
+                        src: testsConfig[testType] ? testsConfig[testType].src : [],
+                        dest: 'tmp/tests/' + testType + '/built-tests.js'
+                    }
+                ],
+
+                options: extend({}, config.options, {
                     alias: [
                         './tmp/tests/qunit/qunit.js:qunit',
                         './tmp/tests/test-utils.js:test-utils'
-                    ]
+                    ],
+                    browserifyOptions: {
+                        debug: true
+                    },
+                    watch: true
                 })
+            }
+        },
+        qunit: {
+            tests: {
+                options: {
+                    urls: [
+                        'http://localhost:7755/qunit/index.html'
+                    ]
+                }
+            }
+        },
+        mocha_phantomjs: {
+            tests: {
+                options: {
+                    urls: ['http://localhost:7755/mocha/index.html']
+                }
             }
         }
     });
@@ -114,7 +132,9 @@ module.exports = function(grunt, args) {
     grunt.task.loadNpmTasks('grunt-contrib-connect');
     grunt.task.loadNpmTasks('grunt-contrib-clean');
     grunt.task.loadNpmTasks('grunt-contrib-copy');
+    grunt.task.loadNpmTasks('grunt-text-replace');
     grunt.task.loadNpmTasks('grunt-browserify');
+    grunt.task.loadNpmTasks('grunt-mocha-phantomjs');
 
 
     var tasks = [
@@ -122,17 +142,20 @@ module.exports = function(grunt, args) {
         'copy:utility_test_files',
         'browserify:tests'
     ];
-    
-    if (args[0] === 'server') {
+
+    if (keepalive) {
         // run test server!
         tasks.push('connect:test-server:keepalive');
     } else {
-        tasks = tasks.concat([
-            'connect:test-server',
-            'qunit:local',
-            'clean:tmp'
-        ]);
+        tasks.push('connect:test-server');
+        if (testType === 'mocha') {
+            tasks.push('mocha_phantomjs');
+        } else if (testType === 'qunit') {
+            tasks.push('qunit:tests');
+        }
+        tasks.push('clean:tmp');
     }
+
     grunt.task.run(tasks);
 
 
