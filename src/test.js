@@ -55,13 +55,12 @@ module.exports = function(grunt, args) {
                     hostname: '*',
                     base: ['.', 'tmp', 'tmp/tests'],
                     onCreateServer: function(server) {
-                        server.on('close', function() {
-                            // remove tmp directory
-                            deleteFolderRecursive('tmp');
-                        });
                         // when server is killed on UNIX-like systems, call close, so we can remove tmp directory
                         process.on('SIGINT', function() {
+                            // remove tmp directory
+                            deleteFolderRecursive('tmp');
                             server.close();
+                            process.exit();
                         });
                     }
                 }
@@ -89,8 +88,7 @@ module.exports = function(grunt, args) {
 
                 options: extend({}, config.options, {
                     alias: [
-                        './tmp/tests/qunit/qunit.js:qunit',
-                        './tmp/tests/test-utils.js:test-utils'
+                        './tmp/tests/qunit/qunit.js:qunit'
                     ],
                     browserifyOptions: {
                         debug: true
