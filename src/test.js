@@ -116,13 +116,15 @@ module.exports = function(grunt, args) {
     });
 
     // must load all tasks manually for user
-    grunt.task.loadNpmTasks('grunt-contrib-clean');
-    grunt.task.loadNpmTasks('grunt-contrib-qunit');
-    grunt.task.loadNpmTasks('grunt-contrib-connect');
-    grunt.task.loadNpmTasks('grunt-contrib-copy');
-    grunt.task.loadNpmTasks('grunt-browserify');
-    grunt.task.loadNpmTasks('grunt-text-replace');
-    grunt.task.loadNpmTasks('grunt-mocha-phantomjs');
+    var internalNpmPath = path.resolve(__dirname, '../node_modules');
+    grunt.task.loadTasks(internalNpmPath + '/grunt-contrib-clean/tasks');
+    grunt.task.loadTasks(internalNpmPath + '/grunt-contrib-qunit/tasks');
+    grunt.task.loadTasks(internalNpmPath + '/grunt-contrib-connect/tasks');
+    grunt.task.loadTasks(internalNpmPath + '/grunt-contrib-copy/tasks');
+    grunt.task.loadTasks(internalNpmPath + '/grunt-browserify/tasks');
+    grunt.task.loadTasks(internalNpmPath + '/grunt-text-replace/tasks');
+    grunt.task.loadTasks(internalNpmPath + '/grunt-mocha-phantomjs/tasks');
+
 
     var tasks = [
         'clean:tmp',
