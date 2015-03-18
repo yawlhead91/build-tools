@@ -1,7 +1,7 @@
 'use strict';
 
-var glob = require('glob');
 var fs = require('fs');
+var path = require('path');
 
 var extRootPath = process.cwd();
 var intRootPath = extRootPath + '/node_modules/grunt-build-tools';
