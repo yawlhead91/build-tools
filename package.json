@@ -1,7 +1,7 @@
 {
   "name": "grunt-build-tools",
   "description": "Mark's build tools",
-  "version": "0.8.3",
+  "version": "0.8.0",
   "homepage": "https://github.com/mkay581/build-tools",
   "author": {
     "name": "Mark Kennedy",
@@ -31,26 +31,22 @@
     "test": "grunt test"
   },
   "dependencies": {
+    "browserify": "^9.0.3",
+    "clean": "^4.0.1",
+    "connect": "^3.3.5",
+    "fs-extra": "^0.16.5",
     "glob": "^4.4.0",
     "grunt": "~0.4.5",
     "grunt-banner": "^0.2.3",
-    "grunt-bump": "^0.0.16",
-    "grunt-mocha": "^0.4.11",
-    "load-grunt-tasks": ">=0.6.0",
     "mocha": "^2.1.0",
-    "phantomjs": "~1.9.7",
-    "sinon": "^1.12.2"
-  },
-  "peerDependencies": {
-    "grunt-browserify": "^3.3.0",
-    "grunt-mocha-phantomjs": "^0.6.0",
-    "grunt-text-replace": "^0.4.0",
-    "grunt-contrib-clean": "^0.6.0",
-    "grunt-contrib-connect": "^0.9.0",
-    "grunt-contrib-copy": "^0.6.0",
-    "grunt-contrib-qunit": "^0.5.2",
-    "grunt-contrib-requirejs": "^0.4.4",
-    "grunt-contrib-uglify": "^0.6.0"
+    "mocha-phantomjs": "^3.5.3",
+    "node-qunit-phantomjs": "^1.2.0",
+    "promise": "^6.1.0",
+    "replace": "^0.3.0",
+    "semver": "^4.3.1",
+    "serve-static": "^1.9.2",
+    "sinon": "^1.12.2",
+    "vinyl-source-stream": "^1.1.0"
   },
   "keywords": [
     "gruntplugin"

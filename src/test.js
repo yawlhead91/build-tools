@@ -1,149 +1,178 @@
 'use strict';
 
-var fs = require('fs');
-var path = require('path');
+var fs = require('fs-extra');
+var browserify = require('browserify');
+var spawn = require('child_process').spawn;
+var Promise = require('promise');
+var connect = require('connect');
+var glob = require('glob');
+var serveStatic = require('serve-static');
+var source = require('vinyl-source-stream');
 
-var extRootPath = process.cwd();
-var intRootPath = extRootPath + '/node_modules/grunt-build-tools';
+var server;
+var tempDir = process.cwd() + '/tmp';
 
 module.exports = function(grunt, args) {
     var config = grunt.config.get('bt') || {},
         testsConfig = config.tests || {},
-        testType = Object.keys(testsConfig)[0],// only run the first test suite declared.. for now
-        keepalive = args[1] === 'server';
+        testType = Object.keys(testsConfig)[0];// only run the first test suite declared.. for now
 
-    // deletes a folder and its contents
-    // @todo: make this function asynchonous, it's blocking the Ctrl+C SIGINT triggering!
-    var deleteFolderRecursive = function(path) {
-        if( fs.existsSync(path) ) {
-            fs.readdirSync(path).forEach(function(file,index){
-                var curPath = path + "/" + file;
-                if(fs.lstatSync(curPath).isDirectory()) { // recurse
-                    deleteFolderRecursive(curPath);
-                } else { // delete file
-                    fs.unlinkSync(curPath);
+    var options = {
+        keepalive: args[1] === 'server',
+        port: 7755,
+        type: testType
+    };
+    function clean() {
+        console.log('cleaning files...');
+        return new Promise(function (resolve, reject) {
+            fs.remove(tempDir, function (err) {
+                if (err) {
+                    console.error(err);
+                    reject(err);
+                } else {
+                    resolve();
+                    console.log('files cleaned!');
                 }
             });
-            fs.rmdirSync(path);
-        }
-    };
-
-    /**
-     * Merges the contents of two or more objects.
-     * @param {object} obj - The target object
-     * @param {...object} - Additional objects who's properties will be merged in
-     */
-    function extend(target) {
-        var merged = target,
-            source, i;
-        for (i = 1; i < arguments.length; i++) {
-            source = arguments[i];
-            for (var prop in source) {
-                if (source.hasOwnProperty(prop)) {
-                    merged[prop] = source[prop];
-                }
-            }
-        }
-        return merged;
+        });
     }
 
-    grunt.config.merge({
-        connect: {
-            'test-server': {
-                options: {
-                    port: 7755,
-                    hostname: '*',
-                    base: ['.', 'tmp', 'tmp/tests'],
-                    onCreateServer: function(server) {
-                        // when server is killed on UNIX-like systems, call close, so we can remove tmp directory
-                        process.on('SIGINT', function() {
-                            // remove tmp directory
-                            deleteFolderRecursive('tmp');
-                            server.close();
-                            process.exit();
+    function runBrowserify() {
+        console.log('browserifyin...');
+        var fileGlobs = testsConfig[testType] ? testsConfig[testType].src : [],
+            outputFile = tempDir + '/tests/built-tests.js',
+            data = '',
+            stream;
+        return new Promise(function (resolve, reject) {
+            fileGlobs.forEach(function (pattern) {
+                glob(pattern, function (err, paths) {
+                    var b = browserify({
+                        basedir: process.cwd() + '/',
+                        debug: true,
+                        insertGlobalVars: {
+                            qunit: function () {
+                                return {
+                                    id: tempDir + '/tests/qunit/qunit.js'
+                                }
+                            }
+                        }
+                    });
+                    if (!err) {
+                        console.log(paths);
+                        paths.forEach(function (path) {
+                            b.add(process.cwd() + '/' + path);
                         });
+                        stream = b.bundle();
+
+                        stream.on('data', function (d) {
+                            data += d.toString();
+                        });
+                        stream.on('end', function () {
+                            console.log(data);
+                            fs.outputFile(outputFile, data, function (err) {
+                                if (err) reject(err);
+                                resolve();
+                            });
+                        });
+                        stream.on('error', console.log);
+                    } else {
+                        console.error(err);
+                        reject();
                     }
-                }
-            }
-        },
-        clean: {
-            tmp: ['tmp']
-        },
-        copy: {
-            'utility_test_files': {
-                expand: true,
-                cwd: intRootPath + '/src/test',
-                dest: 'tmp/tests',
-                src: ['**/*']
-            }
-        },
-        browserify: {
-            'tests': {
-                files: [
-                    {
-                        src: testsConfig[testType] ? testsConfig[testType].src : [],
-                        dest: 'tmp/tests/' + testType + '/built-tests.js'
-                    }
-                ],
-
-                options: extend({}, config.options, {
-                    alias: [
-                        './tmp/tests/qunit/qunit.js:qunit'
-                    ],
-                    browserifyOptions: {
-                        debug: true
-                    },
-                    watch: true
-                })
-            }
-        },
-        qunit: {
-            tests: {
-                options: {
-                    urls: [
-                        'http://localhost:7755/qunit/index.html'
-                    ]
-                }
-            }
-        },
-        mocha_phantomjs: {
-            tests: {
-                options: {
-                    urls: ['http://localhost:7755/mocha/index.html']
-                }
-            }
-        }
-    });
-
-    // must load all tasks manually for user
-    grunt.task.loadNpmTasks('grunt-contrib-clean');
-    grunt.task.loadNpmTasks('grunt-contrib-qunit');
-    grunt.task.loadNpmTasks('grunt-contrib-connect');
-    grunt.task.loadNpmTasks('grunt-contrib-copy');
-    grunt.task.loadNpmTasks('grunt-browserify');
-    grunt.task.loadNpmTasks('grunt-text-replace');
-    grunt.task.loadNpmTasks('grunt-mocha-phantomjs');
-
-    var tasks = [
-        'clean:tmp',
-        'copy:utility_test_files',
-        'browserify:tests'
-    ];
-
-    if (keepalive) {
-        // run test server!
-        tasks.push('connect:test-server:keepalive');
-    } else {
-        tasks.push('connect:test-server');
-        if (testType === 'mocha') {
-            tasks.push('mocha_phantomjs');
-        } else if (testType === 'qunit') {
-            tasks.push('qunit:tests');
-        }
-        tasks.push('clean:tmp');
+                });
+            });
+        }).then(function () {
+                console.log('browserifyin done');
+            });
     }
 
-    grunt.task.run(tasks);
+    function runMochaTest() {
+        var data = '',
+            child = spawn(['mocha-phantomjs'], ['http://localhost:7755/index.html']);
+        console.log('running tests...');
+        return new Promise(function (resolve) {
+            //child.stdout.on('data', function (buffer) {
+            //    data += buffer.toString();
+            //    console.log(data);
+            //});
+            //child.stdout.on('end', function () {
+                resolve();
+            //    console.log('done running tests');
+            //});
+        });
+    }
 
+    function copyFiles(options) {
+        console.log('copying test files over');
+        return new Promise(function (resolve, reject) {
+            fs.copy(__dirname + '/test/' + options.type, tempDir + '/tests', function(err) {
+                if (err) {
+                    console.error(err);
+                    reject(err);
+                } else {
+                    console.log('files copied!');
+                    resolve();
+                }
+            });
+        });
+    }
 
+    function stopServer(options) {
+        return new Promise(function (resolve) {
+            // never resolve promise if we're keeping the server alive
+            if (!options.keepalive) {
+                console.log('shutting down server...');
+                server.close();
+                resolve();
+            }
+        });
+    }
+
+    function runServer(options) {
+        var folders = ['.' + tempDir, tempDir + '/tests'];
+        console.log('running server...');
+        return new Promise(function (resolve) {
+            // run test server!
+            var app = connect();
+            // serve multiple directories
+            folders.forEach(function (folder) {
+                console.log(folder);
+                app.use(serveStatic(folder));
+            });
+            //create node.js http server and listen on port
+            server = app.listen(options.port);
+
+            // when server is killed on UNIX-like systems, call close
+            process.on('SIGINT', function() {
+                server.close();
+                resolve();
+            });
+        });
+    }
+
+    function runTest(options) {
+        console.log('running ' + options.type + ' tests...');
+        return runServer(options).then(function () {
+            if (!options.keepalive) {
+                return runMochaTest().then(function () {
+                    return stopServer(options);
+                });
+            }
+        });
+    }
+
+    return clean().then(function () {
+        return runBrowserify().then(function () {
+            return copyFiles(options).then(function() {
+                return runServer(options).then(function () {
+                    return runTest(testType).then(function () {
+                        return clean();
+                    });
+                });
+            });
+        });
+    }).catch(function (err) {
+        console.error(err);
+        clean();
+    });
 };
