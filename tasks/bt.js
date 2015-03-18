@@ -15,7 +15,9 @@ module.exports = function(grunt) {
             done = this.async();
         if (command) {
             require('./../src/' + command)(grunt, Array.prototype.slice.call(arguments, 1))
-                .then(done);
+                .then(done, function () {
+                    done(false);
+                });
         } else if (!command) {
             grunt.log.error('you must specify a bt command');
         } else {

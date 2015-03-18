@@ -40,13 +40,13 @@
     "grunt-banner": "^0.2.3",
     "mocha": "^2.1.0",
     "mocha-phantomjs": "^3.5.3",
+    "ncp": "^2.0.0",
     "node-qunit-phantomjs": "^1.2.0",
     "promise": "^6.1.0",
     "replace": "^0.3.0",
     "semver": "^4.3.1",
     "serve-static": "^1.9.2",
-    "sinon": "^1.12.2",
-    "vinyl-source-stream": "^1.1.0"
+    "sinon": "^1.12.2"
   },
   "keywords": [
     "gruntplugin"

@@ -7,10 +7,13 @@ var Promise = require('promise');
 var connect = require('connect');
 var glob = require('glob');
 var serveStatic = require('serve-static');
-var source = require('vinyl-source-stream');
+var path = require('path');
 
 var server;
 var tempDir = process.cwd() + '/tmp';
+
+var ncp = require('ncp').ncp;
+ncp.limit = 16;
 
 module.exports = function(grunt, args) {
     var config = grunt.config.get('bt') || {},
@@ -47,10 +50,14 @@ module.exports = function(grunt, args) {
             fileGlobs.forEach(function (pattern) {
                 glob(pattern, function (err, paths) {
                     var b = browserify({
-                        basedir: process.cwd() + '/',
                         debug: true,
                         insertGlobalVars: {
                             qunit: function () {
+                                return {
+                                    id: tempDir + '/tests/qunit/qunit.js'
+                                }
+                            },
+                            'test-utils': function () {
                                 return {
                                     id: tempDir + '/tests/qunit/qunit.js'
                                 }
@@ -58,17 +65,15 @@ module.exports = function(grunt, args) {
                         }
                     });
                     if (!err) {
-                        console.log(paths);
+                        // must add each path individual unfortunately.
                         paths.forEach(function (path) {
                             b.add(process.cwd() + '/' + path);
                         });
                         stream = b.bundle();
-
                         stream.on('data', function (d) {
                             data += d.toString();
                         });
                         stream.on('end', function () {
-                            console.log(data);
                             fs.outputFile(outputFile, data, function (err) {
                                 if (err) reject(err);
                                 resolve();
@@ -102,16 +107,43 @@ module.exports = function(grunt, args) {
         });
     }
 
+    function copyFile(filePath) {
+        var testsDir = tempDir + '/tests'
+        ncp(filePath, testsDir, function (err) {
+            if (!err) {
+                ncp(internalPath + '/test-utils.js', testsDir, function (err) {
+                    console.log(err);
+                    if (!err) {
+                        console.log('files copied!');
+                        resolve();
+                    } else {
+                        reject(err);
+                    }
+                });
+            } else {
+                console.log(err);
+                reject(err);
+            }
+        })
+    }
+
     function copyFiles(options) {
+        var testsDir = tempDir + '/tests',
+            internalPath = path.join(__dirname, '/test');
         console.log('copying test files over');
         return new Promise(function (resolve, reject) {
-            fs.copy(__dirname + '/test/' + options.type, tempDir + '/tests', function(err) {
-                if (err) {
-                    console.error(err);
-                    reject(err);
+            ncp(internalPath + '/' + options.type + '/', testsDir, function (err) {
+                if (!err) {
+                    ncp(internalPath + '/test-utils.js', testsDir, function (err) {
+                        if (!err) {
+                            console.log('files copied!');
+                            resolve();
+                        } else {
+                            reject(err);
+                        }
+                    });
                 } else {
-                    console.log('files copied!');
-                    resolve();
+                    reject(err);
                 }
             });
         });
