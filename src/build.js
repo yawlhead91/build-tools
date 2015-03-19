@@ -1,8 +1,9 @@
 'use strict';
 var glob = require('glob');
 var path = require('path');
+var Promise = require('promise');
 
-var extRootPath = process.cwd();
+var internalModulePath = path.resolve(__dirname, '..');
 
 module.exports = function(grunt, args) {
     var btConfig = grunt.config.get('bt') || {},
@@ -19,7 +20,7 @@ module.exports = function(grunt, args) {
     var buildBrowserifyFiles = function () {
         var paths = {};
         srcFiles.forEach(function (filePath) {
-            paths[extRootPath + '/' + dist + '/' + path.basename(filePath)] = [filePath];
+            paths[process.cwd() + '/' + dist + '/' + path.basename(filePath)] = [filePath];
         });
         return paths;
     };
@@ -28,7 +29,7 @@ module.exports = function(grunt, args) {
         var paths = {};
         srcFiles.forEach(function (filePath) {
             var baseFileName = path.basename(filePath).split('.js')[0];
-            paths[extRootPath + '/' + dist + '/' + baseFileName + '-min.js'] = [filePath];
+            paths[process.cwd() + '/' + dist + '/' + baseFileName + '-min.js'] = [filePath];
         });
         return paths;
     };
@@ -60,13 +61,15 @@ module.exports = function(grunt, args) {
         }
     });
 
-    grunt.task.loadNpmTasks('grunt-contrib-clean');
-    grunt.task.loadNpmTasks('grunt-contrib-uglify');
-    grunt.task.loadNpmTasks('grunt-banner');
-    grunt.task.loadNpmTasks('grunt-browserify');
+    require(internalModulePath + '/node_modules/grunt-contrib-clean/tasks/clean')(grunt);
+    require(internalModulePath + '/node_modules/grunt-contrib-uglify/tasks/uglify')(grunt);
+    require(internalModulePath + '/node_modules/grunt-banner/tasks/usebanner')(grunt);
+    require(internalModulePath + '/node_modules/grunt-browserify/tasks/browserify')(grunt);
 
     grunt.task.run(['clean:dist', 'browserify:dist', 'uglify', 'usebanner']);
     // run tests
     require('./test')(grunt, args);
+
+    return Promise.resolve();
 
 };

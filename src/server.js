@@ -1,5 +1,7 @@
 'use strict';
 
+var Promise = require('promise');
+
 module.exports = function(grunt, args) {
 
     grunt.config.merge({
@@ -14,5 +16,7 @@ module.exports = function(grunt, args) {
     require(process.cwd() + '/node_modules/grunt-contrib-connect/tasks/connect')(grunt);
 
     grunt.task.run(['connect:local']);
+
+    return Promise.resolve();
 
 };

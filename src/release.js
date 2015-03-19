@@ -1,4 +1,5 @@
 'use strict';
+var Promise = require('promise');
 
 module.exports = function(grunt, args) {
 
@@ -20,5 +21,7 @@ module.exports = function(grunt, args) {
         'bump:' + (args[0] || 'patch'),
         'bt:build'
     ]);
+
+    return Promise.resolve();
 
 };
