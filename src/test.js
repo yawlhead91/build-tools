@@ -62,7 +62,6 @@ module.exports = function(grunt, args) {
                 glob(pattern, function (err, paths) {
                     var b = browserify({
                         debug: true
-                        //insertGlobalVars: buildGlobalVars(options),
                     });
                     if (!err) {
                         // must add each path individual unfortunately.
@@ -71,7 +70,6 @@ module.exports = function(grunt, args) {
                         });
                         // require global files
                         _.each(buildGlobalRequirePaths(options), function (path, id) {
-                            console.log(path);
                             b.require(path, {expose: id});
                         });
 
@@ -85,9 +83,8 @@ module.exports = function(grunt, args) {
                                 resolve();
                             });
                         });
-                        stream.on('error', console.log);
+                        stream.on('error', reject);
                     } else {
-                        console.error(err);
                         reject();
                     }
                 });
@@ -105,9 +102,12 @@ module.exports = function(grunt, args) {
             },
             cmd = internalModulePath + '/node_modules/.bin/' + nameMap[options.type],
             child;
+
         console.log('running ' + options.type + ' tests...');
+
         child = spawn(cmd, ['http://localhost:7755/index.html']);
-        return new Promise(function (resolve) {
+
+        return new Promise(function (resolve, reject) {
             child.stdout.on('data', function (buffer) {
                 data += buffer.toString();
                 console.log(data);
@@ -117,7 +117,7 @@ module.exports = function(grunt, args) {
                 console.log('done running tests');
             });
 
-            child.stdout.on('error', console.log);
+            child.stdout.on('error', reject);
         });
     }
 
@@ -138,7 +138,6 @@ module.exports = function(grunt, args) {
                             }
                         });
                     } else {
-                        console.log(err);
                         reject(err);
                     }
                 });
@@ -164,7 +163,6 @@ module.exports = function(grunt, args) {
             var app = connect();
             // serve multiple directories
             folders.forEach(function (folder) {
-                console.log(folder);
                 app.use(serveStatic(folder));
             });
             //create node.js http server and listen on port
