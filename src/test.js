@@ -148,9 +148,8 @@ module.exports = function(grunt, args) {
 
     function stopServer() {
         return new Promise(function (resolve) {
-            // never resolve promise if we're keeping the server alive
-            if (!options.keepalive) {
-                console.log('shutting down server...');
+            console.log('shutting down server...');
+            if (server) {
                 server.close();
                 resolve();
             }
@@ -174,10 +173,11 @@ module.exports = function(grunt, args) {
             // when server is killed on UNIX-like systems, call close
             process.on('SIGINT', function() {
                 server.close();
+            });
+            server.on('close', function () {
                 resolve();
             });
             console.log('server started!');
-            resolve();
         });
     }
 
