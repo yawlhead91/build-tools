@@ -68,8 +68,5 @@ module.exports = function(grunt, args) {
 
     grunt.task.run(['clean:dist', 'browserify:dist', 'uglify', 'usebanner']);
     // run tests
-    require('./test')(grunt, args);
-
-    return Promise.resolve();
-
+    return require('./test')(grunt, args);
 };
