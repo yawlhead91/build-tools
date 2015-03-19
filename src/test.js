@@ -178,6 +178,10 @@ module.exports = function(grunt, args) {
                 resolve();
             });
             console.log('server started!');
+
+            if (!options.keepalive) {
+                resolve();
+            }
         });
     }
 
