@@ -8,9 +8,11 @@ var connect = require('connect');
 var glob = require('glob');
 var serveStatic = require('serve-static');
 var path = require('path');
+var _ = require('underscore');
 
 var server;
 var tempDir = process.cwd() + '/tmp';
+var internalModulePath = path.resolve(__dirname, '..');
 
 var ncp = require('ncp').ncp;
 ncp.limit = 16;
@@ -40,6 +42,15 @@ module.exports = function(grunt, args) {
         });
     }
 
+    function buildGlobalRequirePaths() {
+        var paths = {};
+        if (options.type === 'qunit') {
+            paths['qunit'] = tempDir + '/tests/qunit.js';
+        }
+        paths['test-utils'] = tempDir + '/tests/test-utils.js';
+        return paths;
+    }
+
     function runBrowserify() {
         console.log('browserifyin...');
         var fileGlobs = testsConfig[testType] ? testsConfig[testType].src : [],
@@ -50,25 +61,20 @@ module.exports = function(grunt, args) {
             fileGlobs.forEach(function (pattern) {
                 glob(pattern, function (err, paths) {
                     var b = browserify({
-                        debug: true,
-                        insertGlobalVars: {
-                            qunit: function () {
-                                return {
-                                    id: tempDir + '/tests/qunit/qunit.js'
-                                }
-                            },
-                            'test-utils': function () {
-                                return {
-                                    id: tempDir + '/tests/qunit/qunit.js'
-                                }
-                            }
-                        }
+                        debug: true
+                        //insertGlobalVars: buildGlobalVars(options),
                     });
                     if (!err) {
                         // must add each path individual unfortunately.
                         paths.forEach(function (path) {
                             b.add(process.cwd() + '/' + path);
                         });
+                        // require global files
+                        _.each(buildGlobalRequirePaths(options), function (path, id) {
+                            console.log(path);
+                            b.require(path, {expose: id});
+                        });
+
                         stream = b.bundle();
                         stream.on('data', function (d) {
                             data += d.toString();
@@ -91,65 +97,56 @@ module.exports = function(grunt, args) {
             });
     }
 
-    function runMochaTest() {
+    function test() {
         var data = '',
-            child = spawn(['mocha-phantomjs'], ['http://localhost:7755/index.html']);
-        console.log('running tests...');
+            nameMap = {
+                mocha: 'mocha-phantomjs',
+                qunit: 'node-qunit-phantomjs'
+            },
+            cmd = internalModulePath + '/node_modules/.bin/' + nameMap[options.type],
+            child;
+        console.log('running ' + options.type + ' tests...');
+        child = spawn(cmd, ['http://localhost:7755/index.html']);
         return new Promise(function (resolve) {
-            //child.stdout.on('data', function (buffer) {
-            //    data += buffer.toString();
-            //    console.log(data);
-            //});
-            //child.stdout.on('end', function () {
+            child.stdout.on('data', function (buffer) {
+                data += buffer.toString();
+                console.log(data);
+            });
+            child.stdout.on('end', function () {
                 resolve();
-            //    console.log('done running tests');
-            //});
+                console.log('done running tests');
+            });
+
+            child.stdout.on('error', console.log);
         });
     }
 
-    function copyFile(filePath) {
-        var testsDir = tempDir + '/tests'
-        ncp(filePath, testsDir, function (err) {
-            if (!err) {
-                ncp(internalPath + '/test-utils.js', testsDir, function (err) {
-                    console.log(err);
-                    if (!err) {
-                        console.log('files copied!');
-                        resolve();
-                    } else {
-                        reject(err);
-                    }
-                });
-            } else {
-                console.log(err);
-                reject(err);
-            }
-        })
-    }
-
-    function copyFiles(options) {
-        var testsDir = tempDir + '/tests',
+    function copyFiles() {
+        var testsDir = tempDir + '/tests/',
             internalPath = path.join(__dirname, '/test');
         console.log('copying test files over');
         return new Promise(function (resolve, reject) {
-            ncp(internalPath + '/' + options.type + '/', testsDir, function (err) {
-                if (!err) {
-                    ncp(internalPath + '/test-utils.js', testsDir, function (err) {
-                        if (!err) {
-                            console.log('files copied!');
-                            resolve();
-                        } else {
-                            reject(err);
-                        }
-                    });
-                } else {
-                    reject(err);
-                }
+            fs.ensureDir(testsDir, function () {
+                ncp(internalPath + '/' + options.type + '/', testsDir, function (err) {
+                    if (!err) {
+                        ncp(internalPath + '/test-utils.js', testsDir + '/test-utils.js', function (err) {
+                            if (!err) {
+                                console.log('files copied!');
+                                resolve();
+                            } else {
+                                reject(err);
+                            }
+                        });
+                    } else {
+                        console.log(err);
+                        reject(err);
+                    }
+                });
             });
         });
     }
 
-    function stopServer(options) {
+    function stopServer() {
         return new Promise(function (resolve) {
             // never resolve promise if we're keeping the server alive
             if (!options.keepalive) {
@@ -160,7 +157,7 @@ module.exports = function(grunt, args) {
         });
     }
 
-    function runServer(options) {
+    function runServer() {
         var folders = ['.' + tempDir, tempDir + '/tests'];
         console.log('running server...');
         return new Promise(function (resolve) {
@@ -179,27 +176,26 @@ module.exports = function(grunt, args) {
                 server.close();
                 resolve();
             });
+            console.log('server started!');
+            resolve();
         });
     }
 
-    function runTest(options) {
-        console.log('running ' + options.type + ' tests...');
-        return runServer(options).then(function () {
+    function runTest() {
+        return runServer().then(function () {
             if (!options.keepalive) {
-                return runMochaTest().then(function () {
-                    return stopServer(options);
+                return test().then(function () {
+                    return stopServer();
                 });
             }
         });
     }
 
     return clean().then(function () {
-        return runBrowserify().then(function () {
-            return copyFiles(options).then(function() {
-                return runServer(options).then(function () {
-                    return runTest(testType).then(function () {
-                        return clean();
-                    });
+        return copyFiles().then(function() {
+            return runBrowserify().then(function () {
+                return runTest().then(function () {
+                    return clean();
                 });
             });
         });
