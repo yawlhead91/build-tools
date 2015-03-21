@@ -1,14 +1,13 @@
 'use strict';
 
 var fs = require('fs-extra');
-var browserify = require('browserify');
 var spawn = require('child_process').spawn;
 var Promise = require('promise');
 var connect = require('connect');
-var glob = require('glob');
 var serveStatic = require('serve-static');
 var path = require('path');
 var _ = require('underscore');
+var utils = require('./utils');
 
 var server;
 var tempDir = process.cwd() + '/tmp';
@@ -27,71 +26,27 @@ module.exports = function(grunt, args) {
         port: 7755,
         type: testType
     };
-    function clean() {
-        console.log('cleaning files...');
-        return new Promise(function (resolve, reject) {
-            fs.remove(tempDir, function (err) {
-                if (err) {
-                    console.error(err);
-                    reject(err);
-                } else {
-                    resolve();
-                    console.log('files cleaned!');
-                }
-            });
-        });
-    }
 
-    function buildGlobalRequirePaths() {
-        var paths = {};
-        if (options.type === 'qunit') {
-            paths['qunit'] = tempDir + '/tests/qunit.js';
-        }
-        paths['test-utils'] = tempDir + '/tests/test-utils.js';
-        return paths;
+    function clean() {
+        return utils.clean(tempDir);
     }
 
     function runBrowserify() {
-        console.log('browserifyin...');
-        var fileGlobs = testsConfig[testType] ? testsConfig[testType].src : [],
-            outputFile = tempDir + '/tests/built-tests.js',
-            data = '',
-            stream;
-        return new Promise(function (resolve, reject) {
-            fileGlobs.forEach(function (pattern) {
-                glob(pattern, function (err, paths) {
-                    var b = browserify({
-                        debug: true
-                    });
-                    if (!err) {
-                        // must add each path individual unfortunately.
-                        paths.forEach(function (path) {
-                            b.add(process.cwd() + '/' + path);
-                        });
-                        // require global files
-                        _.each(buildGlobalRequirePaths(options), function (path, id) {
-                            b.require(path, {expose: id});
-                        });
+        var requirePaths = {};
+        if (options.type === 'qunit') {
+            requirePaths['qunit'] = tempDir + '/tests/qunit.js';
+        }
+        requirePaths['test-utils'] = tempDir + '/tests/test-utils.js';
+        var fileMap = {};
+        fileMap[tempDir + '/tests/built-tests.js'] = testsConfig[testType] ? testsConfig[testType].src : [];
 
-                        stream = b.bundle();
-                        stream.on('data', function (d) {
-                            data += d.toString();
-                        });
-                        stream.on('end', function () {
-                            fs.outputFile(outputFile, data, function (err) {
-                                if (err) reject(err);
-                                resolve();
-                            });
-                        });
-                        stream.on('error', reject);
-                    } else {
-                        reject();
-                    }
-                });
-            });
-        }).then(function () {
-                console.log('browserifyin done');
-            });
+        return utils.browserifyFiles({
+            files: fileMap,
+            requires: requirePaths,
+            browserifyOptions: {
+                debug: true
+            }
+        });
     }
 
     function test() {
