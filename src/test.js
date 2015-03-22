@@ -65,9 +65,9 @@ module.exports = function(grunt, args) {
         return new Promise(function (resolve, reject) {
             child.stdout.on('data', function (buffer) {
                 data += buffer.toString();
-                console.log(data);
             });
             child.stdout.on('end', function () {
+                console.log(data);
                 resolve();
                 console.log('done running tests');
             });
