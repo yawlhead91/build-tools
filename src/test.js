@@ -50,8 +50,7 @@ module.exports = function(grunt, args) {
     }
 
     function test() {
-        var data = '',
-            nameMap = {
+        var nameMap = {
                 mocha: 'mocha-phantomjs',
                 qunit: 'node-qunit-phantomjs'
             },
@@ -64,10 +63,9 @@ module.exports = function(grunt, args) {
 
         return new Promise(function (resolve, reject) {
             child.stdout.on('data', function (buffer) {
-                data += buffer.toString();
+                process.stdout.write(buffer.toString());
             });
             child.stdout.on('end', function () {
-                console.log(data);
                 resolve();
                 console.log('done running tests');
             });

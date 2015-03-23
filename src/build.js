@@ -50,18 +50,27 @@ module.exports = function(grunt, args) {
                 console.log( 'Banner added to ' + src);
             });
         });
-        console.log('grunt-banner completed successfully' );
+        console.log('banner creation finished successfully' );
         return Promise.resolve();
     };
 
     var browserifyFiles = function () {
-        return utils.browserifyFiles({
-            files: btConfig.build.files
-        });
+        console.log(btConfig.build.files);
+        if (btConfig.build && btConfig.build.files) {
+            return utils.browserifyFiles({
+                files: btConfig.build.files
+            });
+        } else {
+            return Promise.resolve();
+        }
     };
 
     var uglifyFiles = function () {
-        return utils.uglifyFiles({files: btConfig.min.files});
+        if (btConfig.min && btConfig.min.files) {
+            return utils.uglifyFiles({files: btConfig.min.files});
+        } else {
+            return Promise.resolve();
+        }
     };
 
     // run tests first
