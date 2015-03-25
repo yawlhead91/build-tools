@@ -55,7 +55,6 @@ module.exports = function(grunt, args) {
     };
 
     var browserifyFiles = function () {
-        console.log(btConfig.build.files);
         if (btConfig.build && btConfig.build.files) {
             return utils.browserifyFiles({
                 files: btConfig.build.files
@@ -84,5 +83,7 @@ module.exports = function(grunt, args) {
                 });
             });
         });
+    }).catch(function (err) {
+        console.error(err);
     });
 };
