@@ -1,6 +1,6 @@
 module.exports = {
-    build: require('./build'),
-    release: require('./release'),
-    test: require('./test'),
-    server: require('./server')
+    build: require('./src/build'),
+    release: require('./src/release'),
+    test: require('./src/test'),
+    server: require('./src/server')
 };

@@ -16,16 +16,24 @@ var internalModulePath = path.resolve(__dirname, '..');
 var ncp = require('ncp').ncp;
 ncp.limit = 16;
 
-module.exports = function(grunt, args) {
-    var config = grunt.config.get('bt') || {},
-        testsConfig = config.tests || {},
-        testType = Object.keys(testsConfig)[0];// only run the first test suite declared.. for now
+/**
+ *
+ * @param options
+ * @param {string} options.type - The type of test to run (i.e. "qunit", "mocha")
+ * @param {Array} options.src - The array containing src globs test
+ * @param {boolean} options.keepalive - Whether to keep alive the test server
+ * @param {Number} options.port - Optional port to start server on (default to 7755)
+ * @returns {*}
+ */
+module.exports = function(options) {
 
-    var options = {
-        keepalive: args[1] === 'server',
-        port: 7755,
-        type: testType
-    };
+    options = _.extend({
+        src: []
+    }, options);
+
+    if (!options.type || !options.src) {
+        return Promise.resolve();
+    }
 
     function clean() {
         return utils.clean(tempDir);
@@ -38,7 +46,7 @@ module.exports = function(grunt, args) {
         }
         requirePaths['test-utils'] = tempDir + '/tests/test-utils.js';
         var fileMap = {};
-        fileMap[tempDir + '/tests/built-tests.js'] = testsConfig[testType] ? testsConfig[testType].src : [];
+        fileMap[tempDir + '/tests/built-tests.js'] = options.src;
 
         return utils.browserifyFiles({
             files: fileMap,
@@ -56,6 +64,8 @@ module.exports = function(grunt, args) {
             },
             cmd = internalModulePath + '/node_modules/.bin/' + nameMap[options.type],
             child;
+
+        console.log(cmd);
 
         console.log('running ' + options.type + ' tests...');
 
