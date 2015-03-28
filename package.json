@@ -8,6 +8,7 @@
     "email": "mkay581@gmail.com",
     "url": "http:://heyimmark.com"
   },
+  "main": "bt.js",
   "publishConfig": {
     "registry": "https://registry.npmjs.org/"
   },
