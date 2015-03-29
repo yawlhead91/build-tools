@@ -1,5 +1,7 @@
+'use strict';
 var Promise = require('promise');
 var fs = require('fs-extra');
+var semver = require('semver');
 
 /**
  * Bumps up the versions of all package files.
@@ -16,7 +18,7 @@ module.exports = function (type) {
 
     files.forEach(function (path) {
         promises.push(new Promise(function (resolve, reject) {
-            var contents = require(path) || {},
+            var contents = require(process.cwd() + '/' + path) || {},
                 currentVersion = contents.version,
                 nextVersion = semver.inc(currentVersion, type);
 
@@ -33,5 +35,5 @@ module.exports = function (type) {
         }));
     });
 
-    return Promise.all(promises);
+    return Promise.all(promises).catch(console.log);
 };

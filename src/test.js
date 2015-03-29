@@ -8,6 +8,7 @@ var serveStatic = require('serve-static');
 var path = require('path');
 var _ = require('underscore');
 var utils = require('./utils');
+var clean = require('./clean');
 
 var server;
 var tempDir = process.cwd() + '/tmp';
@@ -18,35 +19,35 @@ ncp.limit = 16;
 
 /**
  *
+ * @param {Object} config - The configuration obj
  * @param options
- * @param {string} options.type - The type of test to run (i.e. "qunit", "mocha")
- * @param {Array} options.src - The array containing src globs test
  * @param {boolean} options.keepalive - Whether to keep alive the test server
  * @param {Number} options.port - Optional port to start server on (default to 7755)
  * @returns {*}
  */
-module.exports = function(options) {
+module.exports = function(config, options) {
 
-    options = _.extend({
-        src: []
+    var testsConfig = config.tests || {},
+        testId = Object.keys(testsConfig)[0], // only run the first test suite declared.. for now
+        src = testsConfig[testId].src || [];
+
+    options = _.extend({}, {
+        port: 7755,
+        keepalive: false
     }, options);
-
-    if (!options.type || !options.src) {
+    
+    if (!testId || !src) {
         return Promise.resolve();
-    }
-
-    function clean() {
-        return utils.clean(tempDir);
     }
 
     function runBrowserify() {
         var requirePaths = {};
-        if (options.type === 'qunit') {
+        if (testId === 'qunit') {
             requirePaths['qunit'] = tempDir + '/tests/qunit.js';
         }
         requirePaths['test-utils'] = tempDir + '/tests/test-utils.js';
         var fileMap = {};
-        fileMap[tempDir + '/tests/built-tests.js'] = options.src;
+        fileMap[tempDir + '/tests/built-tests.js'] = src;
 
         return utils.browserifyFiles({
             files: fileMap,
@@ -62,12 +63,10 @@ module.exports = function(options) {
                 mocha: 'mocha-phantomjs',
                 qunit: 'node-qunit-phantomjs'
             },
-            cmd = internalModulePath + '/node_modules/.bin/' + nameMap[options.type],
+            cmd = internalModulePath + '/node_modules/.bin/' + nameMap[testId],
             child;
-
-        console.log(cmd);
-
-        console.log('running ' + options.type + ' tests...');
+        
+        console.log('running ' + testId + ' tests...');
 
         child = spawn(cmd, ['http://localhost:7755/index.html']);
 
@@ -90,7 +89,7 @@ module.exports = function(options) {
         console.log('copying test files over');
         return new Promise(function (resolve, reject) {
             fs.ensureDir(testsDir, function () {
-                ncp(internalPath + '/' + options.type + '/', testsDir, function (err) {
+                ncp(internalPath + '/' + testId + '/', testsDir, function (err) {
                     if (!err) {
                         ncp(internalPath + '/test-utils.js', testsDir + '/test-utils.js', function (err) {
                             if (!err) {
@@ -156,16 +155,16 @@ module.exports = function(options) {
         });
     }
 
-    return clean().then(function () {
+    return clean(tempDir).then(function () {
         return copyFiles().then(function() {
             return runBrowserify().then(function () {
                 return runTest().then(function () {
-                    return clean();
+                    return clean(tempDir);
                 });
             });
         });
     }).catch(function (err) {
         console.error(err);
-        clean();
+        clean(tempDir);
     });
 };

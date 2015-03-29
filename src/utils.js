@@ -2,32 +2,11 @@
 
 var Promise = require('promise');
 var _ = require('underscore');
-var uglify = require("uglify-js").minify;
 var fs = require('fs-extra');
 var glob = require('glob');
 var browserify = require('browserify');
 
 module.exports = {
-
-    /**
-     * Removes a directory (and its contents) or file.
-     * @param path
-     * @returns {Promise}
-     */
-    clean: function (path) {
-        console.log('cleaning files...');
-        return new Promise(function (resolve, reject) {
-            fs.remove(path, function (err) {
-                if (err) {
-                    console.error(err);
-                    reject(err);
-                } else {
-                    resolve();
-                    console.log('files cleaned!');
-                }
-            });
-        });
-    },
 
     /**
      * Resolves a relative path to the external project.
@@ -44,32 +23,6 @@ module.exports = {
                 return scope(path);
             });
         }
-    },
-
-    /**
-     * Minifies files.
-     * @param options
-     * @param {Object} options.files - A mapping containing file destination (keys) to the associate set of file bundles (array of values) to minify
-     * @returns {Promise}
-     */
-    uglifyFiles: function (options) {
-        var result;
-        // TODO: this currently only assumes ONE set of files are being uglified, will break if there are more!
-        // Change to accommodate multiple bundle building when necessary
-        return new Promise(function (resolve, reject) {
-            _.each(options.files, function (srcPaths, destPath) {
-                result = uglify(this.scopePaths(srcPaths)).code;
-                fs.outputFile(this.scopePaths(destPath), result, function (err) {
-                    if (err) {
-                        console.error(err);
-                        reject(err);
-                    } else {
-                        resolve();
-                        console.log('files uglified!');
-                    }
-                }.bind(this));
-            }.bind(this));
-        }.bind(this));
     },
 
     /**
@@ -135,10 +88,18 @@ module.exports = {
     browserifyFiles: function (options) {
         var promises = [];
         options.requires = options.requires || [];
+
+        if (!options.files) {
+            return Promise.resolve();
+        }
+
+        console.log('browserifyin...');
         _.each(options.files, function (srcPaths, destPath) {
             promises.push(this.browserifyFile(destPath, srcPaths, options));
         }.bind(this));
-        return Promise.all(promises);
+        return Promise.all(promises).then(function () {
+            console.log('done browserifying!');
+        });
     }
 
 
