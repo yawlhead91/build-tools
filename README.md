@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/mkay581/build-tools.svg?branch=master)](https://travis-ci.org/build-tools/rogue)
+
 # Build Tools
 
 A set of javascript tasks to help speed up packaging and building processes.
@@ -21,7 +23,7 @@ You can install [Node.js](http://www.nodejs.org/) via the package provided on [t
 
 Installing Build Tools as a global module will give you command-line access to all tasks available.
 
-You can install globally by typing the following in your terminal
+You can install globally by typing the following in your terminal:
 
 ```
 npm install build-tools  -g
