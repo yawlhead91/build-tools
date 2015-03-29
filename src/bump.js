@@ -2,6 +2,7 @@
 var Promise = require('promise');
 var fs = require('fs-extra');
 var semver = require('semver');
+var _ = require('underscore');
 
 /**
  * Bumps up the versions of all package files.
@@ -16,32 +17,45 @@ module.exports = function (type) {
 
     type = type || 'patch';
 
-    files.forEach(function (path) {
-        promises.push(new Promise(function (resolve, reject) {
-            var stats;
+    var validateFiles = function (files) {
+        var fileMaps = {},
+            absolutePath,
+            contents;
+        files.forEach(function (path) {
+            absolutePath = process.cwd() + '/' + path;
             try {
-                stats = fs.lstatSync(path);
+                contents = require(absolutePath);
             } catch (e) {
-                // file doesnt exist so just fail silently and resolve
-                resolve();
+                // do nothing if file does not exist
+                return;
             }
-            var contents = require(process.cwd() + '/' + path) || {},
-                currentVersion = contents.version,
-                nextVersion = semver.inc(currentVersion, type);
 
-            if (contents && nextVersion) {
-                contents.version = nextVersion;
-                contents = JSON.stringify(contents, null, 2) + "\n";
-                try {
-                    fs.writeFileSync(path, contents);
-                } catch (e) {
-                    reject(e);
+            fileMaps[path] = {
+                file: path,
+                contents: contents,
+                currentVersion: contents.version
+            };
+        });
+        return fileMaps;
+    };
+
+        var nextVersion;
+        _.each(validateFiles(files), function (map, path) {
+            promises.push(new Promise(function (resolve, reject) {
+                nextVersion = semver.inc(map.currentVersion, type);
+                if (map.contents && nextVersion) {
+                    map.contents.version = nextVersion;
+                    map.contents = JSON.stringify(map.contents, null, 2) + "\n";
+                    try {
+                        fs.writeFileSync(path, map.contents);
+                    } catch (e) {
+                        reject(e);
+                    }
                 }
-            }
-            resolve();
-
-        }));
-    });
-
-    return Promise.all(promises);
+                resolve();
+            }));
+        });
+        return Promise.all(promises).then(function () {
+            return Promise.resolve(nextVersion);
+        }).catch(console.log);
 };
