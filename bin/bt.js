@@ -1,0 +1,15 @@
+#!/usr/bin/env node
+'use strict';
+var command = process.argv[2];
+
+if (command) {
+    try {
+        require('../cli/' + command)(process.argv.slice(3));
+    } catch (e) {
+        if (e.message === 'Cannot find module \'../cli/' + command + '\'') {
+            console.error('There is no command by the name of ' + command + '.');
+        } else {
+            console.error(e.message);
+        }
+    }
+}
