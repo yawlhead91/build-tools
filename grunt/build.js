@@ -1,10 +1,11 @@
 'use strict';
-var bt = require('build-tools');
+
+var build = require('./../src/build');
 
 /**
  * Builds files into dist folder using build tools.
  * @returns {Promise}
  */
 module.exports = function (config) {
-    return bt.build(config);
+    return build(config);
 };

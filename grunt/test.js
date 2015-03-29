@@ -1,9 +1,9 @@
 'use strict';
-var bt = require('build-tools');
+var test = require('./../src/test');
 
 module.exports = function (config, args) {
     args = args || [];
-    return bt.test(config, {
+    return test(config, {
         keepalive: args[1] === 'server'
     });
 };

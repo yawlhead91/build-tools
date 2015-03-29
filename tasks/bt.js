@@ -9,7 +9,7 @@ module.exports = function(grunt) {
             config = grunt.config.get('bt'),
             commandPromise = Promise.resolve();
         if (command) {
-            commandPromise = require('./../src/' + command)(config, args);
+            commandPromise = require('./../grunt/' + command)(config, args);
         } else if (!command) {
             grunt.log.error('you must specify a bt command');
         } else {
