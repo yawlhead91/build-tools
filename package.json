@@ -15,7 +15,7 @@
     "type": "git",
     "url": "git://github.com/mkay581/build-tools.git"
   },
-  "bin": "./bin/bt.js",
+  "bin": "bin/bt",
   "bugs": {
     "url": "https://github.com/mkay581/build-tools/issues"
   },
