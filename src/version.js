@@ -4,7 +4,6 @@ var Promise = require('promise');
 var bump = require('./bump');
 var path = require('path');
 
-
 /**
  * Ups the current package to a new version and commits it locally.
  * Imitates `npm version` functionality: https://docs.npmjs.com/cli/version
@@ -13,7 +12,8 @@ var path = require('path');
  * @type {exports}
  */
 module.exports = (function (type) {
-    var localRepo = git(process.cwd());
+    var localRepo = git(process.cwd()),
+        newVersionNum;
 
     var ensureCleanWorkingDirectory = function () {
         return new Promise(function (resolve, reject) {
@@ -58,7 +58,7 @@ module.exports = (function (type) {
         });
     };
 
-    var commit = function (newVersionNum) {
+    var commit = function () {
         console.log('committing locally...');
         return new Promise(function (resolve, reject) {
             localRepo.commit(newVersionNum, function (err) {
@@ -83,12 +83,13 @@ module.exports = (function (type) {
     var pushTag = function () {
         console.log('pushing new tag to remote...');
         return new Promise(function (resolve, reject) {
-            localRepo.createTag(newVersionNum, function (err) {
+            localRepo.push('origin', newVersionNum, function (err) {
                 if (err) return reject(err);
                 console.log('tag pushed to remote completed!');
                 resolve();
             });
         });
+
     };
 
     var merge = function (branch) {
@@ -103,15 +104,19 @@ module.exports = (function (type) {
                         if (err) return reject(err);
                         // push result to Github
                         localRepo.push('origin', branch, function (err) {
-                            if (err) return reject(err);
-                            // merge done, now navigate back to original branch
-                            localRepo.checkout(branches.current, function (err) {
-                                if (err) return reject(err);
-                                console.log('merging completed!');
-                                resolve();
+                            // create and push tags
+                            return createTag(newVersionNum).then(function () {
+                                return pushTag(newVersionNum).then(function () {
+                                    if (err) return reject(err);
+                                    // merge done, now navigate back to original branch
+                                    localRepo.checkout(branches.current, function (err) {
+                                        if (err) return reject(err);
+                                        console.log('merging completed!');
+                                        resolve();
+                                    });
+                                })
                             });
                         });
-
                     });
                 });
             });
@@ -119,9 +124,9 @@ module.exports = (function (type) {
     };
 
     return ensureCleanWorkingDirectory().then(function () {
-        return bump(type).then(function (newVersionNum) {
+        return bump(type).then(function (newVersion) {
+            newVersionNum = newVersion;
             return getBumpedFiles().then(function (bumpedFiles) {
-                console.log(arguments);
                 return stageFiles(bumpedFiles).then(function () {
                     return commit(newVersionNum).then(function () {
                         return merge('master');
