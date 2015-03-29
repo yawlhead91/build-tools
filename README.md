@@ -9,6 +9,7 @@ A set of javascript tasks to help speed up packaging and building processes.
 1. [Dependencies](#dependencies)
 1. [CLI Commands](#cli-commands)
     * [bt test](#bt-test)
+    * [bt version](#bt-version)
 1. [Grunt Tasks](#grunt-tasks)
     * [grunt bt:test](#grunt-bt-test)
 
@@ -67,6 +68,32 @@ bt test qunit server
 ```
 
 Which will run your tests in the browser located at http://localhost:7755.
+
+### bt version
+
+The `version` command is a just a cheap imitation of [npm's version command](https://docs.npmjs.com/cli/version). You
+don't need any fancy configuration. Just run the following command:
+
+```
+bt version [SEMVER]
+```
+
+Replacing [SEMVER] with (`major`, `minor` or `patch`) (`patch` is the default if nothing is supplied).
+
+Running this command will:
+
+1. Update all relevant package files (`package.json` and `bower.json` if exists) to the new version
+1. Commit the change to your local git repository (the commit message being your new version number)
+1. Check out your master branch
+1. Merge the branch you were on into your `master` branch
+1. Push your `master` branch remotely to Github
+`. Create a new tag of your new version
+`. Push new tag to remote
+1. Check back out the branch where you initially called the `version` command.
+
+It is recommended to only run this command when you're on `master` or your "production" branch, since that is where all
+relevant commits have already been committed, and is less likely to have convoluted commits that you might not want in
+your new version.
 
 ## Grunt Tasks
 
