@@ -65,7 +65,7 @@ module.exports = function(config, options) {
             },
             cmd = internalModulePath + '/node_modules/.bin/' + nameMap[testId],
             child;
-        
+
         console.log('running ' + testId + ' tests...');
 
         child = spawn(cmd, ['http://localhost:7755/index.html']);

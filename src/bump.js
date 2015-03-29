@@ -18,6 +18,13 @@ module.exports = function (type) {
 
     files.forEach(function (path) {
         promises.push(new Promise(function (resolve, reject) {
+            var stats;
+            try {
+                stats = fs.lstatSync(path);
+            } catch (e) {
+                // file doesnt exist so just fail silently and resolve
+                resolve();
+            }
             var contents = require(process.cwd() + '/' + path) || {},
                 currentVersion = contents.version,
                 nextVersion = semver.inc(currentVersion, type);
@@ -32,8 +39,9 @@ module.exports = function (type) {
                 }
             }
             resolve();
+
         }));
     });
 
-    return Promise.all(promises).catch(console.log);
+    return Promise.all(promises);
 };
