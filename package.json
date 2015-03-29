@@ -24,11 +24,8 @@
       "url": "https://github.com/mkay581/build-tools/blob/master/LICENSE-MIT"
     }
   ],
-  "engines": {
-    "node": ">= 0.8.0"
-  },
   "scripts": {
-    "test": "grunt test"
+    "test": "nodeunit tests"
   },
   "dependencies": {
     "browserify": "^9.0.3",
@@ -53,5 +50,10 @@
   "keywords": [
     "build tools",
     "build"
-  ]
+  ],
+  "devDependencies": {
+    "mockery": "^1.4.0",
+    "nodeunit": "^0.9.1",
+    "sinon": "^1.14.1"
+  }
 }
