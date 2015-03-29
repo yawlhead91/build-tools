@@ -2,7 +2,6 @@
 var git = require('gitty');
 var Promise = require('promise');
 var bump = require('./bump');
-var path = require('path');
 
 /**
  * Ups the current package to a new version and commits it locally.
@@ -11,7 +10,7 @@ var path = require('path');
  * @returns {Promise} Returns a promise that resolves when completed
  * @type {exports}
  */
-module.exports = (function (type) {
+module.exports = function (type) {
     var localRepo = git(process.cwd()),
         newVersionNum;
 
@@ -49,7 +48,6 @@ module.exports = (function (type) {
     var stageFiles = function (files) {
         console.log('staging files...');
         return new Promise(function (resolve, reject) {
-            console.log(files);
             localRepo.add(files, function (err) {
                 if (err) return reject(err);
                 console.log('staging files completed!');
@@ -135,4 +133,4 @@ module.exports = (function (type) {
             });
         });
     }).catch(console.log);
-})();
+};
