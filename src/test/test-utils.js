@@ -1,3 +1,6 @@
+'use strict';
+var Promise = require('promise');
+
 module.exports = {
 
     /**
@@ -21,22 +24,6 @@ module.exports = {
         }
         return event;
     },
-
-    ///**
-    // * Creates an event.
-    // * @param {string} name - The event name
-    // * @param {object} [options] - Options to be passed to event
-    // */
-    //createEvent: function (name, options) {
-    //    var event;
-    //    options = options || {};
-    //    options.bubbles = options.bubbles || false;
-    //    options.cancelable = options.cancelable|| false;
-    //
-    //    event = document.createEvent('CustomEvent');
-    //    event.initCustomEvent(name, options.bubbles, options.cancelable, null);
-    //    return event;
-    //},
 
     /**
      * Creates an HTML Element from an html string.
@@ -69,6 +56,22 @@ module.exports = {
             val = val.trim();
         }
         return val;
+    },
+
+    /**
+     * Creates and returns a promise that can be resolved or rejected.
+     * @returns {*}
+     */
+    createPromise: function () {
+        var resolve,
+            reject,
+            promise = new Promise(function (res, rej) {
+                resolve = res;
+                reject = rej;
+            });
+        promise.resolve = resolve;
+        promise.reject = reject;
+        return promise;
     }
 
 };
