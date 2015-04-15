@@ -3,7 +3,13 @@
 module.exports = function (grunt) {
 
     grunt.initConfig({
-        bt: {}
+        bt: {
+            tests: {
+                mocha: {
+                    src: ['tests/mocha/test-utils-tests.js']
+                }
+            }
+        }
     });
 
     // Load THIS plugin's task(s) internally.
