@@ -148,10 +148,10 @@ module.exports = function(config, options) {
     function runTest() {
         return runServer().then(function () {
             if (!options.keepalive) {
-                return test().then(function (code) {
+                return test().then(function (errorCode) {
                     return stopServer().then(function () {
                         return clean(tempDir).then(function () {
-                            if (code !== 0) {
+                            if (errorCode) {
                                 throw new Error('test failure');
                             }
                         });
