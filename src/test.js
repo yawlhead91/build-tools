@@ -74,9 +74,9 @@ module.exports = function(config, options) {
             child.stdout.on('data', function (buffer) {
                 process.stdout.write(buffer.toString());
             });
-            child.stdout.on('end', function () {
-                resolve();
+            child.on('close', function (code) {
                 console.log('done running tests');
+                resolve(code);
             });
 
             child.stdout.on('error', reject);
@@ -148,8 +148,14 @@ module.exports = function(config, options) {
     function runTest() {
         return runServer().then(function () {
             if (!options.keepalive) {
-                return test().then(function () {
-                    return stopServer();
+                return test().then(function (code) {
+                    return stopServer().then(function () {
+                        return clean(tempDir).then(function () {
+                            if (code !== 0) {
+                                throw new Error('test failure');
+                            }
+                        });
+                    });
                 });
             }
         });
@@ -158,13 +164,8 @@ module.exports = function(config, options) {
     return clean(tempDir).then(function () {
         return copyFiles().then(function() {
             return runBrowserify().then(function () {
-                return runTest().then(function () {
-                    return clean(tempDir);
-                });
+                return runTest();
             });
         });
-    }).catch(function (err) {
-        console.error(err);
-        clean(tempDir);
     });
 };
