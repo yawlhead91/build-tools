@@ -40,7 +40,7 @@ module.exports = function(config, options) {
         return Promise.resolve();
     }
 
-    function runBrowserify() {
+    function runBrowserify(options) {
         var requirePaths = {};
         if (testId === 'qunit') {
             requirePaths['qunit'] = tempDir + '/tests/qunit.js';
@@ -52,6 +52,7 @@ module.exports = function(config, options) {
         return utils.browserifyFiles({
             files: fileMap,
             requires: requirePaths,
+            watch: true,
             browserifyOptions: {
                 debug: true
             }
@@ -163,7 +164,7 @@ module.exports = function(config, options) {
 
     return clean(tempDir).then(function () {
         return copyFiles().then(function() {
-            return runBrowserify().then(function () {
+            return runBrowserify(options).then(function () {
                 return runTest();
             });
         });

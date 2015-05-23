@@ -5,6 +5,7 @@ var _ = require('underscore');
 var fs = require('fs-extra');
 var glob = require('glob');
 var browserify = require('browserify');
+var watchify = require('watchify');
 
 module.exports = {
 
@@ -33,11 +34,9 @@ module.exports = {
      * @returns {Promise}
      */
     browserifyFile: function (destPath, srcPaths, options) {
-        var data = '',
-            stream,
+        var stream,
             b,
             finalPaths = [];
-        console.log('browserifying ' + destPath);
         return new Promise(function (resolve, reject) {
             // deal with file globs
             _.each(srcPaths, function (path) {
@@ -51,30 +50,72 @@ module.exports = {
             // merge custom browserify options if exist
             options.browserifyOptions = _.extend({}, options.browserifyOptions);
 
+            // add required parameters for watchify
+            options.browserifyOptions.cache = {};
+            options.browserifyOptions.packageCache = {};
+
             b = browserify(options.browserifyOptions);
+
+            if (options.watch) {
+                b = watchify(b);
+                // re-bundle when updated
+                b.on('update', function () {
+                    console.log('file updated!');
+                    b.bundle();
+                });
+            }
 
             // must add each path individual unfortunately.
             finalPaths.forEach(function (path) {
                 b.add(path);
             }.bind(this));
+
             // require global files
             _.each(options.requires, function (path, id) {
                 b.require(path, {expose: id});
             });
 
+            b.on('bundle', function (stream) {
+                console.log('browserifying bundle...');
+                this._writeBrowserifyBundleStreamToFile(stream, destPath)
+                    .then(function () {
+                        console.log('done browserifying bundle!');
+                        resolve();
+                    })
+                    .catch(function (e) {
+                        console.log('browserifying failed');
+                        reject(e);
+                    });
+            }.bind(this));
+
             stream = b.bundle();
+
+        }.bind(this));
+    },
+
+    /**
+     * Handles writing the browserify bundle stream to the destination file.
+     * @param {EventEmitter} stream - The bundle stream
+     * @param {string} destPath - The destination file
+     * @private
+     */
+    _writeBrowserifyBundleStreamToFile: function (stream, destPath) {
+        var data = '';
+        return new Promise(function (resolve, reject) {
+            stream.on('error', reject);
             stream.on('data', function (d) {
                 data += d.toString();
             });
             stream.on('end', function () {
                 fs.outputFile(destPath, data, function (err) {
-                    if (err) reject(err);
-                    console.log('done browserifying ' + destPath);
-                    resolve();
+                    if (!err) {
+                        resolve();
+                    } else {
+                        reject(err);
+                    }
                 });
             });
-            stream.on('error', reject);
-        }.bind(this));
+        });
     },
 
     /**
@@ -93,12 +134,12 @@ module.exports = {
             return Promise.resolve();
         }
 
-        console.log('browserifyin...');
+        console.log('browserifyin all files...');
         _.each(options.files, function (srcPaths, destPath) {
             promises.push(this.browserifyFile(destPath, srcPaths, options));
         }.bind(this));
         return Promise.all(promises).then(function () {
-            console.log('done browserifying!');
+            console.log('done browserifying all files!');
         });
     }
 
