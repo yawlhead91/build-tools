@@ -14,7 +14,7 @@ module.exports = function(config) {
     // run tests first
     return test(config).then(function () {
         return clean(config.dist).then(function () {
-            return utils.browserifyFiles({files: config.build.files}).then(function () {
+            return utils.browserifyFiles(config.build).then(function () {
                 return minify({files: config.min.files}).then(function () {
                     return banner(config.banner.files).then(function () {
                         console.log('done build!');
