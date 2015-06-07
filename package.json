@@ -42,6 +42,7 @@
     "mocha-phantomjs": "^3.5.3",
     "ncp": "^2.0.0",
     "node-qunit-phantomjs": "^1.2.0",
+    "phantomjs": "^1.9.17",
     "promise": "^6.1.0",
     "replace": "^0.3.0",
     "semver": "^4.3.1",
