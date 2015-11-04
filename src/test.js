@@ -20,27 +20,31 @@ ncp.limit = 16;
 /**
  *
  * @param {Object} config - The configuration obj
- * @param options
+ * @param {Object} options - The master options object
  * @param {boolean} options.keepalive - Whether to keep alive the test server
  * @param {Number} options.port - Optional port to start server on (default to 7755)
  * @returns {*}
  */
 module.exports = function(config, options) {
 
+    config = config || {};
+
     var testsConfig = config.tests || {},
         testId = Object.keys(testsConfig)[0], // only run the first test suite declared.. for now
-        src = testsConfig[testId].src || [];
+        testConfig = testsConfig[testId] || {},
+        src = testConfig.src || [];
 
     options = _.extend({}, {
         port: 7755,
         keepalive: false
     }, options);
-    
-    if (!testId || !src) {
+
+    if (!testId || !testConfig || !src.length) {
+        console.warn('no test configuration specified or no matching files were found');
         return Promise.resolve();
     }
 
-    function runBrowserify(options) {
+    function runBrowserify() {
         var requirePaths = {};
         if (testId === 'qunit') {
             requirePaths['qunit'] = tempDir + '/tests/qunit.js';

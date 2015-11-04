@@ -11,11 +11,23 @@ var clean = require('./clean');
  * @returns {*}
  */
 module.exports = function(config) {
-    // run tests first
+
+    config = config || {};
+
+    if (!config.build) {
+        console.warn('nothin\' to build.');
+        return Promise.resolve();
+    }
+
+    // build with the supplied build property
+    config.build = config.build['local'] || config.build['prod'] || config.build;
+
     return test(config).then(function () {
         return clean(config.dist).then(function () {
             return utils.browserifyFiles(config.build).then(function () {
+                config.min = config.min || {};
                 return minify({files: config.min.files}).then(function () {
+                    config.banner = config.banner || {};
                     return banner(config.banner.files).then(function () {
                         console.log('done build!');
                     });

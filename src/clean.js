@@ -9,6 +9,10 @@ var fs = require('fs-extra');
 module.exports = function (paths) {
     var promises = [];
 
+    if (!paths || !paths.length) {
+        return Promise.resolve();
+    }
+
     if (typeof paths === 'string') {
         paths = [paths];
     }

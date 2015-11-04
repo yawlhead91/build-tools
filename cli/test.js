@@ -1,6 +1,6 @@
 'use strict';
 var test = require('./../src/test');
-var config = require('./../bt-config');
+var config = require(process.cwd() + '/bt-config') || {};
 
 /**
  * Runs tests.

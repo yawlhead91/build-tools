@@ -10,6 +10,11 @@ var Promise = require('promise');
  * @returns {Promise}
  */
 module.exports = function (files) {
+
+    if (!files || !files.length) {
+        return Promise.resolve();
+    }
+
     var pkg = require(process.cwd() + '/package.json'),
         banner = '/** \n' +
             '* ' + pkg.name + ' - v' + pkg.version + '.\n' +
