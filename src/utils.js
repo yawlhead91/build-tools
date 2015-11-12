@@ -61,7 +61,11 @@ module.exports = {
                 // re-bundle when updated
                 b.on('update', function () {
                     console.log('file updated!');
-                    b.bundle();
+                    b
+                        .transform("babelify", {
+                            presets: ["es2015"]
+                        })
+                        .bundle();
                 });
             }
 

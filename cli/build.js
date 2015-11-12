@@ -6,5 +6,7 @@ var build = require('./../src/build');
  * @returns {Promise}
  */
 module.exports = function (args) {
-    return build(require(process.cwd() + '/bt-config'));
+    var options = require(process.cwd() + '/bt-config');
+    options.env = args[0];
+    return build(options);
 };
