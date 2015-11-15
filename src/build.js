@@ -7,47 +7,83 @@ var minify = require('./minify');
 var clean = require('./clean');
 var server = require('./server');
 var _ = require('underscore');
+var copy = require('./copy');
+var browserify = require('./browserify');
+var path = require('path');
+
 /**
  * Cleans, browserifies, minifies, and creates banners for passed files.
  * @param {Object} [options] - The build configuration
  * @param {String} [options.env] - The unique build environment id
+ * @param {Object} [options.files] - An object containg a file mapping of the files to build
+ * @param {Object} [options.testsConfig] - The config for testing
+ * @param {String} [options.dist] - The destination folder of where the the files will be built
+ * @param {String} [options.browserifyOptions] - The browserify options
  * @returns {*}
  */
 module.exports = function(options) {
 
     var availableEnvs = new Set(['local', 'prod']);
 
+    options = options || {};
+
+    // account for deprecated 'min' property
+    options.minifyFiles = options.min ? options.min.files : options.minifyFiles;
+    // account for deprecated 'banner' property
+    options.bannerFiles = options.banner ? options.banner.files : options.bannerFiles;
+    // account for deprecated 'tests' property
+    options.testsConfig = options.tests || options.testsConfig;
+    options.files = options.build ? options.build.files : options.files;
+
     if (!options.env) {
         console.warn('no environment was supplied, building prod instead...');
-    }
-    if (!availableEnvs.has(options.env)) {
+    } else if (!availableEnvs.has(options.env)) {
         console.warn('there is no environment named ' + options.env + ' building prod instead...');
     }
 
-    options = _.extend({
-        env: 'prod'
-    }, options);
-
-    if (!options.build) {
-        console.warn('nothin\' to build.');
+    if (!options.dist) {
+        console.warn('um, no distribution folder was specified to build into.');
+        return Promise.resolve();
+    } else if (!options.files) {
+        console.warn('no files to build.');
         return Promise.resolve();
     }
 
-    // build with the supplied build property
-    options.build = options.build[options.env] || options.build;
+    options = _.extend({
+        env: 'prod',
+        files: null,
+        dist: null,
+        minifyFiles: null,
+        bannerFiles: null,
+        testsConfig: null
+    }, options);
 
-    return test(options).then(function () {
+    return test(options.testsConfig).then(function () {
         return clean(options.dist).then(function () {
-            options.watch = options.env === 'local' || options.watch;
-            return utils.browserifyFiles(options).then(function () {
-                options.min = options.min || {};
-                return minify({files: options.min.files}).then(function () {
-                    options.banner = options.banner || {};
-                    return banner(options.banner.files).then(function () {
-                        console.log('done build!');
-                        if (options.env === 'local') {
-                            return server();
-                        }
+            var browserifyOptions = {
+                watch: options.env === 'local',
+                browserifyOptions: options.browserifyOptions,
+                files: {}
+            };
+            var copyOptions = {files: {}};
+            // only copy only non-js files
+            _.each(options.files, function (srcPaths, destPath) {
+                if (path.extname(destPath) === '.js') {
+                    browserifyOptions.files[destPath] = srcPaths;
+                } else {
+                    copyOptions.files[destPath] = srcPaths;
+                }
+            });
+            return copy(copyOptions).then(function () {
+                return browserify(browserifyOptions).then(function () {
+                    options.min = options.min || {};
+                    return minify({files: options.minifyFiles}).then(function () {
+                        return banner(options.bannerFiles).then(function () {
+                            console.log('done build!');
+                            if (options.env === 'local') {
+                                return server();
+                            }
+                        });
                     });
                 });
             });

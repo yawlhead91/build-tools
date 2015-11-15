@@ -9,6 +9,7 @@ var path = require('path');
 var _ = require('underscore');
 var utils = require('./utils');
 var clean = require('./clean');
+var browserify = require('./browserify');
 
 var server;
 var tempDir = process.cwd() + '/tmp';
@@ -19,41 +20,37 @@ ncp.limit = 16;
 
 /**
  *
- * @param {Object} config - The configuration obj
- * @param {Object} options - The master options object
- * @param {boolean} options.keepalive - Whether to keep alive the test server
- * @param {Number} options.port - Optional port to start server on (default to 7755)
+ * @param {Object} [options] - The test options object
+ * @param {String} options.id - Unique identifier for the type of test (.eg 'mocha', 'qunit')
+ * @param {Array} options.files - The array of file paths to tests
+ * @param {boolean} [options.keepalive] - Whether to keep alive the test server
+ * @param {Number} [options.port] - Optional port to start server on (default to 7755)
  * @returns {*}
  */
-module.exports = function(config, options) {
-
-    config = config || {};
-
-    var testsConfig = config.tests || {},
-        testId = Object.keys(testsConfig)[0], // only run the first test suite declared.. for now
-        testConfig = testsConfig[testId] || {},
-        src = testConfig.src || [];
+module.exports = function(options) {
 
     options = _.extend({}, {
+        id: 'mocha',
         port: 7755,
-        keepalive: false
+        keepalive: false,
+        files: []
     }, options);
 
-    if (!testId || !testConfig || !src.length) {
+    if (!options.id || !options.files || !options.files.length) {
         console.warn('no test configuration specified or no matching files were found');
         return Promise.resolve();
     }
 
     function runBrowserify() {
         var requirePaths = {};
-        if (testId === 'qunit') {
+        if (options.id === 'qunit') {
             requirePaths['qunit'] = tempDir + '/tests/qunit.js';
         }
         requirePaths['test-utils'] = tempDir + '/tests/test-utils.js';
         var fileMap = {};
-        fileMap[tempDir + '/tests/built-tests.js'] = src;
+        fileMap[tempDir + '/tests/built-tests.js'] = options.files;
 
-        return utils.browserifyFiles({
+        return browserify({
             files: fileMap,
             requires: requirePaths,
             watch: true,
@@ -68,10 +65,10 @@ module.exports = function(config, options) {
                 mocha: 'mocha-phantomjs',
                 qunit: 'node-qunit-phantomjs'
             },
-            cmd = internalModulePath + '/node_modules/.bin/' + nameMap[testId],
+            cmd = internalModulePath + '/node_modules/.bin/' + nameMap[options.id],
             child;
 
-        console.log('running ' + testId + ' tests...');
+        console.log('running ' + options.id + ' tests...');
 
         child = spawn(cmd, ['http://localhost:7755/index.html']);
 
@@ -94,7 +91,7 @@ module.exports = function(config, options) {
         console.log('copying test files over');
         return new Promise(function (resolve, reject) {
             fs.ensureDir(testsDir, function () {
-                ncp(internalPath + '/' + testId + '/', testsDir, function (err) {
+                ncp(internalPath + '/' + options.id + '/', testsDir, function (err) {
                     if (!err) {
                         ncp(internalPath + '/test-utils.js', testsDir + '/test-utils.js', function (err) {
                             if (!err) {
