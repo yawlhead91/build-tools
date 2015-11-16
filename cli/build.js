@@ -24,7 +24,5 @@ module.exports = function (args) {
         dist: config.dist
     }, config.build, args);
 
-    console.log(options);
-
     return build(options);
 };
