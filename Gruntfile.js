@@ -6,7 +6,7 @@ module.exports = function (grunt) {
         bt: {
             tests: {
                 mocha: {
-                    src: ['tests/mocha/test-utils-tests.js']
+                    src: ['tests/mocha/*']
                 }
             }
         }

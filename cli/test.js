@@ -1,6 +1,7 @@
 'use strict';
 var test = require('./../src/test');
-var config = require('./../bt-config');
+var config = require(process.cwd() + '/bt-config') || {};
+var _ = require('underscore');
 
 /**
  * Runs tests.
@@ -8,7 +9,15 @@ var config = require('./../bt-config');
  * @returns {*}
  */
 module.exports = function (args) {
-    return test(config, {
-        keepalive: args[1] === 'server'
+    args = args || [];
+    config.tests = config.tests || {src: {}};
+    var keepalive = args[1] === 'server';
+    var testIds = _.keys(config.tests);
+    var testId = args[0] || testIds[0];
+
+    return test({
+        id: testId,
+        files: config.tests[testId].src,
+        keepalive: keepalive
     });
 };
