@@ -4,15 +4,25 @@ var Promise = require('promise');
 var connect = require('connect');
 var serveStatic = require('serve-static');
 var _ = require('underscore');
+var path = require('path');
 
 var server;
 var serverPromise;
 
+/**
+ * Starts a server.
+ * @param {Object} options - The server options
+ * @param {Number} [options.port] - The port number to start the server on
+ * @param {String} [options.staticDir] - The directory to serve static files
+ * @param {String} [options.middleware] - The path to the middleware file that is called when server is ran
+ * @returns {*}
+ */
 module.exports = function(options) {
 
     options = _.extend({
         port: 7000,
-        staticDir: process.cwd()
+        staticDir: process.cwd(),
+        middleware: null
     }, options);
 
     function stopServer() {
@@ -30,7 +40,13 @@ module.exports = function(options) {
             // run test server!
             var app = connect();
             console.log('running server on http://localhost:' + options.port + '...');
-            app.use(serveStatic(options.staticDir + '/'));
+            if (options.middleware) {
+                var middleware = require(options.middleware);
+                middleware(app);
+            } else {
+                // we can at least provide some basic functionality...sheesh
+                app.use(serveStatic(options.staticDir + '/'));
+            }
             //create node.js http server and listen on port
             server = app.listen(options.port);
 
