@@ -3,7 +3,7 @@
 var fs = require('fs-extra');
 var spawn = require('child_process').spawn;
 var Promise = require('promise');
-var connect = require('connect');
+var express = require('express');
 var serveStatic = require('serve-static');
 var path = require('path');
 var _ = require('underscore');
@@ -124,7 +124,7 @@ module.exports = function(options) {
         console.log('running server...');
         return new Promise(function (resolve) {
             // run test server!
-            var app = connect();
+            var app = express();
             // serve multiple directories
             folders.forEach(function (folder) {
                 app.use(serveStatic(folder));
