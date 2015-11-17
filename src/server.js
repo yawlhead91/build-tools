@@ -1,7 +1,7 @@
 'use strict';
 
 var Promise = require('promise');
-var connect = require('connect');
+var express = require('express');
 var serveStatic = require('serve-static');
 var _ = require('underscore');
 var path = require('path');
@@ -36,13 +36,17 @@ module.exports = function(options) {
     }
 
     function startServer() {
-        serverPromise = new Promise(function (resolve) {
+        serverPromise = new Promise(function (resolve, reject) {
             // run test server!
-            var app = connect();
+            var app = express();
             console.log('running server on http://localhost:' + options.port + '...');
             if (options.middleware) {
-                var middleware = require(options.middleware);
-                middleware(app);
+                try {
+                    require(options.middleware)(app);
+                } catch (err) {
+                    console.error(err);
+                    return reject(err);
+                }
             } else {
                 // we can at least provide some basic functionality...sheesh
                 app.use(serveStatic(options.staticDir + '/'));
