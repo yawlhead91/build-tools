@@ -83,7 +83,7 @@ module.exports = function(options) {
                         return banner(options.bannerFiles).then(function () {
                             console.log('done build!');
                             if (options.env === 'local') {
-                                return server({middleware: options.middleware, port: options.port});
+                                return server(options);
                             }
                         });
                     });

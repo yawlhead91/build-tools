@@ -19,6 +19,7 @@ var serverPromise;
  */
 module.exports = function(options) {
 
+
     options = _.extend({
         port: 7000,
         staticDir: process.cwd(),

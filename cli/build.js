@@ -22,8 +22,10 @@ module.exports = function (args) {
         env: [String],
         files: [null],
         dist: [path],
-        middleware: [path]
+        middleware: [path],
+        port: [Number, null]
     }, {}, args, 0);
+
 
     var options = _.extend({
         env: env,

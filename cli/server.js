@@ -8,7 +8,7 @@ var path = require('path');
 module.exports = function (args) {
 
     var options = nopt({
-        port: [String, null],
+        port: [Number, null],
         staticDir: [String, null],
         middleware: [path]
     }, {}, args, 0);
