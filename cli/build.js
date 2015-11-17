@@ -9,8 +9,14 @@ var path = require('path');
  * @returns {Promise}
  */
 module.exports = function (args) {
-    var config = require(process.cwd() + '/bt-config');
+    var config;
     var env = args[0];
+
+    try {
+        config = require(process.cwd() + '/bt-config');
+    } catch (err) {
+        config = {};
+    }
 
     args = nopt({
         env: [String],

@@ -20,6 +20,7 @@ var path = require('path');
  * @param {String} [options.dist] - The destination folder of where the the files will be built
  * @param {String} [options.browserifyOptions] - The browserify options
  * @param {String} [options.middleware] - The path to middleware file when server is started (when env is 'local')
+ * @param {String} [options.port] - The port to start server on (when env is 'local')
  * @returns {*}
  */
 module.exports = function(options) {
@@ -82,7 +83,7 @@ module.exports = function(options) {
                         return banner(options.bannerFiles).then(function () {
                             console.log('done build!');
                             if (options.env === 'local') {
-                                return server({middleware: options.middleware});
+                                return server({middleware: options.middleware, port: options.port});
                             }
                         });
                     });
