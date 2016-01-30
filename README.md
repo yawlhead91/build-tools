@@ -9,10 +9,12 @@ A set of javascript tasks to help speed up packaging and building processes.
 1. [Dependencies](#dependencies)
 1. [CLI Commands](#cli-commands)
     * [bt server](#bt-server)
+    * [bt build](#bt-build)
     * [bt test](#bt-test)
     * [bt version](#bt-version)
 1. [Grunt Tasks](#grunt-tasks)
     * [grunt bt:server](#grunt-bt-server)
+    * [grunt bt:build](#grunt-bt-build)
     * [grunt bt:test](#grunt-bt-test)
 
 ## Dependencies
@@ -42,6 +44,38 @@ bt server port=8200 staticDir=./blah middleware=./myServer.js
 ```
 
 Providing no arguments will serve the root directory of your project on localhost via port 7000, and use express's standard middleware by default.
+
+### bt build
+
+The build command will compile your application's js files using browserify. First you need to specify the files you
+want the build command to use in your `bt-config.js` file.
+
+For instance, if you wanted to build `src/main.js` (your entry file) into a final `dist/app.js` file,
+specify the following in your `bt-config.js` file:
+
+```javascript
+module.exports = {
+    build: {
+        files: {
+            'dist/app.js': ['src/main.js']
+        }
+    },
+};
+```
+
+Then you can run the build command in your terminal:
+
+```
+bt build
+```
+
+By default, the build assumes a "production" build and does not watch your files as you edit them. If you want your files
+to be "watched" and built on the fly as you edit them, pass the `local` option when running the terminal command like this:
+
+```
+bt build local
+```
+
 
 ### bt test
 
@@ -131,6 +165,15 @@ Same as the [`bt server`](#bt-server) command using grunt.
 ```shell
 grunt bt:server
 ```
+
+### grunt bt:build
+
+Same as the [`bt build`](#bt-build) command using grunt.
+
+```shell
+grunt bt:build
+```
+
 
 ### grunt bt:test
 
