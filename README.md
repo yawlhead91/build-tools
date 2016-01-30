@@ -34,13 +34,14 @@ npm install build-tools  -g
 
 ### bt server
 
-To start a local server on port 8200 that serves the "blah" directory in your project, just run the following command:
+To start a local server on port 8200 that serves the "blah" directory in your project using your own custom middleware myServer.js file,
+just run the following command (all arguments are optional):
 
 ```
-bt server port=8200 staticDir=./blah
+bt server port=8200 staticDir=./blah middleware=./myServer.js
 ```
 
-Providing no arguments will serve the root directory of your project on localhost via port 7000 by default.
+Providing no arguments will serve the root directory of your project on localhost via port 7000, and use express's standard middleware by default.
 
 ### bt test
 
