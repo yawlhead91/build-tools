@@ -8,9 +8,11 @@ A set of javascript tasks to help speed up packaging and building processes.
 
 1. [Dependencies](#dependencies)
 1. [CLI Commands](#cli-commands)
+    * [bt server](#bt-server)
     * [bt test](#bt-test)
     * [bt version](#bt-version)
 1. [Grunt Tasks](#grunt-tasks)
+    * [grunt bt:server](#grunt-bt-server)
     * [grunt bt:test](#grunt-bt-test)
 
 ## Dependencies
@@ -28,6 +30,15 @@ You can install globally by typing the following in your terminal:
 
 ```
 npm install build-tools  -g
+```
+
+### bt server
+
+To start a local server to serve the root of your directory, just run the following command (will run on
+localhost port 7000 by default).
+
+```
+bt server
 ```
 
 ### bt test
@@ -110,6 +121,14 @@ grunt.loadNpmTasks('build-tools');
 ```
 
 The any of the following commands can be ran.
+
+### grunt bt:server
+
+Same as the [`bt server`](#bt-server) command using grunt.
+
+```shell
+grunt bt:server
+```
 
 ### grunt bt:test
 
