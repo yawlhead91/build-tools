@@ -1,11 +1,5 @@
 'use strict';
-
-var Promise = require('promise');
-var _ = require('underscore');
-var fs = require('fs-extra');
-var glob = require('glob');
-var browserify = require('browserify');
-var watchify = require('watchify');
+var grunt = require("grunt");
 
 module.exports = {
 
@@ -24,7 +18,27 @@ module.exports = {
                 return scope(path);
             });
         }
-    }
+    },
 
+    /**
+     * Returns the build-tools configuration, whether its as a bt-config file or grunt file.
+     * @returns {undefined|Object}
+     */
+    getConfig: function () {
+        var rootPath = process.cwd(),
+            config;
+        try {
+            config = require(rootPath + '/bt-config');
+        } catch (err) {
+            try {
+                require(rootPath + '/Gruntfile')(grunt);
+                config = grunt.config("bt");
+            } catch (err) {
+                console.warn("Project has no configuration file for bt command!");
+            }
+        }
+
+        return config;
+    }
 
 };

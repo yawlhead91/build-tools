@@ -1,6 +1,7 @@
 'use strict';
 var test = require('./../src/test');
-var config = require(process.cwd() + '/bt-config') || {};
+var utils = require('./../src/utils');
+var config = utils.getConfig() || {};
 var _ = require('underscore');
 
 /**

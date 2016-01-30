@@ -3,20 +3,15 @@ var build = require('./../src/build');
 var _ = require('underscore');
 var nopt = require('nopt');
 var path = require('path');
+var utils = require('./../src/utils');
 
 /**
  * Builds files specified in config file into the destination folder.
  * @returns {Promise}
  */
 module.exports = function (args) {
-    var config;
+    var config = utils.getConfig() || {};
     var env = args[0];
-
-    try {
-        config = require(process.cwd() + '/bt-config');
-    } catch (err) {
-        config = {};
-    }
 
     args = nopt({
         env: [String],
