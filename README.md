@@ -40,7 +40,7 @@ To start a local server on port 8200 that serves the "blah" directory in your pr
 bt server port=8200 staticDir=./blah
 ```
 
-Providing no arguments will start the serve the root directory of your project on localhost via port 7000 by default.
+Providing no arguments will serve the root directory of your project on localhost via port 7000 by default.
 
 ### bt test
 
