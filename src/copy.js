@@ -33,6 +33,27 @@ module.exports = function (options) {
         });
     }
 
+    /**
+     * Returns a set of paths based on a glob string
+     * @param {string} srcGlob - The glob string
+     * @returns {Promise} Returns a promise with the array of paths that match
+     */
+    function getGlobs (srcGlob) {
+        return new Promise(function (resolve, reject) {
+            // if the path is not a glob pattern, just return it
+            if (!glob.hasMagic(srcGlob)) {
+                return resolve([srcGlob]);
+            }
+            glob(srcGlob, function (err, paths) {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(paths);
+                }
+            })
+        });
+    }
+
 
     /**
      * Copies a set of files to a destination.
@@ -49,19 +70,12 @@ module.exports = function (options) {
 
         return srcFilePaths.reduce(function (prevPromise, srcGlob) {
             return prevPromise.then(function () {
-                return new Promise(function (resolve, reject) {
-                    glob(srcGlob, function (err, paths) {
-                        if (err) {
-                            reject(err);
-                        }
-                        return paths.reduce(function (prev, p) {
-                                return prev.then(function () {
-                                    return copyFile(p, destPath);
-                                });
-                            }, Promise.resolve())
-                            .then(resolve)
-                            .catch(reject);
-                    });
+                return getGlobs(srcGlob).then(function (paths) {
+                    return paths.reduce(function (prev, p) {
+                        return prev.then(function () {
+                            return copyFile(p, destPath);
+                        });
+                    }, Promise.resolve())
                 });
             });
         }, Promise.resolve());
