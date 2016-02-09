@@ -8,6 +8,7 @@ var browserify = require('browserify');
 var watchify = require('watchify');
 var utils = require('./utils');
 var babelify = require("babelify");
+var path = require("path");
 
 /**
  * Browserifies a single file bundle.
@@ -58,7 +59,9 @@ var browserifyFile = function (destPath, srcPaths, options) {
             b.require(path, {expose: id});
         });
 
-        b.transform(babelify);
+        b.transform(babelify, {
+            presets: ["es2015"]
+        });
 
         b.on('bundle', function (stream) {
             console.log('browserifying bundle...');
