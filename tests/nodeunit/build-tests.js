@@ -10,7 +10,8 @@ var testMock,
     browserifyMock,
     minifyMock,
     bannerMock,
-    serverMock;
+    serverMock,
+    sassMock;
 
 var allowables = ['util', testPath, 'promise', './bump'];
 
@@ -25,6 +26,7 @@ module.exports = {
         testMock = sinon.stub().returns(Promise.resolve());
         cleanMock = sinon.stub().returns(Promise.resolve());
         copyMock = sinon.stub().returns(Promise.resolve());
+        sassMock = sinon.stub().returns(Promise.resolve());
         browserifyMock = sinon.stub().returns(Promise.resolve());
         minifyMock = sinon.stub().returns(Promise.resolve());
         bannerMock = sinon.stub().returns(Promise.resolve());
@@ -32,6 +34,7 @@ module.exports = {
         mockery.registerMock('./test', testMock);
         mockery.registerMock('./clean', cleanMock);
         mockery.registerMock('./copy', copyMock);
+        mockery.registerMock('./sassify', sassMock);
         mockery.registerMock('./browserify', browserifyMock);
         mockery.registerMock('./minify', minifyMock);
         mockery.registerMock('./banner', bannerMock);
@@ -50,7 +53,7 @@ module.exports = {
     },
 
     'calling with no parameters returns a resolved promise and does not call any modules': function (test) {
-        test.expect(7);
+        test.expect(8);
         var build = require(testPath);
         build().then(function () {
             test.equal(testMock.callCount, 0);
@@ -60,12 +63,13 @@ module.exports = {
             test.equal(minifyMock.callCount, 0);
             test.equal(bannerMock.callCount, 0);
             test.equal(serverMock.callCount, 0);
+            test.equal(sassMock.callCount, 0);
             test.done();
         }, test.done);
     },
 
     'calling with empty object returns a resolved promise and does not call any modules': function (test) {
-        test.expect(7);
+        test.expect(8);
         var build = require(testPath);
         build({}).then(function () {
             test.equal(testMock.callCount, 0);
@@ -75,12 +79,13 @@ module.exports = {
             test.equal(minifyMock.callCount, 0);
             test.equal(bannerMock.callCount, 0);
             test.equal(serverMock.callCount, 0);
+            test.equal(sassMock.callCount, 0);
             test.done();
         }, test.done);
     },
 
     'no dist option does not call any modules and still resolves': function (test) {
-        test.expect(7);
+        test.expect(8);
         var build = require(testPath);
         build({}).then(function () {
             test.equal(testMock.callCount, 0);
@@ -90,12 +95,13 @@ module.exports = {
             test.equal(minifyMock.callCount, 0);
             test.equal(bannerMock.callCount, 0);
             test.equal(serverMock.callCount, 0);
+            test.equal(sassMock.callCount, 0);
             test.done();
         }, test.done);
     },
 
     'no files option does not call any modules and still resolves': function (test) {
-        test.expect(7);
+        test.expect(8);
         var build = require(testPath);
         build({}).then(function () {
             test.equal(testMock.callCount, 0);
@@ -105,6 +111,7 @@ module.exports = {
             test.equal(minifyMock.callCount, 0);
             test.equal(bannerMock.callCount, 0);
             test.equal(serverMock.callCount, 0);
+            test.equal(sassMock.callCount, 0);
             test.done();
         }, test.done);
     },

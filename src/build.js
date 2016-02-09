@@ -10,6 +10,7 @@ var _ = require('underscore');
 var copy = require('./copy');
 var browserify = require('./browserify');
 var path = require('path');
+var sassify = require('./sassify');
 
 /**
  * Cleans, browserifies, minifies, and creates banners for passed files.
@@ -62,31 +63,38 @@ module.exports = function(options) {
         staticDir: null
     }, options);
 
+    options.watch = options.env === 'local';
+
     return test(options.testsConfig).then(function () {
         return clean(options.dist).then(function () {
             var browserifyOptions = {
-                watch: options.env === 'local',
+                watch: options.watch,
                 browserifyOptions: options.browserifyOptions,
                 files: {}
             };
-            var copyOptions = {files: {}};
+            var copyOptions = {files: {}},
+                sassOptions = {files: {}, watch: options.watch};
             // only copy only non-js files
             _.each(options.files, function (srcPaths, destPath) {
-                if (path.extname(destPath) === '.js') {
+                if (path.extname(destPath) === '.css') {
+                    sassOptions.files[destPath] = srcPaths;
+                } else if (path.extname(destPath) === '.js') {
                     browserifyOptions.files[destPath] = srcPaths;
                 } else {
                     copyOptions.files[destPath] = srcPaths;
                 }
             });
             return copy(copyOptions).then(function () {
-                return browserify(browserifyOptions).then(function () {
-                    options.min = options.min || {};
-                    return minify({files: options.minifyFiles}).then(function () {
-                        return banner(options.bannerFiles).then(function () {
-                            console.log('done build!');
-                            if (options.env === 'local') {
-                                return server(options);
-                            }
+                return sassify(sassOptions).then(function () {
+                    return browserify(browserifyOptions).then(function () {
+                        options.min = options.min || {};
+                        return minify({files: options.minifyFiles}).then(function () {
+                            return banner(options.bannerFiles).then(function () {
+                                console.log('done build!');
+                                if (options.env === 'local') {
+                                    return server(options);
+                                }
+                            });
                         });
                     });
                 });
