@@ -18,7 +18,8 @@ module.exports = function (args) {
         files: [null],
         dist: [path],
         middleware: [path],
-        port: [Number, null]
+        port: [Number, null],
+        staticDir: [String, null]
     }, {}, args, 0);
 
 
