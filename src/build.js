@@ -72,7 +72,7 @@ module.exports = function(options) {
                 browserifyOptions: options.browserifyOptions,
                 files: {}
             };
-            var copyOptions = {files: {}},
+            var copyOptions = {files: {}, watch: options.watch},
                 sassOptions = {files: {}, watch: options.watch};
             // only copy only non-js files
             _.each(options.files, function (srcPaths, destPath) {

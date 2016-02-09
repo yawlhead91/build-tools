@@ -9,6 +9,7 @@ var path = require('path');
  * Copies files to designated locations.
  * @param {Object} [options] - The copy options
  * @param {Object} [options.files] - A map containing destination paths (keys) with their arrays of source files (values)
+ * @param {Boolean} [options.watch] - Whether to watch the files and rebuild as necessary
  * @returns {Promise} Returns a promise when the files are copied
  */
 module.exports = function (options) {
@@ -18,7 +19,8 @@ module.exports = function (options) {
     }
 
     options = _.extend({
-        files: {}
+        files: {},
+        watch: false
     }, options);
 
     function ensureDestinationDirectory (dir) {
@@ -59,9 +61,10 @@ module.exports = function (options) {
      * Copies a set of files to a destination.
      * @param {Array} srcFilePaths - source path(s) (can contain globs)
      * @param {string} destPath - the destination
+     * @param {boolean} [watch] - Whether to watch the file
      * @returns {Promise}
      */
-    function copyFiles(srcFilePaths, destPath) {
+    function copyFiles(srcFilePaths, destPath, watch) {
 
         // ensure it is an array
         if (!Array.isArray(srcFilePaths)) {
@@ -73,7 +76,11 @@ module.exports = function (options) {
                 return getGlobs(srcGlob).then(function (paths) {
                     return paths.reduce(function (prev, p) {
                         return prev.then(function () {
-                            return copyFile(p, destPath);
+                            return copyFile(p, destPath).then(function () {
+                                if (watch) {
+                                    watchFile(p, destPath);
+                                }
+                            });
                         });
                     }, Promise.resolve())
                 });
@@ -133,10 +140,25 @@ module.exports = function (options) {
         }
     }
 
+    /**
+     * Watches a file and rebuilds if updated.
+     * @param srcPath
+     * @param destPath
+     */
+    function watchFile(srcPath, destPath) {
+        fs.watch(srcPath, function () {
+            console.log("file updated... rebuilding...");
+            copyFile(srcPath, destPath).then(function () {
+                console.log("file built");
+                watchFile(srcPath, destPath);
+            });
+        });
+    }
+
     var destPaths = _.keys(options.files);
     return destPaths.reduce(function (prevPromise, key) {
         return prevPromise.then(function () {
-            return copyFiles(options.files[key], key);
+            return copyFiles(options.files[key], key, options.watch);
         });
     }, Promise.resolve());
 };
