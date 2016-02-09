@@ -60,10 +60,12 @@ module.exports = function(options) {
         minifyFiles: null,
         bannerFiles: null,
         testsConfig: null,
-        staticDir: null
+        staticDir: null,
+        browserifyOptions: {}
     }, options);
 
     options.watch = options.env === 'local';
+    options.browserifyOptions.debug = options.browserifyOptions.debug || options.env === 'local';
 
     return test(options.testsConfig).then(function () {
         return clean(options.dist).then(function () {
