@@ -60,7 +60,7 @@ var browserifyFile = function (destPath, srcPaths, options) {
         });
 
         b.transform(babelify, {
-            presets: ["es2015"]
+            presets: [require('babel-preset-es2015')]
         });
 
         b.on('bundle', function (stream) {
