@@ -2,7 +2,8 @@
 var version = require('./../src/version');
 
 /**
- * Runs tests.
+ * Bumps the version of the npm package, commits it as an
+ * entry and pushes it both locally and remotely to the master branch repo.
  * @param args - The cli arguments
  * @returns {*}
  */
