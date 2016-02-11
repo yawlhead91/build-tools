@@ -12,12 +12,10 @@ A set of javascript tasks to help speed up packaging and building processes.
     * [bt build](#bt-build)
     * [bt test](#bt-test)
     * [bt version](#bt-version)
-    * [bt release](#bt-release)
 1. [Grunt Tasks](#grunt-tasks)
     * [grunt bt:server](#grunt-bt-server)
     * [grunt bt:build](#grunt-bt-build)
     * [grunt bt:test](#grunt-bt-test)
-    * [grunt bt:release](#grunt-bt-release)
 
 ## Dependencies
 
@@ -191,15 +189,6 @@ It is recommended to only run this command when you're on `master` or your "prod
 relevant commits have already been committed, and is less likely to have convoluted commits that you might not want in
 your new version.
 
-### bt release
-
-The release command bumps the versions of all package files (package.json and bower.json), runs all [tests](#bt-test),
-then runs a prod build just like when running the [`bt build`](#bt-build) command.
-
-```
-bt release [SEMVER]
-```
-
 Replacing [SEMVER] with (`major`, `minor` or `patch`) (`patch` is the default if nothing is supplied).
 
 ## Grunt Tasks
@@ -257,12 +246,4 @@ Then you can run:
 
 ```shell
 grunt bt:test
-```
-
-### grunt bt:release
-
-Same as the [`bt release`](#bt-release) command.
-
-```shell
-grunt bt:release
 ```
