@@ -69,6 +69,8 @@ Then you can run the build command in your terminal:
 bt build
 ```
 
+#### Building for local development
+
 By default, the build assumes a "production" build and does not watch your files as you edit them. If you want your files
 to be "watched" and built on the fly as you edit them, pass the `local` option when running the terminal command like this:
 
