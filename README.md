@@ -89,6 +89,39 @@ Arguments allowed are:
 | `port`| Number| The port number to start the server on (if `local` is passed)
 | `staticDir`| String | The path (relative to he project root) containing the files that should be served when the server starts
 
+
+#### Requiring files
+
+There are also configuration options you can specify in your configuration like `requires`, which will ensure
+that any external scripts are preloaded. See [https://github.com/substack/node-browserify#brequirefile-opts](browserify
+require documentation) to understand why you may want to do this. Here is an example of a configuration. All paths are
+relative to your project's root.
+
+```javascript
+{
+    build: {
+           requires: [
+                "./app/my-script"
+            ]
+        }
+}
+```
+
+Or you can specify an object for your requires to expose reusable variables:
+
+```javascript
+{
+    build: {
+           requires: {
+            "my-code": "./app/my-script"
+           }
+        }
+}
+```
+
+Then you can reference `my-code` anywhere in your bundled script files.
+
+
 ### bt test
 
 The `test` command will run all tests in any given project. The following test files are supported:

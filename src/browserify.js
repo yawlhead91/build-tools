@@ -57,6 +57,8 @@ var browserifyFile = function (destPath, srcPaths, options) {
 
         // require global files
         _.each(options.requires, function (path, id) {
+            // options.requires can be an array of strings or an object
+            id = typeof id == "string" ? id : path;
             b.require(path, {expose: id});
         });
 
