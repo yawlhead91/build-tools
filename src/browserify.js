@@ -9,6 +9,7 @@ var watchify = require('watchify');
 var utils = require('./utils');
 var babelify = require("babelify");
 var path = require("path");
+var es2015 = require('babel-preset-es2015');
 
 /**
  * Browserifies a single file bundle.
@@ -60,7 +61,7 @@ var browserifyFile = function (destPath, srcPaths, options) {
         });
 
         b.transform(babelify, {
-            presets: [require('babel-preset-es2015')]
+            presets: [es2015]
         });
 
         b.on('bundle', function (stream) {
