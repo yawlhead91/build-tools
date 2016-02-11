@@ -53,7 +53,7 @@ module.exports = function(options) {
         return browserify({
             files: fileMap,
             requires: requirePaths,
-            watch: true,
+            watch: options.keepalive,
             browserifyOptions: {
                 debug: true
             }
