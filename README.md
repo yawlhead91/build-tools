@@ -181,15 +181,13 @@ Running this command will:
 1. Check out your master branch
 1. Merge the branch you were on into your `master` branch
 1. Push your `master` branch remotely to Github
-`. Create a new tag of your new version
-`. Push new tag to remote
+1. Create a new tag of your new version
+1. Push new tag to remote
 1. Check back out the branch where you initially called the `version` command.
 
-It is recommended to only run this command when you're on `master` or your "production" branch, since that is where all
+It is recommended to only run this command when you're on `master` or a branch ready for production, since that is where all
 relevant commits have already been committed, and is less likely to have convoluted commits that you might not want in
 your new version.
-
-Replacing [SEMVER] with (`major`, `minor` or `patch`) (`patch` is the default if nothing is supplied).
 
 ## Grunt Tasks
 
