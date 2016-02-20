@@ -10,6 +10,7 @@ var _ = require('underscore');
 var utils = require('./utils');
 var clean = require('./clean');
 var browserify = require('./browserify');
+var qunit = require('node-qunit-phantomjs');
 
 var server;
 var tempDir = process.cwd() + '/tmp';
@@ -60,18 +61,9 @@ module.exports = function(options) {
         });
     }
 
-    function test() {
-        var nameMap = {
-                mocha: 'mocha-phantomjs',
-                qunit: 'node-qunit-phantomjs'
-            },
-            cmd = internalModulePath + '/node_modules/.bin/' + nameMap[options.id],
-            child;
-
-        console.log('running ' + options.id + ' tests...');
-
-        child = spawn(cmd, ['http://localhost:7755/index.html']);
-
+    function runMochaTest() {
+        var binPath = internalModulePath + '/node_modules/.bin/mocha-phantomjs';
+        var child = spawn(binPath, ['http://localhost:' + options.port + '/index.html']);
         return new Promise(function (resolve, reject) {
             child.stdout.on('data', function (buffer) {
                 process.stdout.write(buffer.toString());
@@ -81,8 +73,43 @@ module.exports = function(options) {
                 resolve(code);
             });
 
-            child.stdout.on('error', reject);
+            child.stdout.on('error', function (errorCode) {
+                reject(new Error(errorCode));
+            });
         });
+    }
+
+    function runQunitTest() {
+        return new Promise(function (resolve, reject) {
+            qunit('http://localhost:' + options.port + '/index.html', {'verbose': true}, function (err) {
+                if (!err) {
+                    resolve();
+                } else {
+                    reject(err);
+                }
+            });
+        });
+    }
+
+    function test() {
+        var promise;
+        console.log('running ' + options.id + ' tests...');
+        if (options.id.toLowerCase() === 'qunit') {
+            promise = runQunitTest();
+        } else {
+            promise = runMochaTest();
+        }
+
+        return new Promise(function (resolve) {
+            promise.then(resolve);
+            promise.catch(function (err) {
+                // still resolve with the error code even though we have error to ensure
+                // processes that follow still have a chance to run
+                console.log(err);
+                resolve(err);
+            });
+        });
+
     }
 
     function copyFiles() {
@@ -150,11 +177,11 @@ module.exports = function(options) {
     function runTest() {
         return runServer().then(function () {
             if (!options.keepalive) {
-                return test().then(function (errorCode) {
+                return test().then(function (error) {
                     return stopServer().then(function () {
                         return clean(tempDir).then(function () {
-                            if (errorCode) {
-                                throw new Error('test failure');
+                            if (error) {
+                                throw error;
                             }
                         });
                     });
