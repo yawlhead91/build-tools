@@ -44,6 +44,7 @@ module.exports = function(options) {
 
     function runBrowserify() {
         var requirePaths = {};
+        // expose "qunit" and "test-utils" variables to external project
         if (options.id === 'qunit') {
             requirePaths['qunit'] = tempDir + '/tests/qunit.js';
         }
