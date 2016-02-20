@@ -16,6 +16,7 @@ var es2015 = require('babel-preset-es2015');
  * @param destPath
  * @param srcPaths
  * @param options
+ * @param {Object|Array} [options.requires] - Required files
  * @returns {Promise}
  */
 var browserifyFile = function (destPath, srcPaths, options) {
@@ -75,6 +76,7 @@ var browserifyFile = function (destPath, srcPaths, options) {
                 })
                 .catch(function (e) {
                     console.log('browserifying failed');
+                    console.log(e);
                     reject(e);
                 });
         });
