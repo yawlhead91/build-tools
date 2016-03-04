@@ -39,6 +39,7 @@ module.exports = function (args) {
     };
 
     return runTests(args).then(function () {
+        options.watch = env === "local";
         return build(options);
     });
 };

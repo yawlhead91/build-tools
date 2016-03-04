@@ -24,6 +24,7 @@ module.exports = function (c, args) {
         config.build = config.build || {};
         config.build.env = args[0];
         config.build.dist = config.dist;
+        config.build.watch = env === "local";
         return build(config.build);
     });
 };
