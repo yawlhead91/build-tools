@@ -1,7 +1,6 @@
 'use strict';
 var Promise = require('promise');
 var utils = require('./utils');
-var test = require('./test');
 var banner = require('./banner');
 var minify = require('./minify');
 var clean = require('./clean');
@@ -17,7 +16,6 @@ var sassify = require('./sassify');
  * @param {Object} [options] - The build configuration
  * @param {String} [options.env] - The unique build environment id
  * @param {Object} [options.files] - An object containg a file mapping of the files to build
- * @param {Object} [options.testsConfig] - The config for testing
  * @param {String} [options.dist] - The destination folder of where the the files will be built
  * @param {String} [options.browserifyOptions] - The browserify options
  * @param {String} [options.middleware] - The path to middleware file when server is started (when env is 'local')
@@ -31,13 +29,14 @@ module.exports = function(options) {
 
     options = options || {};
 
+
     // account for deprecated 'min' property
     options.minifyFiles = options.min ? options.min.files : options.minifyFiles;
     // account for deprecated 'banner' property
     options.bannerFiles = options.banner ? options.banner.files : options.bannerFiles;
-    // account for deprecated 'tests' property
-    options.testsConfig = options.tests || options.testsConfig;
     options.files = options.build ? options.build.files : options.files;
+
+    console.log(options);
 
     if (!options.env) {
         console.warn('no environment was supplied, building prod instead...');
@@ -59,7 +58,6 @@ module.exports = function(options) {
         dist: null,
         minifyFiles: null,
         bannerFiles: null,
-        testsConfig: null,
         staticDir: null,
         browserifyOptions: {}
     }, options);
@@ -67,37 +65,35 @@ module.exports = function(options) {
     options.watch = options.env === 'local';
     options.browserifyOptions.debug = options.browserifyOptions.debug || options.env === 'local';
 
-    return test(options.testsConfig).then(function () {
-        return clean(options.dist).then(function () {
-            var browserifyOptions = {
-                watch: options.watch,
-                browserifyOptions: options.browserifyOptions,
-                files: {},
-                requires: options.requires
-            };
-            var copyOptions = {files: {}, watch: options.watch},
-                sassOptions = {files: {}, watch: options.watch};
-            // only copy only non-js files
-            _.each(options.files, function (srcPaths, destPath) {
-                if (path.extname(destPath) === '.css') {
-                    sassOptions.files[destPath] = srcPaths;
-                } else if (path.extname(destPath) === '.js') {
-                    browserifyOptions.files[destPath] = srcPaths;
-                } else {
-                    copyOptions.files[destPath] = srcPaths;
-                }
-            });
-            return copy(copyOptions).then(function () {
-                return sassify(sassOptions).then(function () {
-                    return browserify(browserifyOptions).then(function () {
-                        options.min = options.min || {};
-                        return minify({files: options.minifyFiles}).then(function () {
-                            return banner(options.bannerFiles).then(function () {
-                                console.log('done build!');
-                                if (options.env === 'local') {
-                                    return server(options);
-                                }
-                            });
+    return clean(options.dist).then(function () {
+        var browserifyOptions = {
+            watch: options.watch,
+            browserifyOptions: options.browserifyOptions,
+            files: {},
+            requires: options.requires
+        };
+        var copyOptions = {files: {}, watch: options.watch},
+            sassOptions = {files: {}, watch: options.watch};
+        // only copy only non-js files
+        _.each(options.files, function (srcPaths, destPath) {
+            if (path.extname(destPath) === '.css') {
+                sassOptions.files[destPath] = srcPaths;
+            } else if (path.extname(destPath) === '.js') {
+                browserifyOptions.files[destPath] = srcPaths;
+            } else {
+                copyOptions.files[destPath] = srcPaths;
+            }
+        });
+        return copy(copyOptions).then(function () {
+            return sassify(sassOptions).then(function () {
+                return browserify(browserifyOptions).then(function () {
+                    options.min = options.min || {};
+                    return minify({files: options.minifyFiles}).then(function () {
+                        return banner(options.bannerFiles).then(function () {
+                            console.log('done build!');
+                            if (options.env === 'local') {
+                                return server(options);
+                            }
                         });
                     });
                 });

@@ -4,6 +4,8 @@ var _ = require('underscore');
 var nopt = require('nopt');
 var path = require('path');
 var utils = require('./../src/utils');
+var test = require('./test');
+var Promise = require("promise");
 
 /**
  * Builds files specified in config file into the destination folder.
@@ -28,5 +30,15 @@ module.exports = function (args) {
         dist: config.dist
     }, config.build, args);
 
-    return build(options);
+    var runTests = function (args) {
+        if (env !== "local") {
+            return test(args);
+        } else {
+            return Promise.resolve();
+        }
+    };
+
+    return runTests(args).then(function () {
+        return build(options);
+    });
 };
