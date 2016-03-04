@@ -69,10 +69,11 @@ Then you can run the build command in your terminal:
 bt build
 ```
 
-#### Building for local development
+#### Running builds
 
-By default, the build assumes a "production" build and does not watch your files as you edit them. If you want your files
-to be "watched" and built on the fly as you edit them, pass the `local` option when running the terminal command like this:
+You can run builds by using the build command. By default, the build command assumes a "production" build, will run tests
+(if applicable) and does not watch your files as you edit them. If you want your files to be "watched" and built
+on the fly as you edit them, pass the `local` option when running the terminal command like this:
 
 ```
 bt build local
@@ -90,7 +91,6 @@ Arguments allowed are:
 |--------|--------|--------|
 | `port`| Number| The port number to start the server on (if `local` is passed)
 | `staticDir`| String | The path (relative to he project root) containing the files that should be served when the server starts
-
 
 #### Requiring files
 
