@@ -4,8 +4,7 @@ var sinon = require('sinon');
 var mockery = require('mockery');
 var Promise = require('promise');
 
-var testMock,
-    cleanMock,
+var cleanMock,
     copyMock,
     browserifyMock,
     minifyMock,
@@ -23,7 +22,6 @@ module.exports = {
         sinon.stub(console, 'error');
         mockery.enable({useCleanCache: true});
         mockery.warnOnUnregistered(false); // suppress non-allowed modules
-        testMock = sinon.stub().returns(Promise.resolve());
         cleanMock = sinon.stub().returns(Promise.resolve());
         copyMock = sinon.stub().returns(Promise.resolve());
         sassMock = sinon.stub().returns(Promise.resolve());
@@ -31,7 +29,6 @@ module.exports = {
         minifyMock = sinon.stub().returns(Promise.resolve());
         bannerMock = sinon.stub().returns(Promise.resolve());
         serverMock = sinon.stub().returns(Promise.resolve());
-        mockery.registerMock('./test', testMock);
         mockery.registerMock('./clean', cleanMock);
         mockery.registerMock('./copy', copyMock);
         mockery.registerMock('./sassify', sassMock);
@@ -53,10 +50,9 @@ module.exports = {
     },
 
     'calling with no parameters returns a resolved promise and does not call any modules': function (test) {
-        test.expect(8);
+        test.expect(7);
         var build = require(testPath);
         build().then(function () {
-            test.equal(testMock.callCount, 0);
             test.equal(cleanMock.callCount, 0);
             test.equal(copyMock.callCount, 0);
             test.equal(browserifyMock.callCount, 0);
@@ -69,10 +65,9 @@ module.exports = {
     },
 
     'calling with empty object returns a resolved promise and does not call any modules': function (test) {
-        test.expect(8);
+        test.expect(7);
         var build = require(testPath);
         build({}).then(function () {
-            test.equal(testMock.callCount, 0);
             test.equal(cleanMock.callCount, 0);
             test.equal(copyMock.callCount, 0);
             test.equal(browserifyMock.callCount, 0);
@@ -85,10 +80,9 @@ module.exports = {
     },
 
     'no dist option does not call any modules and still resolves': function (test) {
-        test.expect(8);
+        test.expect(7);
         var build = require(testPath);
         build({}).then(function () {
-            test.equal(testMock.callCount, 0);
             test.equal(cleanMock.callCount, 0);
             test.equal(copyMock.callCount, 0);
             test.equal(browserifyMock.callCount, 0);
@@ -101,10 +95,9 @@ module.exports = {
     },
 
     'no files option does not call any modules and still resolves': function (test) {
-        test.expect(8);
+        test.expect(7);
         var build = require(testPath);
         build({}).then(function () {
-            test.equal(testMock.callCount, 0);
             test.equal(cleanMock.callCount, 0);
             test.equal(copyMock.callCount, 0);
             test.equal(browserifyMock.callCount, 0);
@@ -112,36 +105,6 @@ module.exports = {
             test.equal(bannerMock.callCount, 0);
             test.equal(serverMock.callCount, 0);
             test.equal(sassMock.callCount, 0);
-            test.done();
-        }, test.done);
-    },
-
-    'tests option with build.files option will be passed to the test module (deprecated)': function (test) {
-        test.expect(1);
-        var build = require(testPath);
-        var customOptions = {"presto": 2};
-        build({tests: customOptions, build: {files: {}}, dist: {}}).then(function () {
-            test.deepEqual(testMock.args[0], [customOptions]);
-            test.done();
-        }, test.done);
-    },
-
-    'testsConfig object without a files option will NOT call the test module': function (test) {
-        test.expect(1);
-        var build = require(testPath);
-        var customOptions = {"blah": 2};
-        build({testsConfig: customOptions}).then(function () {
-            test.equal(testMock.callCount, 0);
-            test.done();
-        }, test.done);
-    },
-
-    'testsConfig with a files option will call the test module with the testsConfig object': function (test) {
-        test.expect(1);
-        var build = require(testPath);
-        var customOptions = {"blah": 2};
-        build({testsConfig: customOptions, files: {}, dist: {}}).then(function () {
-            test.deepEqual(testMock.args[0], [customOptions]);
             test.done();
         }, test.done);
     },
