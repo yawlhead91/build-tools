@@ -35,9 +35,7 @@ module.exports = function(options) {
     // account for deprecated 'banner' property
     options.bannerFiles = options.banner ? options.banner.files : options.bannerFiles;
     options.files = options.build ? options.build.files : options.files;
-
-    console.log(options);
-
+    
     if (!options.env) {
         console.warn('no environment was supplied, building prod instead...');
     } else if (!availableEnvs.has(options.env)) {
