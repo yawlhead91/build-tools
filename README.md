@@ -169,8 +169,8 @@ Which will run your tests in the browser located at http://localhost:7755.
 The `release` command is to quickly package up your project, commit it locally, tag it, and pushes it to your github repo.
  The command does the following:
 
-1. Runs all [tests](#bt-test).
-1. Runs a [production build](#bt-build).
+1. Runs all [tests](#bt-test) you've specified.
+1. Runs a [production build](#bt-build), if specified.
 1. Ups the version of the package, which involves the exact same steps performed by the [version command](#bt-version).
 
 ### bt version
