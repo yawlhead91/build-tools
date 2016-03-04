@@ -12,6 +12,7 @@ var Promise = require("promise");
  * @returns {Promise}
  */
 module.exports = function (args) {
+    args = args || [];
     var config = utils.getConfig() || {};
     var env = args[0];
 

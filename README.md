@@ -11,6 +11,7 @@ A set of javascript tasks to help speed up packaging and building processes.
     * [bt server](#bt-server)
     * [bt build](#bt-build)
     * [bt test](#bt-test)
+    * [bt release](#bt-release)
     * [bt version](#bt-version)
 1. [Grunt Tasks](#grunt-tasks)
     * [grunt bt:server](#grunt-bt-server)
@@ -162,6 +163,15 @@ bt test qunit server
 ```
 
 Which will run your tests in the browser located at http://localhost:7755.
+
+### bt release
+
+The `release` command is to quickly package up your project, commit it locally, tag it, and pushes it to your github repo.
+ The command does the following:
+
+1. Runs all [tests](#bt-test).
+1. Runs a [production build](#bt-build).
+1. Ups the version of the package, which involves the exact same steps performed by the [version command](#bt-version).
 
 ### bt version
 

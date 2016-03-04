@@ -14,23 +14,7 @@ module.exports = function (type) {
     var localRepo = git(process.cwd()),
         newVersionNum;
 
-    var ensureCleanWorkingDirectory = function () {
-        return new Promise(function (resolve, reject) {
-            localRepo.status(function (err, status) {
-                if (err) return reject(err);
-                if (status && !status.staged.length && !status.unstaged.length && !status.untracked.length) {
-                    resolve();
-                } else {
-                    // working directory is dirty! so bail
-                    console.error('Your working directory must be clean before you ' +
-                    'can create a new version of your package');
-                    reject();
-                }
-            });
-        });
-    };
-
-    var getBumpedFiles = function () {
+    var getEditedFiles = function () {
         var files = [];
         return new Promise(function (resolve, reject) {
             localRepo.status(function (err, status) {
@@ -121,14 +105,12 @@ module.exports = function (type) {
         });
     };
 
-    return ensureCleanWorkingDirectory().then(function () {
-        return bump(type).then(function (newVersion) {
-            newVersionNum = newVersion;
-            return getBumpedFiles().then(function (bumpedFiles) {
-                return stageFiles(bumpedFiles).then(function () {
-                    return commit(newVersionNum).then(function () {
-                        return merge('master');
-                    });
+    return bump(type).then(function (newVersion) {
+        newVersionNum = newVersion;
+        return getEditedFiles().then(function (editedFiles) {
+            return stageFiles(editedFiles).then(function () {
+                return commit(newVersionNum).then(function () {
+                    return merge('master');
                 });
             });
         });
