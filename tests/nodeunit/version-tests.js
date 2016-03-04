@@ -53,21 +53,6 @@ module.exports = {
         test.done();
     },
 
-    'calling version() with a dirty current working directory halts versioning': function (test) {
-        test.expect(1);
-        var version = require(testPath);
-        var statusResp = {
-            staged: [],
-            unstaged: [ { file: 'package.json', status: 'modified' } ],
-            untracked: [ 'src/version.js', 'tests/version-tests.js' ]
-        };
-        localRepoMock.status.yields(null, statusResp); // return unclean status
-        version().then(function () {
-            test.equal(bumpStub.callCount, 0, 'files were not bumped');
-            test.done();
-        }, test.done);
-    },
-
     'calling version() with a clean working directory calls correct git methods': function (test) {
         test.expect(10);
         var version = require(testPath);
@@ -79,13 +64,12 @@ module.exports = {
             unstaged: [],
             untracked: []
         };
-        localRepoMock.status.onFirstCall().yields(null, statusResp); // return clean directory status
         var afterBumpStatus = {
             staged: [],
             unstaged: [ { file: 'package.json', status: 'modified' } ],
             untracked: []
         };
-        localRepoMock.status.onSecondCall().yields(null, afterBumpStatus); // return status after package.json file has been bumped
+        localRepoMock.status.onFirstCall().yields(null, afterBumpStatus); // return status after package.json file has been bumped
         localRepoMock.add.yields(null); // staged files success
         localRepoMock.commit.yields(null); // commit success
         var getBranchesResp = {current: currentBranch};
