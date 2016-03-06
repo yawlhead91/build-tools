@@ -3,6 +3,7 @@ var sass = require('node-sass');
 var Promise = require('promise');
 var _ = require('underscore');
 var fs = require('fs-extra');
+var path = require("path");
 
 var watchFile = function (sourceFile, destinationFile) {
     return new Promise(function (resolve) {
@@ -12,27 +13,46 @@ var watchFile = function (sourceFile, destinationFile) {
     });
 };
 
-var sassifyFile = function (sourceFile, destinationFile, watch) {
+/**
+ * Creates the destination directory if it doesnt exist.
+ * @param dest
+ * @returns {*|exports|module.exports}
+ */
+var ensureDestinationDir = function (dest) {
     return new Promise(function (resolve, reject) {
-        sass.render({
-            file: sourceFile,
-            outFile: destinationFile
-        }, function (err, result) {
+        fs.ensureDir(path.dirname(dest), function (err) {
             if (!err) {
-                // No errors during the compilation, let's write result on the disk
-                fs.writeFile(destinationFile, result.css, function (err) {
-                    if (!err) {
-                        if (watch) {
-                            watchFile(sourceFile, destinationFile);
-                        }
-                        resolve();
-                    } else {
-                        reject(err);
-                    }
-                });
+                resolve();
             } else {
                 reject(err);
             }
+        });
+    });
+};
+
+var sassifyFile = function (sourceFile, destinationFile, watch) {
+    return ensureDestinationDir(destinationFile).then(function () {
+        return new Promise(function (resolve, reject) {
+            sass.render({
+                file: sourceFile,
+                outFile: destinationFile
+            }, function (err, result) {
+                if (!err) {
+                    // No errors during the compilation, let's write result on the disk
+                    fs.writeFile(destinationFile, result.css, function (err) {
+                        if (!err) {
+                            if (watch) {
+                                watchFile(sourceFile, destinationFile);
+                            }
+                            resolve();
+                        } else {
+                            reject(err);
+                        }
+                    });
+                } else {
+                    reject(err);
+                }
+            });
         });
     });
 };
