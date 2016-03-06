@@ -43,7 +43,7 @@
     "nopt": "^3.0.4",
     "promise": "^6.1.0",
     "replace": "^0.3.0",
-    "semver": "^4.3.1",
+    "semver": "^4.3.6",
     "serve-static": "^1.9.2",
     "sinon": "^1.12.2",
     "uglify-js": "^2.4.17",

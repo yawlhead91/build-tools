@@ -2,17 +2,25 @@
 var git = require('gitty');
 var Promise = require('promise');
 var bump = require('./bump');
+var _ = require('underscore');
+var semver = require('semver');
 
 /**
  * Ups the current package to a new version and commits it locally.
  * Imitates `npm version` functionality: https://docs.npmjs.com/cli/version
- * @param {string} [type] - a valid semver string (defaults to patch)
+ * @param {string|number} [type] - a valid semver string (defaults to patch) or the new version number to use
  * @returns {Promise} Returns a promise that resolves when completed
  * @type {exports}
  */
 module.exports = function (type) {
     var localRepo = git(process.cwd()),
         newVersionNum;
+
+    type = type || 'patch';
+
+    if (semver.valid(type)) {
+        newVersionNum = type;
+    }
 
     var getEditedFiles = function () {
         var files = [];
@@ -105,8 +113,15 @@ module.exports = function (type) {
         });
     };
 
-    return bump(type).then(function (newVersion) {
-        newVersionNum = newVersion;
+    var bumpFiles = function () {
+        if (!newVersionNum) {
+            return bump(type);
+        } else {
+            return Promise.resolve();
+        }
+    };
+
+    return bumpFiles().then(function () {
         return getEditedFiles().then(function (editedFiles) {
             return stageFiles(editedFiles).then(function () {
                 return commit(newVersionNum).then(function () {

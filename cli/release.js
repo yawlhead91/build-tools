@@ -1,6 +1,7 @@
 "use strict";
 var test = require('./test');
 var version = require('./../src/version');
+var bump = require('./../src/bump');
 var build = require('./build');
 
 /**
@@ -10,8 +11,10 @@ var build = require('./build');
 module.exports = function (args) {
     var semVersion = args[0];
     return test().then(function () {
-        return build().then(function () {
-            return version(semVersion);
+        return bump(semVersion).then(function (nextVersion) {
+            return build().then(function () {
+                return version(nextVersion);
+            });
         });
     }).catch(function (err) {
         console.error(err);
