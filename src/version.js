@@ -48,10 +48,10 @@ module.exports = function (type) {
         });
     };
 
-    var commit = function () {
+    var commit = function (version) {
         console.log('committing locally...');
         return new Promise(function (resolve, reject) {
-            localRepo.commit(newVersionNum, function (err) {
+            localRepo.commit(version, function (err) {
                 if (err) return reject(err);
                 console.log('committing completed!');
                 resolve();
@@ -59,10 +59,10 @@ module.exports = function (type) {
         });
     };
 
-    var createTag = function () {
+    var createTag = function (version) {
         console.log('creating tag...');
         return new Promise(function (resolve, reject) {
-            localRepo.createTag(newVersionNum, function (err) {
+            localRepo.createTag(version, function (err) {
                 if (err) return reject(err);
                 console.log('tag creation completed!');
                 resolve();
@@ -70,10 +70,10 @@ module.exports = function (type) {
         });
     };
 
-    var pushTag = function () {
+    var pushTag = function (version) {
         console.log('pushing new tag to remote...');
         return new Promise(function (resolve, reject) {
-            localRepo.push('origin', newVersionNum, function (err) {
+            localRepo.push('origin', version, function (err) {
                 if (err) return reject(err);
                 console.log('tag pushed to remote completed!');
                 resolve();
@@ -82,7 +82,7 @@ module.exports = function (type) {
 
     };
 
-    var merge = function (branch) {
+    var merge = function (branch, version) {
         console.log('attempting to merge new version into ' + branch + '...');
         return new Promise(function (resolve, reject) {
             // get current branch so we can navigate back to it when done
@@ -95,8 +95,8 @@ module.exports = function (type) {
                         // push result to Github
                         localRepo.push('origin', branch, function (err) {
                             // create and push tags
-                            return createTag(newVersionNum).then(function () {
-                                return pushTag(newVersionNum).then(function () {
+                            return createTag(version).then(function () {
+                                return pushTag(version).then(function () {
                                     if (err) return reject(err);
                                     // merge done, now navigate back to original branch
                                     localRepo.checkout(branches.current, function (err) {
@@ -114,18 +114,18 @@ module.exports = function (type) {
     };
 
     var bumpFiles = function () {
-        if (!newVersionNum) {
-            return bump(type);
+        if (newVersionNum) {
+            return Promise.resolve(newVersionNum);
         } else {
-            return Promise.resolve();
+            return bump(type);
         }
     };
 
-    return bumpFiles().then(function () {
+    return bumpFiles().then(function (newVersionNbr) {
         return getEditedFiles().then(function (editedFiles) {
             return stageFiles(editedFiles).then(function () {
-                return commit(newVersionNum).then(function () {
-                    return merge('master');
+                return commit(newVersionNbr).then(function () {
+                    return merge('master', newVersionNbr);
                 });
             });
         });
