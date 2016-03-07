@@ -48,10 +48,12 @@ Providing no arguments will serve the root directory of your project on localhos
 
 ### bt build
 
-The build command will compile your application's js files using browserify. First you need to specify the files you
-want the build command to use in your `bt-config.js` file.
+The `build` command builds all of your files into a distribution folder for deployment.
+It will do things like compile all of your application's javascript files into single files using browserify (ES6 files are supported), 
+sassify all of your scss files, minify files, and even add banners to your files if desired. 
 
-For instance, if you wanted to build `src/main.js` (your entry file) into a final `dist/app.js` file,
+First you need to specify the files you want the build command to use in your `bt-config.js` file. For instance, 
+if you wanted to build `src/main.js` (your entry file) into a final `dist/app.js` file,
 specify the following in your `bt-config.js` file:
 
 ```javascript
@@ -70,11 +72,10 @@ Then you can run the build command in your terminal:
 bt build
 ```
 
-#### Running builds
+#### Running builds for local development
 
-You can run builds by using the build command. By default, the build command assumes a "production" build, will run tests
-(if applicable) and does not watch your files as you edit them. If you want your files to be "watched" and built
-on the fly as you edit them, pass the `local` option when running the terminal command like this:
+By default, the `build` command assumes a "production" build, will run tests (if applicable) and does not watch your files as you edit them. 
+If you want your files to be "watched" and built on the fly as you edit them, pass the `local` option when running the terminal command like this:
 
 ```
 bt build local
@@ -166,7 +167,8 @@ Which will run your tests in the browser located at http://localhost:7755.
 
 ### bt release
 
-The `release` command is to quickly package up your project, commit it locally, tag it, and pushes it to your github repo.
+The `release` command is a way to official bundle and make a version of your package. You can think of this command as a much more strict, 
+authoritative version of [version command](#bt-version). It compiles a build, runs tests on it (if applicable), versions it, and commits it to your Github repo.
  The command does the following:
 
 1. Runs all [tests](#bt-test) you've specified.
@@ -175,8 +177,8 @@ The `release` command is to quickly package up your project, commit it locally, 
 
 ### bt version
 
-The `version` command is a just a cheap imitation of [npm's version command](https://docs.npmjs.com/cli/version). You
-don't need any fancy configuration. Just run the following command:
+The `version` command is a just a cheap imitation of [npm's version command](https://docs.npmjs.com/cli/version). It marks your code at a particular version.
+ No tests are run and no build is created and you don't need any fancy configuration. Just run the following command:
 
 ```
 bt version [SEMVER]
