@@ -53,14 +53,17 @@ It will do things like compile all of your application's javascript files into s
 sassify all of your scss files, minify files, and even add banners to your files if desired. 
 
 First you need to specify the files you want the build command to use in your `bt-config.js` file. For instance, 
-if you wanted to build `src/main.js` (your entry file) into a final `dist/app.js` file,
-specify the following in your `bt-config.js` file:
+if you wanted to build both a main.js file and a scss file into a folder called `dist`, then minify the js file, your `bt-config.js` file would look a little like this:
 
 ```javascript
 module.exports = {
     build: {
         files: {
             'dist/app.js': ['src/main.js']
+            'dist/styles.css': ['src/styles/main.scss']
+        },
+        minifyFiles: {
+            'dist/app.js': ['dist/app.js']
         }
     },
 };
