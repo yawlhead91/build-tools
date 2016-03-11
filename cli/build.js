@@ -12,35 +12,35 @@ var Promise = require("promise");
  * @returns {Promise}
  */
 module.exports = function (args) {
-    args = args || [];
     var config = utils.getConfig() || {};
-    var env = args[0];
+    args = args || [];
 
-    args = nopt({
+    var argsObject = nopt({
         env: [String],
         files: [null],
         dist: [path],
         middleware: [path],
         port: [Number, null],
-        staticDir: [String, null]
+        staticDir: [String, null],
+        test: [Boolean, true] // whether or not tests should run before build executes
     }, {}, args, 0);
 
-
-    var options = _.extend({
-        env: env,
+    var buildConfig = _.extend({
+        env: args[0],
         dist: config.dist
-    }, config.build, args);
+    }, config.build, argsObject);
 
-    var runTests = function (args) {
-        if (env !== "local") {
-            return test(args);
-        } else {
+    var runTests = function (env) {
+        // only run tests if this is NOT a local build, otherwise
+        // tests would run every time a watched file is edited.
+        if (!buildConfig.test || env === "local") {
             return Promise.resolve();
+        } else {
+            return test();
         }
     };
 
-    return runTests(args).then(function () {
-        options.watch = env === "local";
-        return build(options);
+    return runTests(buildConfig.env).then(function () {
+        return build(buildConfig);
     });
 };
