@@ -9,10 +9,13 @@ var build = require('./build');
  * @returns {Promise}
  */
 module.exports = function (args) {
-    var semVersion = args[0];
+    args = args || [];
+    var semVersionType = args[0];
     return test().then(function () {
-        return bump(semVersion).then(function (nextVersion) {
-            return build().then(function () {
+        return bump(semVersionType).then(function (nextVersion) {
+            // we are disabling tests from being ran
+            // during build because we've already done it above
+            return build(['prod', '--test=false']).then(function () {
                 return version(nextVersion);
             });
         });
