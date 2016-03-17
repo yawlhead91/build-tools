@@ -69,12 +69,19 @@ module.exports = function(options) {
             child.stdout.on('data', function (buffer) {
                 process.stdout.write(buffer.toString());
             });
+            child.stderr.on('data', function (buffer) {
+                console.error(buffer.toString());
+            });
             child.on('close', function (code) {
-                console.log('done running tests');
-                resolve(code);
+                if (code) {
+                    reject(new Error("tests are unable to run due to syntax error"));
+                } else {
+                    console.log('done running tests');
+                    resolve(code);
+                }
             });
 
-            child.stdout.on('error', function (errorCode) {
+            child.on('error', function (errorCode) {
                 reject(new Error(errorCode));
             });
         });
