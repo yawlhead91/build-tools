@@ -10,6 +10,7 @@ var utils = require('./utils');
 var babelify = require("babelify");
 var path = require("path");
 var es2015 = require('babel-preset-es2015');
+var stage0 = require('babel-preset-stage-0');
 
 /**
  * Browserifies a single file bundle.
@@ -42,15 +43,6 @@ var browserifyFile = function (destPath, srcPaths, options) {
 
         b = browserify(options.browserifyOptions);
 
-        if (options.watch) {
-            b = watchify(b);
-            // re-bundle when updated
-            b.on('update', function () {
-                console.log('file updated!');
-                b.bundle();
-            });
-        }
-
         // must add each path individual unfortunately.
         finalPaths.forEach(function (path) {
             b.add(path);
@@ -62,10 +54,19 @@ var browserifyFile = function (destPath, srcPaths, options) {
             id = typeof id == "string" ? id : path;
             b.require(path, {expose: id});
         });
-
         b.transform(babelify, {
-            presets: [es2015]
+            presets: [es2015, stage0]
         });
+
+        if (options.watch) {
+            b = watchify(b);
+            // re-bundle when updated
+            b.on('update', function () {
+                console.log('file updated!');
+                b.bundle();
+            });
+        }
+
 
         b.on('bundle', function (stream) {
             console.log('browserifying bundle...');

@@ -26,6 +26,7 @@ ncp.limit = 16;
  * @param {Array} options.files - The array of file paths to tests
  * @param {boolean} [options.keepalive] - Whether to keep alive the test server
  * @param {Number} [options.port] - Optional port to start server on (default to 7755)
+ * @param {Object} [options.requires] - A id-url map object of global requires
  * @returns {*}
  */
 module.exports = function(options) {
@@ -34,6 +35,7 @@ module.exports = function(options) {
         id: 'mocha',
         port: 7755,
         keepalive: false,
+        requires: {},
         files: []
     }, options);
 
@@ -43,18 +45,17 @@ module.exports = function(options) {
     }
 
     function runBrowserify() {
-        var requirePaths = {};
         // expose "qunit" and "test-utils" variables to external project
         if (options.id === 'qunit') {
-            requirePaths['qunit'] = tempDir + '/tests/qunit.js';
+            options.requires['qunit'] = tempDir + '/tests/qunit.js';
         }
-        requirePaths['test-utils'] = tempDir + '/tests/test-utils.js';
+        options.requires['test-utils'] = tempDir + '/tests/test-utils.js';
         var fileMap = {};
         fileMap[tempDir + '/tests/built-tests.js'] = options.files;
 
         return browserify({
             files: fileMap,
-            requires: requirePaths,
+            requires: options.requires,
             watch: options.keepalive,
             browserifyOptions: {
                 debug: true
@@ -63,8 +64,9 @@ module.exports = function(options) {
     }
 
     function runMochaTest() {
-        var binPath = internalModulePath + '/node_modules/.bin/mocha-phantomjs';
-        var child = spawn(binPath, ['http://localhost:' + options.port + '/index.html']);
+        var binPath = internalModulePath + '/node_modules/.bin/phantomjs';
+        //var child = spawn(binPath, [internalModulePath + '/node_modules/mocha-phantomjs-core/mocha-phantomjs-core.js', tempDir + '/tests/index.html']);
+        var child = spawn(binPath, [internalModulePath + '/node_modules/mocha-phantomjs-core/mocha-phantomjs-core.js', tempDir + '/tests/index.html']);
         return new Promise(function (resolve, reject) {
             child.stdout.on('data', function (buffer) {
                 process.stdout.write(buffer.toString());
@@ -74,7 +76,8 @@ module.exports = function(options) {
             });
             child.on('close', function (code) {
                 if (code) {
-                    reject(new Error("tests are unable to run due to syntax error"));
+                    reject(new Error("tests failed"));
+                    console.log(arguments);
                 } else {
                     console.log('done running tests');
                     resolve(code);
@@ -82,6 +85,8 @@ module.exports = function(options) {
             });
 
             child.on('error', function (errorCode) {
+                console.log('error!');
+                console.log(arguments);
                 reject(new Error(errorCode));
             });
         });
