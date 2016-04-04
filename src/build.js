@@ -85,7 +85,6 @@ module.exports = function(options) {
         return copy(copyOptions).then(function () {
             return sassify(sassOptions).then(function () {
                 return browserify(browserifyOptions).then(function () {
-                    options.min = options.min || {};
                     return minify({files: options.minifyFiles}).then(function () {
                         return banner(options.bannerFiles).then(function () {
                             console.log('done build!');
