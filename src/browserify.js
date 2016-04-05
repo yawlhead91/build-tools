@@ -63,7 +63,7 @@ var browserifyFile = function (destPath, srcPaths, options) {
         });
 
         if (options.watch) {
-            b = watchify(b);
+            b.plugin(watchify);
             // re-bundle when updated
             b.on('update', function () {
                 console.log('file updated!');

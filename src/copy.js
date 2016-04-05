@@ -4,6 +4,7 @@ var _ = require('underscore');
 var Promise = require('promise');
 var glob = require('glob');
 var path = require('path');
+var chokidar = require('chokidar');
 
 /**
  * Copies files to designated locations.
@@ -146,11 +147,10 @@ module.exports = function (options) {
      * @param destPath
      */
     function watchFile(srcPath, destPath) {
-        fs.watch(srcPath, function () {
+        chokidar.watch(srcPath, {persistent: true}).on('all', () => {
             console.log("file updated... rebuilding...");
             copyFile(srcPath, destPath).then(function () {
                 console.log("file built");
-                watchFile(srcPath, destPath);
             });
         });
     }

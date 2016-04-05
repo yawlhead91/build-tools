@@ -30,6 +30,7 @@
     "babel-preset-stage-0": "^6.5.0",
     "babelify": "^7.2.0",
     "browserify": "^13.0.0",
+    "chokidar": "^1.4.3",
     "clean": "^4.0.1",
     "express": "^4.13.3",
     "fs-extra": "^0.16.5",
@@ -50,7 +51,7 @@
     "sinon": "^1.12.2",
     "uglify-js": "^2.6.2",
     "underscore": "^1.8.2",
-    "watchify": "^3.2.1"
+    "watchify": "^3.7.0"
   },
   "keywords": [
     "build tools",
