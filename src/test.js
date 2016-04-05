@@ -64,9 +64,8 @@ module.exports = function(options) {
     }
 
     function runMochaTest() {
-        var binPath = internalModulePath + '/node_modules/.bin/phantomjs';
-        //var child = spawn(binPath, [internalModulePath + '/node_modules/mocha-phantomjs-core/mocha-phantomjs-core.js', tempDir + '/tests/index.html']);
-        var child = spawn(binPath, [internalModulePath + '/node_modules/mocha-phantomjs-core/mocha-phantomjs-core.js', tempDir + '/tests/index.html']);
+        var binPath = process.cwd() + '/node_modules/.bin/phantomjs';
+        var child = spawn(binPath, [process.cwd() + '/node_modules/mocha-phantomjs-core/mocha-phantomjs-core.js', tempDir + '/tests/index.html']);
         return new Promise(function (resolve, reject) {
             child.stdout.on('data', function (buffer) {
                 process.stdout.write(buffer.toString());
