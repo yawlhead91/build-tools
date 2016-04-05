@@ -13,10 +13,6 @@ A set of javascript tasks to help speed up packaging and building processes.
     * [bt test](#bt-test)
     * [bt release](#bt-release)
     * [bt version](#bt-version)
-1. [Grunt Tasks](#grunt-tasks)
-    * [grunt bt:server](#grunt-bt-server)
-    * [grunt bt:build](#grunt-bt-build)
-    * [grunt bt:test](#grunt-bt-test)
 
 ## Dependencies
 
@@ -204,59 +200,12 @@ It is recommended to only run this command when you're on `master` or a branch r
 relevant commits have already been committed, and is less likely to have convoluted commits that you might not want in
 your new version.
 
-## Grunt Tasks
 
-If you would like to use Build Tools via grunt commands, you must first install Build tools locally:
+## Development
+
+### Run tests
 
 ```
-npm install build-tools
-```
-
-Then load the grunt tasks by adding the following to your `Gruntfile.js`:
-
-```javascript
-grunt.loadNpmTasks('build-tools');
-```
-
-The any of the following commands can be ran.
-
-### grunt bt:server
-
-Same as the [`bt server`](#bt-server) command using grunt.
-
-```shell
-grunt bt:server
-```
-
-### grunt bt:build
-
-Same as the [`bt build`](#bt-build) command using grunt.
-
-```shell
-grunt bt:build
-```
-
-
-### grunt bt:test
-
-This test command is just the [`bt test`](#bt-test) command that can be ran via grunt,
-To use this command, just setup your `Gruntfile.js` file with the following.
-
-For example, if you wanted to run all nodeunit tests on the project that reside in the `test/` folder in your project,
-you would use the following grunt configuration.
-
-```javascript
-'bt': {
-    "tests": {
-        "mocha": {
-            "src": ["tests/mocha/*"]
-        }
-    }
-}
-```
-
-Then you can run:
-
-```shell
-grunt bt:test
+npm install
+npm test
 ```
