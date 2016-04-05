@@ -13,7 +13,7 @@ var _ = require('underscore');
 module.exports = function (type) {
 
     var promises = [],
-        files = ['package.json', 'bower.json'];
+        files = ['package.json'];
 
     type = type || 'patch';
 
