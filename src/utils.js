@@ -1,5 +1,4 @@
 'use strict';
-var grunt = require("grunt");
 
 module.exports = {
 
@@ -30,12 +29,7 @@ module.exports = {
         try {
             config = require(rootPath + '/bt-config');
         } catch (err) {
-            try {
-                require(rootPath + '/Gruntfile')(grunt);
-                config = grunt.config("bt");
-            } catch (err) {
-                console.warn("Project has no configuration file for bt command!");
-            }
+            console.warn("Project has no configuration file for bt command!");
         }
 
         return config;
