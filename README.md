@@ -2,7 +2,16 @@
 
 # Build Tools
 
-A set of javascript tasks to help speed up packaging and building processes.
+A set of CLI commands to quickly version, package, and compile your projects.
+
+## Benefits
+
+* Compiles all JS files using [Browserify](https://github.com/substack/node-browserify)
+* Transpiles all files using [Babel](https://github.com/babel/babel) to support latest ES code
+* Supports [SASS](http://sass-lang.com/) files (.scss)
+* Includes a built-in node server that allows for optional middleware
+* Full Git and NPM integration; Packages projects by creating git version tags, pushing to master branch, and versioning your project as a NPM package
+* Built-in Mocha and QUnit test runners
 
 ## Contents
 
@@ -187,7 +196,7 @@ Replacing [SEMVER] with (`major`, `minor` or `patch`) (`patch` is the default if
 
 Running this command will:
 
-1. Update all relevant package files (`package.json` and `bower.json` if exists) to the new version
+1. Update `package.json` to the new version
 1. Commit the change to your local git repository (the commit message being your new version number)
 1. Check out your master branch
 1. Merge the branch you were on into your `master` branch
