@@ -41,6 +41,8 @@ var browserifyFile = function (destPath, srcPaths, options) {
         options.browserifyOptions.cache = {};
         options.browserifyOptions.packageCache = {};
 
+        options.browserifyOptions.debug = options.watch;
+
         b = browserify(options.browserifyOptions);
 
         // must add each path individual unfortunately.
