@@ -21,6 +21,7 @@ var sassify = require('./sassify');
  * @param {String} [options.middleware] - The path to middleware file when server is started (when env is 'local')
  * @param {String} [options.port] - The port to start server on (when env is 'local')
  * @param {String} [options.staticDir] - The directory to serve static files
+ * @param {Object|Array} [options.requires] - Required files
  * @returns {*}
  */
 module.exports = function(options) {
@@ -57,6 +58,7 @@ module.exports = function(options) {
         minifyFiles: null,
         bannerFiles: null,
         staticDir: null,
+        requires: null,
         browserifyOptions: {}
     }, options);
 
