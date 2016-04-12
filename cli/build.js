@@ -17,17 +17,23 @@ module.exports = function (args) {
 
     var env = args[0] || 'prod';
 
+
     var argsObject = nopt({
         env: [String],
         files: [null],
         dist: [path],
         middleware: [path],
         port: [Number, null],
-        staticDir: [String],
+        staticDir: [path],
         test: [Boolean, true] // whether or not tests should run before build executes
     }, {}, args, 0);
 
-    config.build = config.build[env] || config.build;
+    config.build = config.build || {};
+
+    // use env config if exists
+    if (env) {
+        config.build = config.build[env];
+    }
 
     var buildConfig = _.extend({
         env: env,
