@@ -15,19 +15,23 @@ module.exports = function (args) {
     var config = utils.getConfig() || {};
     args = args || [];
 
+    var env = args[0] || 'prod';
+
     var argsObject = nopt({
         env: [String],
         files: [null],
         dist: [path],
         middleware: [path],
         port: [Number, null],
-        staticDir: [String, null],
+        staticDir: [String],
         test: [Boolean, true] // whether or not tests should run before build executes
     }, {}, args, 0);
 
+    config.build = config.build[env] || config.build;
+
     var buildConfig = _.extend({
-        env: args[0],
-        dist: config.dist
+        env: env,
+        staticDir: process.cwd()
     }, config.build, argsObject);
 
     var runTests = function (env) {

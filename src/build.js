@@ -43,13 +43,12 @@ module.exports = function(options) {
         console.warn('there is no environment named ' + options.env + ' building prod instead...');
     }
 
-    if (!options.dist) {
-        console.warn('um, no distribution folder was specified to build into.');
-        return Promise.resolve();
-    } else if (!options.files) {
+    if (!options.files) {
         console.warn('no files to build.');
         return Promise.resolve();
     }
+
+    console.log('Building ' + options.env + ' environment...');
 
     options = _.extend({
         env: 'prod',
@@ -89,7 +88,7 @@ module.exports = function(options) {
                 return browserify(browserifyOptions).then(function () {
                     return minify({files: options.minifyFiles}).then(function () {
                         return banner(options.bannerFiles).then(function () {
-                            console.log('done build!');
+                            console.log('Successfully built ' + options.env + '!');
                             if (options.env === 'local') {
                                 return server(options);
                             }
