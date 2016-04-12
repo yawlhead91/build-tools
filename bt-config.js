@@ -5,5 +5,4 @@ module.exports = {
             src: ['tests/mocha/*']
         }
     }
-}
-;
+};

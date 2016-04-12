@@ -15,9 +15,6 @@ module.exports = function (args) {
     var config = utils.getConfig() || {};
     args = args || [];
 
-    var env = args[0] || 'prod';
-
-
     var argsObject = nopt({
         env: [String],
         files: [null],
@@ -25,32 +22,33 @@ module.exports = function (args) {
         middleware: [path],
         port: [Number, null],
         staticDir: [path],
-        test: [Boolean, true] // whether or not tests should run before build executes
+        test: [Boolean, true], // whether or not tests should run before build executes
+        watch: [Boolean, false]
     }, {}, args, 0);
 
-    config.build = config.build || {};
+    var env = argsObject.argv.remain[0] || 'prod';
 
-    // use env config if exists
-    if (env) {
-        config.build = config.build[env];
-    }
+    config.build = config.build || {};
+    config.build = config.build[env] || config.build['prod'] || config.build;
 
     var buildConfig = _.extend({
         env: env,
-        staticDir: process.cwd()
-    }, config.build, argsObject);
-
-    var runTests = function (env) {
         // only run tests if this is NOT a local build, otherwise
         // tests would run every time a watched file is edited.
-        if (!buildConfig.test || env === "local") {
+        test: env !== "local",
+        staticDir: process.cwd(),
+        watch: env === "local"
+    }, config.build, argsObject);
+
+    var runTests = function () {
+        if (!buildConfig.test) {
             return Promise.resolve();
         } else {
             return test();
         }
     };
 
-    return runTests(buildConfig.env).then(function () {
+    return runTests().then(function () {
         return build(buildConfig);
     });
 };

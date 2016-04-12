@@ -20,6 +20,7 @@ var sassify = require('./sassify');
  * @param {String} [options.browserifyOptions] - The browserify options
  * @param {String} [options.middleware] - The path to middleware file when server is started (when env is 'local')
  * @param {String} [options.port] - The port to start server on (when env is 'local')
+ * @param {String} [options.watch] - Whether to watch the files  (useful for development)
  * @param {String} [options.staticDir] - The directory to serve static files
  * @param {Object|Array} [options.requires] - Required files
  * @returns {*}
@@ -56,12 +57,12 @@ module.exports = function(options) {
         dist: null,
         minifyFiles: null,
         bannerFiles: null,
+        watch: options.env === 'local',
         staticDir: null,
         requires: null,
         browserifyOptions: {}
     }, options);
 
-    options.watch = options.env === 'local';
     options.browserifyOptions.debug = options.browserifyOptions.debug || options.env === 'local';
 
     return clean(options.dist).then(function () {
