@@ -34,16 +34,14 @@ var browserifyFile = function (destPath, srcPaths, options) {
             finalPaths.push(path);
         }.bind(this));
 
-        // merge custom browserify options if exist
-        options.browserifyOptions = _.extend({}, options.browserifyOptions);
 
         // add required parameters for watchify
-        options.browserifyOptions.cache = {};
-        options.browserifyOptions.packageCache = {};
+        options.cache = {};
+        options.packageCache = {};
 
-        options.browserifyOptions.debug = options.watch;
+        options.debug = options.watch;
 
-        b = browserify(options.browserifyOptions);
+        b = browserify(options);
 
         // must add each path individual unfortunately.
         finalPaths.forEach(function (path) {
@@ -120,10 +118,10 @@ var writeBrowserifyBundleStreamToFile = function (stream, destPath) {
 
 /**
  * Browserifies a set of files.
- * @param {Object} options
+ * @param {Object} options - Options that will be passed to browserify instance
  * @param {Object} options.files - A mapping containing file destination (keys) to the associate set of file bundles (array of values)
  * @param {Object} [options.requires] - A id-url map object of global requires
- * @param {Object} [options.browserifyOptions] - Options that will be passed to browserify instance
+ * @param {Array} [options.plugins] - An array of plugins
  * @returns {Promise} Returns a promise when complete
  */
 module.exports = function (options) {
@@ -131,8 +129,12 @@ module.exports = function (options) {
     var promises = [];
 
     options = _.extend({
-        requires: []
-    }, options);
+        requires: [],
+        plugins: []
+    },
+        options.browserifyOptions, // merge deprecated custom browserify options if exist
+        options
+    );
 
     if (!options.files) {
         return Promise.resolve();

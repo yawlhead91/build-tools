@@ -27,6 +27,7 @@ ncp.limit = 16;
  * @param {boolean} [options.keepalive] - Whether to keep alive the test server
  * @param {Number} [options.port] - Optional port to start server on (default to 7755)
  * @param {Object} [options.requires] - A id-url map object of global requires
+ * @param {Array} [options.plugins] - An array of plugins
  * @returns {*}
  */
 module.exports = function(options) {
@@ -36,7 +37,8 @@ module.exports = function(options) {
         port: 7755,
         keepalive: false,
         requires: {},
-        files: []
+        files: [],
+        plugins: []
     }, options);
 
     if (!options.id || !options.files || !options.files.length) {
@@ -55,6 +57,7 @@ module.exports = function(options) {
 
         return browserify({
             files: fileMap,
+            plugins: options.plugins,
             requires: options.requires,
             watch: options.keepalive
         });
