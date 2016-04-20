@@ -178,7 +178,7 @@ module.exports = function(options) {
             server.on('close', function () {
                 resolve();
             });
-            console.log('server started!');
+            console.log('server started at http://localhost:' + options.port);
 
             if (!options.keepalive) {
                 resolve();
