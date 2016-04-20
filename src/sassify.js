@@ -1,14 +1,19 @@
 "use strict";
 var sass = require('node-sass');
-var Promise = require('promise');
+var Promise = require('bluebird');
 var _ = require('underscore');
 var fs = require('fs-extra');
 var path = require("path");
+var chokidar = require('chokidar');
 
 var watchFile = function (sourceFile, destinationFile) {
     return new Promise(function (resolve) {
-        fs.watch(sourceFile, function () {
-            resolve(sassifyFile(sourceFile, destinationFile, true));
+        chokidar.watch(sourceFile, {ignoreInitial: true}).on('all', function (state, src) {
+            console.log(src + ' has been updated... sassifying it.');
+            sassifyFile(sourceFile, destinationFile, true).then(function () {
+                console.log(src + ' has been successfully sassified!');
+                resolve();
+            });
         });
     });
 };
@@ -30,7 +35,7 @@ var ensureDestinationDir = function (dest) {
     });
 };
 
-var sassifyFile = function (sourceFile, destinationFile, watch) {
+var sassifyFile = function (sourceFile, destinationFile) {
     return ensureDestinationDir(destinationFile).then(function () {
         return new Promise(function (resolve, reject) {
             sass.render({
@@ -41,9 +46,6 @@ var sassifyFile = function (sourceFile, destinationFile, watch) {
                     // No errors during the compilation, let's write result on the disk
                     fs.writeFile(destinationFile, result.css, function (err) {
                         if (!err) {
-                            if (watch) {
-                                watchFile(sourceFile, destinationFile);
-                            }
                             resolve();
                         } else {
                             reject(err);
@@ -65,9 +67,8 @@ var sassifyFile = function (sourceFile, destinationFile, watch) {
  * @returns {Promise} Returns a promise when done writing files
  */
 module.exports = function (options) {
-    var promises = [];
     options = _.extend({
-        files: [],
+        files: {},
         watch: false
     }, options);
 
@@ -76,12 +77,22 @@ module.exports = function (options) {
     }
 
     console.log('sassifying all files...');
-    _.each(options.files, function (srcPaths, destPath) {
+    let destPaths = _.keys(options.files);
+    return Promise.each(destPaths, function (destPath) {
         // only sass the first main file (all other files should be used as
         // @imports inside of the main file), which is the point of using sass in the first place,
-        promises.push(sassifyFile(srcPaths[0], destPath, options.watch));
-    });
-    return Promise.all(promises).then(function () {
+        return sassifyFile(options.files[destPath][0], destPath).then(function () {
+
+        })
+    }).then(function () {
+        if (options.watch) {
+            return Promise.each(destPaths, function (destPath) {
+                let srcPaths = options.files[destPath];
+                return Promise.each(srcPaths, function (srcPath) {
+                    watchFile(srcPath, destPath);
+                });
+            });
+        }
         console.log('done sassifying all files!');
     });
 
