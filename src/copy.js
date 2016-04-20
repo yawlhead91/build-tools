@@ -1,10 +1,12 @@
 'use strict';
 var fs = require('fs-extra');
 var _ = require('underscore');
-var Promise = require('promise');
-var glob = require('glob');
+var Promise = require('bluebird');
+var glob = require('glob-promise');
 var path = require('path');
 var chokidar = require('chokidar');
+var watcher = chokidar.watch([], {ignoreInitial: true});
+var async = require('async-promises');
 
 /**
  * Copies files to designated locations.
@@ -34,60 +36,6 @@ module.exports = function (options) {
                 }
             });
         });
-    }
-
-    /**
-     * Returns a set of paths based on a glob string
-     * @param {string} srcGlob - The glob string
-     * @returns {Promise} Returns a promise with the array of paths that match
-     */
-    function getGlobs (srcGlob) {
-        return new Promise(function (resolve, reject) {
-            // if the path is not a glob pattern, just return it
-            if (!glob.hasMagic(srcGlob)) {
-                return resolve([srcGlob]);
-            }
-            glob(srcGlob, function (err, paths) {
-                if (err) {
-                    reject(err);
-                } else {
-                    resolve(paths);
-                }
-            })
-        });
-    }
-
-
-    /**
-     * Copies a set of files to a destination.
-     * @param {Array} srcFilePaths - source path(s) (can contain globs)
-     * @param {string} destPath - the destination
-     * @param {boolean} [watch] - Whether to watch the file
-     * @returns {Promise}
-     */
-    function copyFiles(srcFilePaths, destPath, watch) {
-
-        // ensure it is an array
-        if (!Array.isArray(srcFilePaths)) {
-            srcFilePaths = [srcFilePaths];
-        }
-
-        return srcFilePaths.reduce(function (prevPromise, srcGlob) {
-            return prevPromise.then(function () {
-                return getGlobs(srcGlob).then(function (paths) {
-                    return paths.reduce(function (prev, p) {
-                        return prev.then(function () {
-                            return copyFile(p, destPath).then(function () {
-                                if (watch) {
-                                    watchFile(p, destPath);
-                                }
-                            });
-                        });
-                    }, Promise.resolve())
-                });
-            });
-        }, Promise.resolve());
-
     }
 
     /**
@@ -142,23 +90,44 @@ module.exports = function (options) {
     }
 
     /**
-     * Watches a file and rebuilds if updated.
+     * Gets the destination path for a source file.
      * @param srcPath
-     * @param destPath
+     * @returns {string} Returns the matching destination path
      */
-    function watchFile(srcPath, destPath) {
-        chokidar.watch(srcPath, {persistent: true}).on('all', () => {
-            console.log("file updated... rebuilding...");
-            copyFile(srcPath, destPath).then(function () {
-                console.log("file built");
+    function getSourceDestinationPath (srcPath) {
+        let dests = _.keys(options.files);
+        return _.find(dests, function (destPath) {
+            let paths = options.files[destPath];
+            return _.find(paths, function (p) {
+                return p === srcPath || srcPath.indexOf(p) !== -1;
             });
         });
     }
 
-    var destPaths = _.keys(options.files);
-    return destPaths.reduce(function (prevPromise, key) {
-        return prevPromise.then(function () {
-            return copyFiles(options.files[key], key, options.watch);
+    return Promise.each(Object.keys(options.files), function (destPath) {
+        let srcFilePaths = options.files[destPath];
+        return Promise.each(srcFilePaths, function (path) {
+            return glob(path).then(function (paths) {
+                // re-assign new globberred paths
+                options.files[destPath] = paths;
+                return async.eachSeries(paths, function (p) {
+                    return copyFile(p, destPath).then(function () {
+                        if (options.watch) {
+                            watcher.add(p);
+                        }
+                    });
+                });
+            });
         });
-    }, Promise.resolve());
+    }).then(function () {
+        watcher.on('all', (state, srcPath) => {
+            if (srcPath) {
+                let destPath = getSourceDestinationPath(srcPath);
+                console.log('file updated... copying ' + srcPath + ' to ' + destPath);
+                copyFile(srcPath, destPath).then(function () {
+                    console.log(srcPath + ' has been rebuilt successfully!');
+                });
+            }
+        });
+    });
 };
