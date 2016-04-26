@@ -59,7 +59,7 @@ var browserifyFile = function (destPath, srcPaths, options) {
             global: true,
             // must whitelist modules that are using the latest es2015/babelify to
             // ensure they are transpiled when build is run
-            ignore: /\/node_modules\/(?!module-js|router-js|scroll-js|resource-manager-js|youtube-video-js\/)/
+            ignore: /\/node_modules\/(?!module-js|router-js|scroll-js|resource-manager-js|form-js|youtube-video-js\/)/
         });
 
         if (options.watch) {
