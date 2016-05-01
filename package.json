@@ -1,15 +1,15 @@
 {
   "name": "build-tools",
   "description": "Build tools",
-  "version": "3.1.7",
+  "version": "4.0.0",
   "homepage": "https://github.com/mkay581/build-tools",
   "author": {
     "name": "Mark Kennedy",
     "email": "mkay581@gmail.com",
     "url": "http:://heyimmark.com"
   },
-  "engines":{
-    "node" : ">=6.0.0"
+  "engines": {
+    "node": ">=6.0.0"
   },
   "publishConfig": {
     "registry": "https://registry.npmjs.org/"
@@ -39,6 +39,7 @@
     "clean": "^4.0.1",
     "express": "^4.13.3",
     "fs-extra": "^0.16.5",
+    "ftp-deploy": "^1.1.0",
     "gitty": "^3.2.1",
     "glob": "^4.5.3",
     "glob-promise": "^1.0.6",
@@ -53,6 +54,7 @@
     "replace": "^0.3.0",
     "semver": "^4.3.6",
     "serve-static": "^1.9.2",
+    "server-destroy": "^1.0.1",
     "sinon": "^1.12.2",
     "uglify-js": "^2.6.2",
     "underscore": "^1.8.3",
