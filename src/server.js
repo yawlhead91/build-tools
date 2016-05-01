@@ -42,7 +42,7 @@ module.exports = function(options) {
             console.log('running server on http://localhost:' + options.port + '...');
             if (options.middleware) {
                 try {
-                    require(options.middleware)(app);
+                    server = require(options.middleware)(app);
                 } catch (err) {
                     console.error(err);
                     return reject(err);
@@ -52,7 +52,8 @@ module.exports = function(options) {
                 app.use(serveStatic(options.staticDir + '/'));
             }
             //create node.js http server and listen on port
-            server = app.listen(options.port);
+            server = server || require('http').createServer(app);
+            server.listen(options.port);
 
             // when server is killed on UNIX-like systems, call close
             process.on('SIGINT', function() {
