@@ -4,7 +4,7 @@ var utils = require('./utils');
 var banner = require('./banner');
 var minify = require('./minify');
 var clean = require('./clean');
-var server = require('./server');
+var Server = require('./server');
 var _ = require('underscore');
 var copy = require('./copy');
 var browserify = require('./browserify');
@@ -91,7 +91,7 @@ module.exports = function(options) {
                         return banner(options.bannerFiles).then(function () {
                             console.log('Successfully built ' + options.env + '!');
                             if (options.env === 'local') {
-                                return server(options);
+                                return new Server(options).start();
                             }
                         });
                     });

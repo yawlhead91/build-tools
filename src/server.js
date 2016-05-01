@@ -4,69 +4,96 @@ var Promise = require('promise');
 var express = require('express');
 var serveStatic = require('serve-static');
 var _ = require('underscore');
-var path = require('path');
+var http = require('http');
 
-var server;
-var serverPromise;
+class Server {
 
-/**
- * Starts a server.
- * @param {Object} options - The server options
- * @param {Number} [options.port] - The port number to start the server on
- * @param {String} [options.staticDir] - The directory to serve static files
- * @param {String} [options.middleware] - The path to the middleware file that is called when server is ran
- * @returns {*}
- */
-module.exports = function(options) {
+    /**
+     * Starts a server.
+     * @param {Object} options - The server options
+     * @param {Number} [options.port] - The port number to start the server on
+     * @param {String} [options.staticDir] - The directory to serve static files
+     * @param {String|Function} [options.middleware] - The path to the middleware file or the middleware function that is passed the app instance and called before server is ran
+     * @param {Function|Promise} [options.onServerEnd] - Called before the server ends
+     * @returns {Promise}
+     */
+    constructor (options) {
+        
+        options = _.extend({
+            port: 7000,
+            staticDir: process.cwd(),
+            middleware: null,
+            onServerEnd: null
+        }, options);
+        
+        this.options = options;
 
-    options = _.extend({
-        port: 7000,
-        staticDir: process.cwd(),
-        middleware: null
-    }, options);
+        this.sockets = []; // keep track of sockets so we can destroy when done
 
-    function stopServer() {
-        return new Promise(function (resolve) {
-            console.log('shutting down server...');
-            if (server) {
-                server.close();
+        let app = express();
+        console.log('running server on http://localhost:' + this.options.port + '...');
+        if (this.options.middleware) {
+            try {
+                if (typeof this.options.middleware !== 'function') {
+                    this.options.middleware = require(this.options.middleware)
+                }
+            } catch (err) {
+                console.error(err);
+                throw Error(err);
             }
-            resolve();
-        });
+            this.server = this.options.middleware(app);
+        } else {
+            // we can at least provide some basic functionality...sheesh
+            app.use(serveStatic(this.options.staticDir + '/'));
+        }
+        //create node.js http server and listen on port
+        this.server = this.server || http.createServer(app);
+
     }
 
-    function startServer() {
-        serverPromise = new Promise(function (resolve, reject) {
-            // run test server!
-            var app = express();
-            console.log('running server on http://localhost:' + options.port + '...');
-            if (options.middleware) {
-                try {
-                    server = require(options.middleware)(app);
-                } catch (err) {
-                    console.error(err);
-                    return reject(err);
-                }
-            } else {
-                // we can at least provide some basic functionality...sheesh
-                app.use(serveStatic(options.staticDir + '/'));
-            }
-            //create node.js http server and listen on port
-            server = server || require('http').createServer(app);
-            server.listen(options.port);
 
-            // when server is killed on UNIX-like systems, call close
-            process.on('SIGINT', function() {
-                stopServer().then(function () {
+    /**
+     * Stops the server.
+     * @returns {*}
+     */
+    stop () {
+        return new Promise((resolve) => {
+            console.log('shutting down server...');
+            this.server.close(() => {
+                this.options.onServerEnd = this.options.onServerEnd || Promise.resolve();
+                this.options.onServerEnd().then(() => {
+                    // destroy any sockets in use
+                    if (this.sockets.length) {
+                        this.sockets.forEach((s) => {
+                            s.destroy();
+                        });
+                    }
                     resolve();
-                    process.exit();
                 });
             });
-            console.log('server started!');
         });
-        return serverPromise;
     }
 
-    return startServer();
+    /**
+     * Starts the server.
+     * @returns {Promise}
+     */
+    start () {
+        this.server.on('connection', (socket) => {
+            this.sockets.push(socket);
+        });
+        this.server.listen(this.options.port);
+        // handle when server is killed on UNIX-like systems...
+        process.on('SIGINT', () => {
+            this.stop().then(() => {
+                // listening to the SIGINT stops node's default exiting,
+                // so we must do it manually here
+                process.exit();
+            });
+        });
+        console.log('server started!');
+        return Promise.resolve();
+    }
+}
 
-};
+module.exports = Server;

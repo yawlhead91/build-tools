@@ -11,6 +11,7 @@ var utils = require('./utils');
 var clean = require('./clean');
 var browserify = require('./browserify');
 var qunit = require('node-qunit-phantomjs');
+var Server = require('./server');
 
 var server;
 var tempDir = process.cwd() + '/tmp';
@@ -105,6 +106,7 @@ module.exports = function(options) {
 
     function test() {
         var promise;
+
         console.log('running ' + options.id + ' tests...');
         if (options.id.toLowerCase() === 'qunit') {
             promise = runQunitTest();
@@ -148,64 +150,48 @@ module.exports = function(options) {
         });
     }
 
-    function stopServer() {
-        return new Promise(function (resolve) {
-            console.log('shutting down server...');
-            if (server) {
-                server.close();
-                resolve();
-            }
-        });
+    function cleanTempFiles() {
+        console.log('cleaning up temporary files');
+        return clean(tempDir);
     }
 
-    function runServer() {
+    function getServer() {
         var folders = ['.' + tempDir, tempDir + '/tests'];
-        console.log('running server...');
-        return new Promise(function (resolve) {
-            // run test server!
-            var app = express();
-            // serve multiple directories
-            folders.forEach(function (folder) {
-                app.use(serveStatic(folder));
-            });
-            //create node.js http server and listen on port
-            server = app.listen(options.port);
-
-            // when server is killed on UNIX-like systems, call close
-            process.on('SIGINT', function() {
-                server.close();
-            });
-            server.on('close', function () {
-                resolve();
-            });
-            console.log('server started at http://localhost:' + options.port);
-
-            if (!options.keepalive) {
-                resolve();
-            }
-        });
-    }
-
-    function runTest() {
-        return runServer().then(function () {
-            if (!options.keepalive) {
-                return test().then(function (error) {
-                    return stopServer().then(function () {
-                        return clean(tempDir).then(function () {
-                            if (error) {
-                                throw error;
-                            }
-                        });
+        if (!server) {
+            server = new Server({
+                port: options.port,
+                middleware: (app) => {
+                    // serve multiple directories
+                    folders.forEach(function (folder) {
+                        app.use(serveStatic(folder));
                     });
-                });
-            }
-        });
+                },
+                onServerEnd: function () {
+                    return cleanTempFiles()
+                }
+            });
+        }
+        return server;
     }
 
-    return clean(tempDir).then(function () {
-        return copyFiles().then(function() {
-            return runBrowserify(options).then(function () {
-                return runTest();
+    // in case the process is stopped after files have
+    // been injected but the server hasnt yet started
+    process.on('SIGINT', function() {
+        cleanTempFiles().then(() => {
+            process.exit();
+        });
+    });
+    return copyFiles().then(function() {
+        return runBrowserify(options).then(function () {
+            let server = getServer();
+            return server.start().then(() => {
+                // dont run test automatically if the intent is to keep the
+                // connection alive for local development in a browser etc
+                if (!options.keepalive) {
+                    return test().then(() => {
+                        return server.stop();
+                    });
+                }
             });
         });
     });
