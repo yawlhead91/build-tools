@@ -26,7 +26,7 @@ module.exports = function (args) {
         watch: [Boolean, false]
     }, {}, args, 0);
 
-    var env = argsObject.argv.remain[0] || 'production';
+    var env = argsObject.argv.remain[0];
 
     config.build = config.build || {};
     config.build = config.build[env] || config.build['production'] || config.build;
