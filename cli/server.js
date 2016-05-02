@@ -1,6 +1,7 @@
 'use strict';
 var nopt = require('nopt');
 var path = require('path');
+var Server = require('./../src/server');
 
 /**
  * Runs server.
@@ -13,5 +14,5 @@ module.exports = function (args) {
         middleware: [path]
     }, {}, args, 0);
 
-    return require('./../src/server')(options);
+    return new Server(options).start();
 };
