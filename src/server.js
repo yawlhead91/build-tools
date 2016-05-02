@@ -60,8 +60,8 @@ class Server {
         return new Promise((resolve) => {
             console.log('shutting down server...');
             this.server.close(() => {
-                this.options.onServerEnd = this.options.onServerEnd || Promise.resolve();
-                this.options.onServerEnd().then(() => {
+                let serverEnd = this.options.onServerEnd ? this.options.onServerEnd() : Promise.resolve();
+                serverEnd.then(() => {
                     // destroy any sockets in use
                     if (this.sockets.length) {
                         this.sockets.forEach((s) => {
