@@ -56,15 +56,6 @@ module.exports = {
         });
     },
 
-    'should pass "production" as env when build is called with no arguments': function (test) {
-        test.expect(1);
-        var build = require(buildPath);
-        build().then(function () {
-            test.equal(buildMock.args[0][0].env, 'production');
-            test.done();
-        });
-    },
-
     'should pass env to build process': function (test) {
         test.expect(1);
         var build = require(buildPath);
