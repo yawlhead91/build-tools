@@ -27,7 +27,7 @@ var sassify = require('./sassify');
  */
 module.exports = function(options) {
 
-    var availableEnvs = new Set(['local', 'prod']);
+    var availableEnvs = new Set(['local', 'production']);
 
     options = options || {};
 
@@ -37,9 +37,15 @@ module.exports = function(options) {
     // account for deprecated 'banner' property
     options.bannerFiles = options.banner ? options.banner.files : options.bannerFiles;
     options.files = options.build ? options.build.files : options.files;
-    
+
+    // support legacy 'prod' environment
+    if (options.env === 'prod') {
+        console.warn('"prod" environment variable is deprecated and will be removed in next major release, please use "production" instead');
+        options.env = 'production';
+    }
+
     if (!options.env) {
-        console.warn('no environment was supplied, building prod instead...');
+        console.warn('no environment was supplied, building production instead...');
     } else if (!availableEnvs.has(options.env)) {
         console.warn('there is no environment named ' + options.env + ' building prod instead...');
     }
@@ -89,7 +95,7 @@ module.exports = function(options) {
                 return browserify(browserifyOptions).then(function () {
                     return minify({files: options.minifyFiles}).then(function () {
                         return banner(options.bannerFiles).then(function () {
-                            console.log('Successfully built ' + options.env + '!');
+                            console.log('Successfully completed a  ' + options.env + ' build!');
                             if (options.env === 'local') {
                                 return new Server(options).start();
                             }

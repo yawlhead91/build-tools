@@ -26,10 +26,10 @@ module.exports = function (args) {
         watch: [Boolean, false]
     }, {}, args, 0);
 
-    var env = argsObject.argv.remain[0] || 'prod';
+    var env = argsObject.argv.remain[0] || 'production';
 
     config.build = config.build || {};
-    config.build = config.build[env] || config.build['prod'] || config.build;
+    config.build = config.build[env] || config.build['production'] || config.build;
 
     var buildConfig = _.extend({
         env: env,

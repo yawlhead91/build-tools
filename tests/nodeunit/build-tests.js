@@ -11,6 +11,7 @@ var cleanMock,
     bannerMock,
     serverMock,
     sassMock;
+var serverConstructorMock;
 
 var allowables = ['util', testPath, 'promise', './bump'];
 
@@ -28,14 +29,17 @@ module.exports = {
         browserifyMock = sinon.stub().returns(Promise.resolve());
         minifyMock = sinon.stub().returns(Promise.resolve());
         bannerMock = sinon.stub().returns(Promise.resolve());
-        serverMock = sinon.stub().returns(Promise.resolve());
+        serverMock = {
+            start: sinon.stub().returns(Promise.resolve())
+        };
+        serverConstructorMock = sinon.stub().returns(serverMock);
         mockery.registerMock('./clean', cleanMock);
         mockery.registerMock('./copy', copyMock);
         mockery.registerMock('./sassify', sassMock);
         mockery.registerMock('./browserify', browserifyMock);
         mockery.registerMock('./minify', minifyMock);
         mockery.registerMock('./banner', bannerMock);
-        mockery.registerMock('./server', serverMock);
+        mockery.registerMock('./server', serverConstructorMock);
         mockery.registerAllowables(allowables);
         cb();
     },
@@ -58,7 +62,7 @@ module.exports = {
             test.equal(browserifyMock.callCount, 0);
             test.equal(minifyMock.callCount, 0);
             test.equal(bannerMock.callCount, 0);
-            test.equal(serverMock.callCount, 0);
+            test.equal(serverConstructorMock.callCount, 0);
             test.equal(sassMock.callCount, 0);
             test.done();
         }, test.done);
@@ -73,7 +77,7 @@ module.exports = {
             test.equal(browserifyMock.callCount, 0);
             test.equal(minifyMock.callCount, 0);
             test.equal(bannerMock.callCount, 0);
-            test.equal(serverMock.callCount, 0);
+            test.equal(serverConstructorMock.callCount, 0);
             test.equal(sassMock.callCount, 0);
             test.done();
         }, test.done);
@@ -88,7 +92,7 @@ module.exports = {
             test.equal(browserifyMock.callCount, 0);
             test.equal(minifyMock.callCount, 0);
             test.equal(bannerMock.callCount, 0);
-            test.equal(serverMock.callCount, 0);
+            test.equal(serverConstructorMock.callCount, 0);
             test.equal(sassMock.callCount, 0);
             test.done();
         }, test.done);
@@ -103,7 +107,7 @@ module.exports = {
             test.equal(browserifyMock.callCount, 0);
             test.equal(minifyMock.callCount, 0);
             test.equal(bannerMock.callCount, 0);
-            test.equal(serverMock.callCount, 0);
+            test.equal(serverConstructorMock.callCount, 0);
             test.equal(sassMock.callCount, 0);
             test.done();
         }, test.done);
@@ -183,7 +187,7 @@ module.exports = {
         test.expect(1);
         var build = require(testPath);
         build({env: 'local', dist: {}, files: {}}).then(function () {
-            test.equal(serverMock.callCount, 1);
+            test.equal(serverConstructorMock.callCount, 1);
             test.done();
         }, test.done);
     },
@@ -192,16 +196,39 @@ module.exports = {
         test.expect(1);
         var build = require(testPath);
         build({dist: {}, files: {}}).then(function () {
-            test.equal(serverMock.callCount, 0);
+            test.equal(serverConstructorMock.callCount, 0);
             test.done();
         }, test.done);
     },
 
-    'server module does NOT get called when a prod env option gets passed': function (test) {
+    'should instantiate server and call its start method when "local" env option is passed': function (test) {
         test.expect(1);
         var build = require(testPath);
-        build({env: 'prod', dist: {}, files: {}}).then(function () {
-            test.equal(serverMock.callCount, 0);
+        build({env: 'local', dist: {}, files: {}}).then(function () {
+            test.equal(serverMock.start.callCount, 1);
+            test.done();
+        }, test.done);
+    },
+
+    'server module does NOT get instantiated when a "production" env option gets passed': function (test) {
+        test.expect(1);
+        var build = require(testPath);
+        build({env: 'production', dist: {}, files: {}}).then(function () {
+            test.equal(serverConstructorMock.callCount, 0);
+            test.done();
+        }, test.done);
+    },
+
+    'should perform a "production" build even if "prod" is passed (deprecation check)': function (test) {
+        var build = require(testPath);
+        var filesOption = {};
+        var htmlDest = "dest/index.html";
+        var jsDest = "dest/app.js";
+        filesOption[htmlDest] = ['my/index.html'];
+        filesOption[jsDest] = ["my/blah.js"];
+        build({env: 'prod', files: filesOption, dist: {}}).then(function () {
+            test.equal(browserifyMock.args[0][0].files[jsDest], filesOption[jsDest], 'js file destination was passed');
+            test.ok(!browserifyMock.args[0][0].files[htmlDest], 'html file destination was not passed');
             test.done();
         }, test.done);
     }

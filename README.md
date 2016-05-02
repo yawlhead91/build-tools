@@ -63,12 +63,14 @@ if you wanted to build both a main.js file and a scss file into a folder called 
 ```javascript
 module.exports = {
     build: {
-        files: {
-            'dist/app.js': ['src/main.js']
-            'dist/styles.css': ['src/styles/main.scss']
-        },
-        minifyFiles: {
-            'dist/app.js': ['dist/app.js']
+        production: {
+            files: {
+                'dist/app.js': ['src/main.js'],
+                'dist/styles.css': ['src/styles/main.scss']
+            },
+            minifyFiles: {
+                'dist/app.js': ['dist/app.js']
+            }
         }
     },
 };
