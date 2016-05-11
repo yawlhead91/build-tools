@@ -4,7 +4,6 @@ var Promise = require('promise');
 var express = require('express');
 var serveStatic = require('serve-static');
 var _ = require('underscore');
-var http = require('http');
 
 class Server {
 
@@ -12,6 +11,8 @@ class Server {
      * Starts a server.
      * @param {Object} options - The server options
      * @param {Number} [options.port] - The port number to start the server on
+     * @param {String} [options.hostname] - Hostname
+     * @param {String} [options.protocol] - Protocol
      * @param {String} [options.staticDir] - The directory to serve static files
      * @param {String|Function} [options.middleware] - The path to the middleware file or the middleware function that is passed the app instance and called before server is ran
      * @param {Function|Promise} [options.onServerEnd] - Called before the server ends
@@ -21,6 +22,8 @@ class Server {
         
         options = _.extend({
             port: 7000,
+            hostname: 'localhost',
+            protocol: 'http',
             staticDir: process.cwd(),
             middleware: null,
             onServerEnd: null
@@ -31,7 +34,6 @@ class Server {
         this.sockets = []; // keep track of sockets so we can destroy when done
 
         let app = express();
-        console.log('running server on http://localhost:' + this.options.port + '...');
         if (this.options.middleware) {
             try {
                 if (typeof this.options.middleware !== 'function') {
@@ -47,7 +49,10 @@ class Server {
             app.use(serveStatic(this.options.staticDir + '/'));
         }
         //create node.js http server and listen on port
-        this.server = this.server || http.createServer(app);
+        this.server = this.server || require(this.options.protocol).createServer(app);
+        this.server.listen(this.options.port, this.options.hostname, () => {
+            console.log('server is running on ' + this.options.protocol + '://' + this.options.hostname + ':' + this.options.port + '...');
+        });
 
     }
 

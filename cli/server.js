@@ -11,7 +11,9 @@ module.exports = function (args) {
     var options = nopt({
         port: [Number, null],
         staticDir: [String, null],
-        middleware: [path]
+        middleware: [path],
+        protocol: [String, null],
+        hostname: [String, null]
     }, {}, args, 0);
 
     return new Server(options).start();
