@@ -43,7 +43,6 @@
     "gitty": "^3.2.1",
     "glob": "^4.5.3",
     "glob-promise": "^1.0.6",
-    "mocha": "^2.1.0",
     "mocha-phantomjs-core": "^2.0.1",
     "ncp": "^2.0.0",
     "node-qunit-phantomjs": "^1.3.1",
