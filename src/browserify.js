@@ -54,13 +54,6 @@ var browserifyFile = function (destPath, srcPaths, options) {
             id = typeof id == "string" ? id : path;
             b.require(path, {expose: id});
         });
-        b.transform(babelify, {
-            presets: [es2015, stage0],
-            global: true,
-            // must whitelist modules that are using the latest es2015/babelify to
-            // ensure they are transpiled when build is run
-            ignore: /\/node_modules\/(?!module-js|router-js|scroll-js|modal-js|resource-manager-js|form-js|inline-edit-js\/)/
-        });
 
         if (options.watch) {
             b.plugin(watchify);
