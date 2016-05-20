@@ -46,6 +46,7 @@ module.exports = function(options) {
 
     if (!options.env) {
         console.warn('no environment was supplied, building production instead...');
+        options.env = 'production';
     } else if (!availableEnvs.has(options.env)) {
         console.warn('there is no environment named ' + options.env + ' building prod instead...');
     }
