@@ -96,7 +96,7 @@ module.exports = function(options) {
                 return browserify(browserifyOptions).then(function () {
                     return minify({files: options.minifyFiles}).then(function () {
                         return banner(options.bannerFiles).then(function () {
-                            console.log('Successfully completed a  ' + options.env + ' build!');
+                            console.log('Successfully completed a ' + options.env + ' build!');
                             if (options.env === 'local') {
                                 return new Server(options).start();
                             }
