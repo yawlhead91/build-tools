@@ -67,6 +67,8 @@ module.exports = {
 
 ```
 
+Then you can just run `bt server production`.
+
 ### bt build
 
 The `build` command builds all of your files into a distribution folder for deployment.
