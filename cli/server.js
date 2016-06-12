@@ -13,7 +13,7 @@ module.exports = function (args) {
     var config = utils.getConfig() || {};
     args = args || [];
 
-    var argObject = nopt({
+    var options = nopt({
         port: [Number, null],
         staticDir: [String, null],
         middleware: [path],
@@ -21,10 +21,9 @@ module.exports = function (args) {
         hostname: [String, null]
     }, {}, args, 0);
 
-    var env = argObject.argv.remain[0] || 'development';
+    var env = options.argv.remain[0] || process.env.NODE_ENV || 'development';
 
-    config = _.extend(config[env].server, argObject);
+    options = _.extend(config[env].server || config.server, options);
+    return new Server(options).start();
 
-    console.log(config);
-    return new Server(config).start();
 };
