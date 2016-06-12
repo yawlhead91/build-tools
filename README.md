@@ -51,6 +51,22 @@ bt server --port=8200 --staticDir=./blah middleware=./myServer.js
 
 Providing no arguments will serve the root directory of your project on localhost via port 7000, and use express's standard middleware by default.
 
+You can also start a server based on configuration that you specify in your bt-config.js file.
+
+```js
+module.exports = {
+    server: {
+        production: {
+           hostname: 'localhost',
+           staticDir: './blah',
+           middleware: './myServer.js',
+           port: 8200
+        }
+    },
+};
+
+```
+
 ### bt build
 
 The `build` command builds all of your files into a distribution folder for deployment.

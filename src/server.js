@@ -4,6 +4,7 @@ var Promise = require('promise');
 var express = require('express');
 var serveStatic = require('serve-static');
 var _ = require('underscore');
+var path = require('path');
 
 class Server {
 
@@ -37,7 +38,7 @@ class Server {
         if (this.options.middleware) {
             try {
                 if (typeof this.options.middleware !== 'function') {
-                    this.options.middleware = require(this.options.middleware)
+                    this.options.middleware = require(path.resolve(process.cwd(), this.options.middleware))
                 }
             } catch (err) {
                 console.error(err);
