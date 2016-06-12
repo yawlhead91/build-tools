@@ -12,6 +12,7 @@ A set of CLI commands to quickly version, package, and compile your projects.
 * Includes a built-in node server that allows for optional middleware
 * Full Git and NPM integration; Packages projects by creating git version tags, pushing to master branch, and versioning your project as a NPM package
 * Built-in Mocha and QUnit test runners
+* Deploys to a server (SFTP)
 
 ## Contents
 
@@ -22,6 +23,7 @@ A set of CLI commands to quickly version, package, and compile your projects.
     * [bt test](#bt-test)
     * [bt release](#bt-release)
     * [bt version](#bt-version)
+    * [bt deploy](#bt-deploy)
 
 ## Dependencies
 
@@ -228,6 +230,55 @@ Running this command will:
 It is recommended to only run this command when you're on `master` or a branch ready for production, since that is where all
 relevant commits have already been committed, and is less likely to have convoluted commits that you might not want in
 your new version.
+
+### bt deploy
+
+The `bt deploy` command allows you to upload files to a server of your choosing.
+
+You can pass options as arguments to your cli command:
+
+```
+bt deploy --hostname=555.555.555.55 --port=22 --path=dist --username=user --password=secret
+```
+
+or you can specify the options in your `bt-config.js` file
+
+
+```js
+module.exports = {
+    deploy: {
+       hostname: '555.555.555.55',
+       username: 'user',
+       password: 'secret',
+       path: 'dist',
+       protocol: 'sftp',
+       port: 22,
+    }
+};
+
+```
+Then you can just run `bt deploy`.
+
+If you need to have a deploy configuration for multiple environments, you can just nest your configuration under
+the id of the environment. The example below assigns the deploy configuration to the `production` environment.
+
+```js
+module.exports = {
+    deploy: {
+        production: {
+           hostname: '555.555.555.55',
+           username: 'user',
+           password: 'secret',
+           path: 'dist',
+           protocol: 'sftp',
+           port: 22,
+        }
+    }
+};
+
+```
+
+Then just run `bt deploy production`.
 
 
 ## Development
