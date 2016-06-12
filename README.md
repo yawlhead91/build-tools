@@ -253,6 +253,10 @@ module.exports = {
        path: 'dist',
        protocol: 'sftp',
        port: 22,
+       exclude: [
+           '.gitignore',
+           'node_modules/**'
+       ]
     }
 };
 
