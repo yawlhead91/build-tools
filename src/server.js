@@ -11,7 +11,7 @@ class Server {
      * Starts a server.
      * @param {Object} options - The server options
      * @param {Number} [options.port] - The port number to start the server on
-     * @param {String} [options.hostname] - Hostname
+     * @param {String} [options.hostname] - Hostname or IP address
      * @param {String} [options.protocol] - Protocol
      * @param {String} [options.staticDir] - The directory to serve static files
      * @param {String|Function} [options.middleware] - The path to the middleware file or the middleware function that is passed the app instance and called before server is ran
