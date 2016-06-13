@@ -45,19 +45,12 @@ module.exports = function (options) {
 
     let client = new Client(options);
 
-    client.on('error', function (src) {
-        console.log('errror!');
-        console.log(src);
-    });
-
     function globberizePath (p) {
         if (!isGlobPath(p)) {
             // if project directory is desired, remove leading slash and dot, glob will assume
-            p = p.replace(/^(\.)/, ""); // remove ./ for globbering below
-            if (p === '/') {
-                p = '';
-            }
-            p = p + '**/*';
+            p = p.replace(/^(\.)/, ""); // remove . for globbering below
+            p = p.replace(/(\/)$/, ""); // remove trailing /
+            p = p + '/**/*';
         }
         return p;
     }
