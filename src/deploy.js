@@ -47,10 +47,15 @@ module.exports = function (options) {
 
     function globberizePath (p) {
         if (!isGlobPath(p)) {
-            // if project directory is desired, remove leading slash and dot, glob will assume
-            p = p.replace(/^(\.)/, ""); // remove . for globbering below
-            p = p.replace(/(\/)$/, ""); // remove trailing /
-            p = p + '/**/*';
+
+            // if project directory is desired, remove leading "./", glob will assume
+            if (p[0] === '.' && p[1] === '/') {
+                p = p.replace(/^(\.\/)/, "");
+            }
+            if (p) {
+                p = path.relative(process.cwd(), p) + '/';
+            }
+            p = p + '**/*';
         }
         return p;
     }
