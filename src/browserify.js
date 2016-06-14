@@ -11,6 +11,7 @@ var babelify = require("babelify");
 var path = require("path");
 var es2015 = require('babel-preset-es2015');
 var stage0 = require('babel-preset-stage-0');
+var envify = require('envify/custom');
 
 /**
  * Browserifies a single file bundle.
@@ -41,7 +42,13 @@ var browserifyFile = function (destPath, srcPaths, options) {
 
         options.debug = options.watch;
 
+
         b = browserify(options);
+
+        b.transform(envify({
+            _: 'purge',
+            NODE_ENV: options.env
+        }), {global: true});
 
         // must add each path individual unfortunately.
         finalPaths.forEach(function (path) {

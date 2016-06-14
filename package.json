@@ -37,6 +37,7 @@
     "browserify": "^13.0.0",
     "chokidar": "^1.4.3",
     "clean": "^4.0.1",
+    "envify": "^3.4.0",
     "express": "^4.13.3",
     "fs-extra": "^0.16.5",
     "ftp-deploy": "^1.1.0",

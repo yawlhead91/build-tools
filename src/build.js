@@ -77,7 +77,8 @@ module.exports = function(options) {
             watch: options.watch,
             browserifyOptions: options.browserifyOptions,
             files: {},
-            requires: options.requires
+            requires: options.requires,
+            env: options.env
         };
         var copyOptions = {files: {}, watch: options.watch},
             sassOptions = {files: {}, watch: options.watch};
