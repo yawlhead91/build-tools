@@ -1,6 +1,6 @@
 'use strict';
 var sinon = require('sinon');
-var testPath = './../../src/copy';
+var testPath = './../src/copy';
 var mockery = require('mockery');
 
 var fsMock;

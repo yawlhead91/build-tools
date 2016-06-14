@@ -26,7 +26,7 @@
   },
   "license": "MIT",
   "scripts": {
-    "test": "./bin/bt test && nodeunit tests/nodeunit"
+    "test": "nodeunit tests"
   },
   "dependencies": {
     "async-promises": "^0.1.2",

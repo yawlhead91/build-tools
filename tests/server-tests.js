@@ -1,6 +1,6 @@
 'use strict';
 var sinon = require('sinon');
-var serverPath = './../../src/server';
+var serverPath = './../src/server';
 var mockery = require('mockery');
 
 var expressMock;

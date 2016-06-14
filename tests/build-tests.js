@@ -1,5 +1,5 @@
 'use strict';
-var testPath = './../../src/build';
+var testPath = './../src/build';
 var sinon = require('sinon');
 var mockery = require('mockery');
 var Promise = require('promise');
