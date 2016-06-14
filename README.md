@@ -155,6 +155,21 @@ Or you can specify an object for your requires to expose reusable variables:
 
 Then you can reference `my-code` anywhere in your bundled script files.
 
+#### NODE_ENV variable
+
+Because the `bt build` command compiles before being available in the browser, this command will inject your current
+environment variable into the `process.env.NODE_ENV` variable in your javascript. So you can do things like the
+following, even in your client-side files!
+
+```js
+if (process.env.NODE_ENV === 'production') {
+    // do things for production environment
+} else {
+    // do things for non-production environment
+}
+```
+Remember that this variable will be either the `env` variable you pass into your `bt build` call or the REAL `NODE_ENV` variable
+in your environment.
 
 ### bt test
 
