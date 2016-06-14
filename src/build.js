@@ -59,7 +59,7 @@ module.exports = function(options) {
     console.log('Building ' + options.env + ' environment...');
 
     options = _.extend({
-        env: 'prod',
+        env: process.env.NODE_ENV,
         files: null,
         dist: null,
         minifyFiles: null,
