@@ -29,7 +29,11 @@ A set of CLI commands to quickly version, package, and compile your projects.
 
 ### Node
 
-You can install [Node.js](http://www.nodejs.org/) via the package provided on [their site](http://www.nodejs.org). Installing node will also install the [Node Package Manager](https://github.com/npm/npm) (NPM) to download and install node modules.
+This package requires Node >=6.0.
+
+You can install [Node.js](http://www.nodejs.org/) via the package provided on [their site](http://www.nodejs.org).
+Installing node will also install the [Node Package Manager](https://github.com/npm/npm) (NPM) to download and
+install node modules.
 
 
 ## CLI Commands
@@ -75,7 +79,7 @@ Then you can just run `bt server production`.
 
 The `build` command builds all of your files into a distribution folder for deployment.
 It will do things like compile all of your application's javascript files into single files using browserify (ES6 files are supported), 
-sassify all of your scss files, minify files, and even add banners to your files if desired. 
+sassify all of your scss files, minify files, and even add banners to your files if desired.
 
 First you need to specify the files you want the build command to use in your `bt-config.js` file. For instance, 
 if you wanted to build both a main.js file and a scss file into a folder called `dist`, then minify the js file, your `bt-config.js` file would look a little like this:
