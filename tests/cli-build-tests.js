@@ -2,7 +2,7 @@
 var sinon = require('sinon');
 var mockery = require('mockery');
 var Promise = require("promise");
-var buildPath = './../../cli/build';
+var buildPath = './../cli/build';
 var testMock, buildMock, utilsMock, configApiStub;
 var allowables = ['./../../cli/build'];
 

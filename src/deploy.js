@@ -34,15 +34,13 @@ module.exports = function (options) {
         return Promise.reject(error);
     }
 
-    // stfp lib recognizes host--not hostname
-    options.host = options.hostname;
-
-
     if (!fs.existsSync(options.path)) {
         var e = new Error(options.path + ' does not exist');
         return Promise.reject(e);
     }
 
+    // stfp lib recognizes host--not hostname
+    options.host = options.hostname;
     let client = new Client(options);
 
     function globberizePath (p) {
@@ -87,7 +85,13 @@ module.exports = function (options) {
     }
 
     console.log('Deploying to ' + options.host + '...');
+
     return glob(globberizePath(options.path), {ignore: options.exclude, dot: true}).then((paths) => {
+
+        if (!paths || !paths.length) {
+            return Promise.resolve();
+        }
+
         return async.eachSeries(paths, function (p) {
             var stats = fs.statSync(p);
             if(stats.isDirectory()){

@@ -1,5 +1,5 @@
 'use strict';
-var testPath = './../../src/clean';
+var testPath = './../src/clean';
 var sinon = require('sinon');
 
 module.exports = {

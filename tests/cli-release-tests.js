@@ -2,7 +2,7 @@
 var sinon = require('sinon');
 var mockery = require('mockery');
 var Promise = require("promise");
-var releasePath = './../../cli/release';
+var releasePath = './../cli/release';
 var testMock, buildMock, bumpMock, versionMock;
 var allowables = ['./../../cli/release'];
 
