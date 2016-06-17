@@ -304,6 +304,18 @@ module.exports = {
 Then just run `bt deploy production`.
 
 
+## Packaging
+
+When running any of the commands that package your project (i.e. `bt build`, `bt release`, etc), this lib takes care
+of determining what file types are a part of your build and spawns off different compilation tasks outlined below.
+
+### SASS files
+
+When detecting a file with a .scss extension, it is compiled into the new css file that you specify in your bt-config file.
+It will also do some small but helpful tasks like add any necessary vendor prefixes to your css and minify it for
+performance. It does also make a css.map file which you can use when debugging or viewing the source.
+
+
 ## Development
 
 ### Run tests
