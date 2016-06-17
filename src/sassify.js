@@ -5,6 +5,7 @@ var _ = require('underscore');
 var fs = require('fs-extra');
 var path = require("path");
 var chokidar = require('chokidar');
+var postcss = require('postcss');
 
 var watchFile = function (sourceFile, destinationFile) {
     return new Promise(function (resolve) {
@@ -46,7 +47,9 @@ var sassifyFile = function (sourceFile, destinationFile) {
                     // No errors during the compilation, let's write result on the disk
                     fs.writeFile(destinationFile, result.css, function (err) {
                         if (!err) {
-                            resolve();
+                            runPostCss(result.css, destinationFile).then(() => {
+                                resolve();
+                            });
                         } else {
                             reject(err);
                         }
@@ -57,6 +60,17 @@ var sassifyFile = function (sourceFile, destinationFile) {
             });
         });
     });
+};
+
+var runPostCss = function (css, destFile) {
+    return postcss([require('autoprefixer'), require('cssnano')])
+        .process(css, {from: destFile, to: destFile})
+        .then(function (result) {
+            fs.writeFileSync(destFile, result.css);
+            if (result.map) {
+                fs.writeFileSync(destFile + '.map', result.map);
+            }
+        });
 };
 
 /**
@@ -81,9 +95,8 @@ module.exports = function (options) {
     return Promise.each(destPaths, function (destPath) {
         // only sass the first main file (all other files should be used as
         // @imports inside of the main file), which is the point of using sass in the first place,
-        return sassifyFile(options.files[destPath][0], destPath).then(function () {
-
-        })
+        let sourceFile = options.files[destPath][0];
+        return sassifyFile(sourceFile, destPath);
     }).then(function () {
         if (options.watch) {
             return Promise.each(destPaths, function (destPath) {
