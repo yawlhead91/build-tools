@@ -122,10 +122,11 @@ module.exports = function (type) {
     };
 
     return bumpFiles().then(function (newVersionNbr) {
+        let tagNumber = 'v' + newVersionNbr;
         return getEditedFiles().then(function (editedFiles) {
             return stageFiles(editedFiles).then(function () {
-                return commit(newVersionNbr).then(function () {
-                    return merge('master', newVersionNbr);
+                return commit(tagNumber).then(function () {
+                    return merge('master', tagNumber);
                 });
             });
         });
