@@ -69,7 +69,14 @@
   },
   "keywords": [
     "build tools",
-    "build"
+    "build",
+    "release management",
+    "packaging",
+    "deployment",
+    "deploy",
+    "publish",
+    "releases",
+    "release"
   ],
   "devDependencies": {
     "mockery": "^1.7.0",
