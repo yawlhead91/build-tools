@@ -10,7 +10,7 @@ var bumpStub;
 var promptMock;
 var bumpStubPromise;
 
-var allowables = ['util', testPath, 'promise', './bump'];
+var allowables = ['util', testPath, 'promise', './bump', 'semver'];
 
 module.exports = {
 
@@ -46,12 +46,7 @@ module.exports = {
             unstaged: [],
             untracked: []
         };
-        var afterBumpStatus = {
-            staged: [],
-            unstaged: [ { file: 'package.json', status: 'modified' } ],
-            untracked: []
-        };
-        localRepoMock.status.onFirstCall().yields(null, afterBumpStatus); // return status after package.json file has been bumped
+        localRepoMock.status.onFirstCall().yields(null, statusResp);
         localRepoMock.add.yields(null); // staged files success
         localRepoMock.commit.yields(null); // commit success
         var getBranchesResp = {current: currentBranch};
@@ -89,11 +84,6 @@ module.exports = {
         var versionType = 'minor';
         var newVersionNumber = '0.2.5';
         var currentBranch = 'master';
-        var statusResp = {
-            staged: [],
-            unstaged: [],
-            untracked: []
-        };
         var afterBumpStatus = {
             staged: [],
             unstaged: [ { file: 'package.json', status: 'modified' } ],
@@ -129,11 +119,6 @@ module.exports = {
         var versionType = 'minor';
         var newVersionNumber = '0.2.5';
         var currentBranch = 'master';
-        var statusResp = {
-            staged: [],
-            unstaged: [],
-            untracked: []
-        };
         var afterBumpStatus = {
             staged: [],
             unstaged: [ { file: 'package.json', status: 'modified' } ],
