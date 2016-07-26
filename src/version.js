@@ -4,15 +4,17 @@ var Promise = require('promise');
 var bump = require('./bump');
 var _ = require('underscore');
 var semver = require('semver');
+var prompt = require('./prompt');
 
 /**
- * Ups the current package to a new version and commits it locally.
- * Imitates `npm version` functionality: https://docs.npmjs.com/cli/version
+ * Ups the current package to a new version, prompts user for commit message, then makes a commit locally.
  * @param {string|number} [type] - a valid semver string (defaults to patch) or the new version number to use
+ * @param {Object} [options] - Set of options
+ * @param {String} [options.commitMessage] -- If not specified, will prompt user for commit message
  * @returns {Promise} Returns a promise that resolves when completed
  * @type {exports}
  */
-module.exports = function (type) {
+module.exports = function (type, options={}) {
     var localRepo = git(process.cwd()),
         newVersionNum;
 
@@ -21,6 +23,8 @@ module.exports = function (type) {
     if (semver.valid(type)) {
         newVersionNum = type;
     }
+
+    options.commitMessage = options.commitMessage || '';
 
     var getEditedFiles = function () {
         var files = [];
@@ -48,10 +52,10 @@ module.exports = function (type) {
         });
     };
 
-    var commit = function (version) {
+    var commit = function (message) {
         console.log('committing locally...');
         return new Promise(function (resolve, reject) {
-            localRepo.commit(version, function (err) {
+            localRepo.commit(message, function (err) {
                 if (err) return reject(err);
                 console.log('committing completed!');
                 resolve();
@@ -79,7 +83,6 @@ module.exports = function (type) {
                 resolve();
             });
         });
-
     };
 
     var merge = function (branch, version) {
@@ -94,19 +97,14 @@ module.exports = function (type) {
                         if (err) return reject(err);
                         // push result to Github
                         localRepo.push('origin', branch, function (err) {
-                            // create and push tags
-                            return createTag(version).then(function () {
-                                return pushTag(version).then(function () {
-                                    if (err) return reject(err);
-                                    // merge done, now navigate back to original branch
-                                    localRepo.checkout(branches.current, function (err) {
-                                        if (err) return reject(err);
-                                        console.log('merging completed!');
-                                        resolve();
-                                    });
-                                })
+                            if (err) return reject(err);
+                            // merge done, now navigate back to original branch
+                            localRepo.checkout(branches.current, function (err) {
+                                if (err) return reject(err);
+                                console.log('merging completed!');
+                                resolve();
                             });
-                        });
+                        })
                     });
                 });
             });
@@ -121,14 +119,37 @@ module.exports = function (type) {
         }
     };
 
-    return bumpFiles().then(function (newVersionNbr) {
-        let tagNumber = 'v' + newVersionNbr;
-        return getEditedFiles().then(function (editedFiles) {
-            return stageFiles(editedFiles).then(function () {
-                return commit(tagNumber).then(function () {
-                    return merge('master', tagNumber);
-                });
-            });
-        });
-    }).catch(console.log);
+    let tagNumber;
+    return bumpFiles()
+        .then(function (newVersionNbr) {
+            tagNumber = 'v' + newVersionNbr;
+            return getEditedFiles();
+        })
+        .then(function (editedFiles) {
+            return stageFiles(editedFiles)
+        })
+        .then(function () {
+            if (options.commitMessage) {
+                return options.commitMessage;
+            }
+            return prompt({defaultText: tagNumber})
+        })
+        .then((commitMessage) => {
+            commitMessage = commitMessage || tagNumber;
+            let frags = commitMessage.split('\n');
+            if (frags[0].trim() !== tagNumber) {
+                commitMessage = tagNumber + '\n\n' + commitMessage;
+            }
+            return commit(commitMessage)
+        })
+        .then(() => {
+            return createTag(tagNumber);
+        })
+        .then(() => {
+            return pushTag(tagNumber);
+        })
+        .then(function () {
+            return merge('master', tagNumber);
+        })
+        .catch(console.log);
 };

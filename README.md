@@ -223,6 +223,25 @@ authoritative version of [version command](#bt-version). It compiles a build, ru
 1. Runs all [tests](#bt-test) you've specified.
 1. Runs a [production build](#bt-build), if specified.
 1. Ups the version of the package, which involves the exact same steps performed by the [version command](#bt-version).
+1. Publishes package to npm.
+1. Release is published to Github, if your [github credentials are setup in your bt-config file](#github-integration).
+1. Notifications are automatically sent out to all who are watchers of the git repo notifying them of the new version.
+
+
+#### Github Integration
+
+In order to have your release published on github, you must [generate a github token](https://help.github.com/articles/creating-an-access-token-for-command-line-use/)
+and add it under the `github` property of your bt-config file:
+
+```javascript
+module.exports = {
+    "github": {
+       "token": "s65495jkgljkgskjfdigf", // the generated github token
+       "user": "githubUserName", // the github username that contains the access token
+       "repo": "my-repo", // the github repo name (optional, assumes local repository)
+    }
+};
+```
 
 ### bt version
 
@@ -238,12 +257,12 @@ Replacing [SEMVER] with (`major`, `minor` or `patch`) (`patch` is the default if
 Running this command will:
 
 1. Update `package.json` to the new version
-1. Commit the change to your local git repository (the commit message being your new version number)
+1. Create a local git commit (you will be prompted for a commit message)
+1. Create a new tag of your new version
+1. Push new tag to your git repository
 1. Check out your master branch
 1. Merge the branch you were on into your `master` branch
 1. Push your `master` branch remotely to Github
-1. Create a new tag of your new version
-1. Push new tag to remote
 1. Check back out the branch where you initially called the `version` command.
 
 It is recommended to only run this command when you're on `master` or a branch ready for production, since that is where all

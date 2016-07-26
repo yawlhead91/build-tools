@@ -39,23 +39,25 @@ module.exports = function (type) {
         return fileMaps;
     };
 
-        var nextVersion;
-        _.each(validateFiles(files), function (map, path) {
-            promises.push(new Promise(function (resolve, reject) {
-                nextVersion = semver.inc(map.currentVersion, type);
-                if (map.contents && nextVersion) {
-                    map.contents.version = nextVersion;
-                    map.contents = JSON.stringify(map.contents, null, 2) + "\n";
-                    try {
-                        fs.writeFileSync(path, map.contents);
-                    } catch (e) {
-                        reject(e);
-                    }
+    var nextVersion,
+        prevVersion;
+    _.each(validateFiles(files), function (map, path) {
+        promises.push(new Promise(function (resolve, reject) {
+            prevVersion = map.currentVersion;
+            nextVersion = semver.inc(map.currentVersion, type);
+            if (map.contents && nextVersion) {
+                map.contents.version = nextVersion;
+                map.contents = JSON.stringify(map.contents, null, 2) + "\n";
+                try {
+                    fs.writeFileSync(path, map.contents);
+                } catch (e) {
+                    reject(e);
                 }
-                resolve();
-            }));
-        });
-        return Promise.all(promises).then(function () {
-            return Promise.resolve(nextVersion);
-        }).catch(console.log);
+            }
+            resolve();
+        }));
+    });
+    return Promise.all(promises).then(function () {
+        return Promise.resolve(nextVersion);
+    }).catch(console.log);
 };
