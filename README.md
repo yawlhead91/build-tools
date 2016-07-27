@@ -217,8 +217,15 @@ Which will run your tests in the browser located at http://localhost:7755.
 ### bt release
 
 The `release` command is a way to official bundle and make a version of your package. You can think of this command as a much more strict, 
-authoritative version of [version command](#bt-version). It compiles a build, runs tests on it (if applicable), versions it, and commits it to your Github repo.
- The command does the following:
+authoritative version of [version command](#bt-version).
+
+```
+bt release [SEMVER]
+```
+
+Replacing [SEMVER] with (`major`, `minor` or `patch`) (`patch` is the default if nothing is supplied).
+
+The `bt release` command does the following:
 
 1. Runs all [tests](#bt-test) you've specified.
 1. Runs a [production build](#bt-build), if specified.
@@ -227,6 +234,16 @@ authoritative version of [version command](#bt-version). It compiles a build, ru
 1. Release is published to Github, if your [github credentials are setup in your bt-config file](#github-integration).
 1. Notifications are automatically sent out to all who are watchers of the git repo notifying them of the new version.
 
+`bt release` arguments can be passed with command:
+
+```
+bt release --draft=true
+```
+
+| Argument | Type | Description |
+|--------|--------|--------|
+| `draft`| Boolean| `true` to upload release to Github as "unpublished", `false` otherwise (defaults to `false`)
+| `prerelease`| Boolean | `true` to mark release as "pre" (defaults to `false`)
 
 #### Github Integration
 
@@ -241,6 +258,12 @@ module.exports = {
        "repo": "my-repo", // the github repo name (optional, assumes local repository)
     }
 };
+```
+
+You can also pass github arguments to the cli command:
+
+```
+bt release --user=githubUserName --repo=my-repo --token=s65495jkgljkgskjfdigf
 ```
 
 ### bt version
