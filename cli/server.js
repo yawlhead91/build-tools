@@ -9,7 +9,6 @@ var _ = require('underscore');
  * Runs server.
  */
 module.exports = function (args) {
-
     var config = utils.getConfig() || {};
     args = args || [];
 
@@ -23,7 +22,10 @@ module.exports = function (args) {
 
     var env = options.argv.remain[0] || process.env.NODE_ENV || 'development';
 
-    options = _.extend(config[env].server || config.server, options);
+    if (config[env]) {
+        config = config[env];
+    }
+    options = _.extend(config.server, options);
     return new Server(options).start();
 
 };
