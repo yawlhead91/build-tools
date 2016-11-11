@@ -55,7 +55,6 @@ module.exports = function(options) {
         options.requires['test-utils'] = tempDir + '/tests/test-utils.js';
         var fileMap = {};
         fileMap[tempDir + '/tests/built-tests.js'] = options.files;
-
         return browserify({
             files: fileMap,
             plugins: options.plugins,
@@ -65,8 +64,11 @@ module.exports = function(options) {
     }
 
     function runMochaTest() {
-        var binPath = process.cwd() + '/node_modules/.bin/phantomjs';
-        var child = spawn(binPath, [process.cwd() + '/node_modules/mocha-phantomjs-core/mocha-phantomjs-core.js', tempDir + '/tests/index.html']);
+        var binPath = internalModulePath + '/node_modules/.bin/phantomjs';
+        var child = spawn(binPath, [
+            internalModulePath + '/node_modules/mocha-phantomjs-core/mocha-phantomjs-core.js',
+            tempDir + '/tests/index.html'
+        ]);
         return new Promise(function (resolve, reject) {
             child.stdout.on('data', function (buffer) {
                 process.stdout.write(buffer.toString());

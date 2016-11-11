@@ -7,10 +7,7 @@ var glob = require('glob');
 var browserify = require('browserify');
 var watchify = require('watchify');
 var utils = require('./utils');
-var babelify = require("babelify");
 var path = require("path");
-var es2015 = require('babel-preset-es2015');
-var stage0 = require('babel-preset-stage-0');
 var envify = require('envify/custom');
 
 /**
@@ -35,13 +32,11 @@ var browserifyFile = function (destPath, srcPaths, options) {
             finalPaths.push(path);
         }.bind(this));
 
-
         // add required parameters for watchify
         options.cache = {};
         options.packageCache = {};
 
         options.debug = options.watch;
-
 
         b = browserify(options);
 
