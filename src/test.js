@@ -15,7 +15,6 @@ var Server = require('./server');
 
 var server;
 var tempDir = process.cwd() + '/tmp';
-var internalModulePath = path.resolve(__dirname, '..');
 
 var ncp = require('ncp').ncp;
 ncp.limit = 16;
@@ -64,9 +63,9 @@ module.exports = function(options) {
     }
 
     function runMochaTest() {
-        var binPath = internalModulePath + '/node_modules/.bin/phantomjs';
+        var binPath = process.cwd() + '/node_modules/.bin/phantomjs';
         var child = spawn(binPath, [
-            internalModulePath + '/node_modules/mocha-phantomjs-core/mocha-phantomjs-core.js',
+            process.cwd() + '/node_modules/mocha-phantomjs-core/mocha-phantomjs-core.js',
             tempDir + '/tests/index.html'
         ]);
         return new Promise(function (resolve, reject) {
