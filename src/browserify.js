@@ -23,13 +23,17 @@ var browserifyFile = function (destPath, srcPaths, options) {
         b,
         finalPaths = [];
     return new Promise(function (resolve, reject) {
-        // deal with file globs
         _.each(srcPaths, function (path) {
+            // deal with file globs
             if (glob.hasMagic(path)) {
-                path = glob.sync(path);
+                glob.sync(path).forEach((p) => {
+                    p = utils.scopePaths(p);
+                    finalPaths.push(p);
+                });
+            } else {
+                path = utils.scopePaths(path);
+                finalPaths.push(path);
             }
-            path = utils.scopePaths(path);
-            finalPaths.push(path);
         }.bind(this));
 
         // add required parameters for watchify
@@ -113,10 +117,11 @@ var writeBrowserifyBundleStreamToFile = function (stream, destPath) {
 
 /**
  * Browserifies a set of files.
- * @param {Object} options - Options that will be passed to browserify instance
+ * @param {Object} options - Options that will be passed to browserify instance (most of these are the same as Browserify opts at https://github.com/substack/node-browserify#browserifyfiles--opts)
  * @param {Object} options.files - A mapping containing file destination (keys) to the associate set of file bundles (array of values)
- * @param {Object} [options.requires] - A id-url map object of global requires
- * @param {Array} [options.plugins] - An array of plugins
+ * @param {Object} [options.requires] - A id-url map object of global browserify requires
+ * @param {Array} [options.plugins] - An array of browserify plugins options
+ * @param {Array} [options.transform] - An array of browserify transforms options
  * @returns {Promise} Returns a promise when complete
  */
 module.exports = function (options) {
@@ -124,12 +129,11 @@ module.exports = function (options) {
     var promises = [];
 
     options = _.extend({
+        files: null,
         requires: [],
-        plugins: []
-    },
-        options.browserifyOptions, // merge deprecated custom browserify options if exist
-        options
-    );
+        plugins: [],
+        transform: [],
+    }, options);
 
     if (!options.files) {
         return Promise.resolve();

@@ -28,6 +28,7 @@ ncp.limit = 16;
  * @param {Number} [options.port] - Optional port to start server on (default to 7755)
  * @param {Object} [options.requires] - A id-url map object of global requires
  * @param {Array} [options.plugins] - An array of plugins
+ * @param {Object} [options.browserifyOptions] - Browserify options
  * @returns {*}
  */
 module.exports = function(options) {
@@ -38,7 +39,8 @@ module.exports = function(options) {
         keepalive: false,
         requires: {},
         files: [],
-        plugins: []
+        plugins: [],
+        browserifyOptions: {}
     }, options);
 
     if (!options.id || !options.files || !options.files.length) {
@@ -47,19 +49,23 @@ module.exports = function(options) {
     }
 
     function runBrowserify() {
+
         // expose "qunit" and "test-utils" variables to external project
         if (options.id === 'qunit') {
             options.requires['qunit'] = tempDir + '/tests/qunit.js';
         }
         options.requires['test-utils'] = tempDir + '/tests/test-utils.js';
+
+        // convert files to an object for browserify process
         var fileMap = {};
         fileMap[tempDir + '/tests/built-tests.js'] = options.files;
-        return browserify({
+        let opts = _.extend(options.browserifyOptions, {
             files: fileMap,
             plugins: options.plugins,
             requires: options.requires,
-            watch: options.keepalive
+            watch: options.keepalive,
         });
+        return browserify(opts);
     }
 
     function runMochaTest() {
@@ -183,7 +189,7 @@ module.exports = function(options) {
         });
     });
     return copyFiles().then(function() {
-        return runBrowserify(options).then(function () {
+        return runBrowserify().then(function () {
             let server = getServer();
             return server.start().then(() => {
                 // dont run test automatically if the intent is to keep the

@@ -73,13 +73,12 @@ module.exports = function(options) {
     options.browserifyOptions.debug = options.browserifyOptions.debug || options.env === 'local';
 
     return clean(options.dist).then(function () {
-        var browserifyOptions = {
+        var browserifyOptions = _.extend({}, options.browserifyOptions, {
             watch: options.watch,
-            browserifyOptions: options.browserifyOptions,
             files: {},
             requires: options.requires,
             env: options.env
-        };
+        });
         var copyOptions = {files: {}, watch: options.watch},
             sassOptions = {files: {}, watch: options.watch};
         // only copy only non-js files

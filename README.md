@@ -94,11 +94,24 @@ module.exports = {
             },
             minifyFiles: {
                 'dist/app.js': ['dist/app.js']
-            }
+            },
+            requires: {
+                "my-code": "./app/my-script" // makes 'my-code' as a global package name in your bundle
+            },
+            "browserifyOptions": {}
         }
     },
 };
 ```
+#### Options
+
+| Option | Type | Description |
+|--------|--------|--------|
+| `files`| Object | An object containing a mapping of output files (keys) to their source files (values)
+| `minifyFiles`| Object | An object containing a mapping of output files (keys) to the files that should be minified (values)
+| `requires`| Array|Object | An array containing which files to ensure are loaded externally and made available in the build. See [https://github.com/substack/node-browserify#brequirefile-opts](browserify's require option) to understand why you may want to use this. This option can also be an object containing require variable (keys) to their paths (values)
+| `browserifyOptions`| Object | [https://github.com/substack/node-browserify#brequirefile-opts](Browserify options). 
+
 
 Then you can run the build command in your terminal:
 
@@ -127,37 +140,6 @@ Arguments allowed are:
 |--------|--------|--------|
 | `port`| Number| The port number to start the server on (if `local` is passed)
 | `staticDir`| String | The path (relative to he project root) containing the files that should be served when the server starts
-
-#### Requiring files
-
-There are also configuration options you can specify in your configuration like `requires`, which will ensure
-that any external scripts are preloaded. See [https://github.com/substack/node-browserify#brequirefile-opts](browserify
-require documentation) to understand why you may want to do this. Here is an example of a configuration. All paths are
-relative to your project's root.
-
-```javascript
-{
-    build: {
-           requires: [
-                "./app/my-script"
-            ]
-        }
-}
-```
-
-Or you can specify an object for your requires to expose reusable variables:
-
-```javascript
-{
-    build: {
-           requires: {
-            "my-code": "./app/my-script"
-           }
-        }
-}
-```
-
-Then you can reference `my-code` anywhere in your bundled script files.
 
 #### NODE_ENV variable
 
@@ -192,11 +174,24 @@ module.exports = {
           "src": ["tests/**/*"],
         },
         "mocha": {
-          "src": ["path/to/mocha/tests/*"]
-        }
+          "src": ["path/to/mocha/tests/*"],
+        },
+        "browserifyOptions": {}
       }
 };
+
 ```
+
+#### Options
+
+| Option | Type | Description |
+|--------|--------|--------|
+| `qunit`| Object | Options to use for qunit test compiling
+| `qunit.src`| Array | An array of file names (or [glob patterns](https://github.com/isaacs/node-glob)) to be compiled and tested using QUnit  
+| `mocha`| Object | Options to use for mocha tests
+| `mocha.src`| Array | An array of file names (or [glob patterns](https://github.com/isaacs/node-glob)) to be compiled and tested using Mocha 
+| `browserifyOptions`| Object | [https://github.com/substack/node-browserify#brequirefile-opts](Browserify options).  
+
 
 Once that's done, just run the following in your terminal:
 

@@ -231,6 +231,24 @@ module.exports = {
             test.ok(!browserifyMock.args[0][0].files[htmlDest], 'html file destination was not passed');
             test.done();
         }, test.done);
-    }
+    },
+
+    'should pass browserify options to browserify': function (test) {
+        var build = require(testPath);
+        var filesOption = {};
+        var htmlDest = "dest/index.html";
+        var jsDest = "dest/app.js";
+        filesOption[htmlDest] = ['my/index.html'];
+        filesOption[jsDest] = ["my/blah.js"];
+        build({
+            files: {'test/file.js': ['test/compile.js']},
+            browserifyOptions: {
+                myTest: 'testo'
+            },
+        }).then(function () {
+            test.deepEqual(browserifyMock.args[0][0].myTest, 'testo');
+            test.done();
+        }, test.done);
+    },
 
 };

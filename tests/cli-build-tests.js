@@ -3,7 +3,7 @@ var sinon = require('sinon');
 var mockery = require('mockery');
 var Promise = require("promise");
 var buildPath = './../cli/build';
-var testMock, buildMock, utilsMock, configApiStub;
+var testMock, buildMock, utilsMock;
 var allowables = ['./../../cli/build'];
 
 module.exports = {
@@ -143,7 +143,34 @@ module.exports = {
             test.deepEqual(buildMock.args[0][0].files, files);
             test.done();
         });
-    }
+    },
+
+    'should pass transform in config to build': function (test) {
+        test.expect(1);
+        var testTransforms = [
+            [
+                "babelify",
+                {
+                    "presets": [
+                        "es2015"
+                    ]
+                }
+            ]
+        ];
+        var mockConfig = {
+            build: {
+                browserifyOptions: {
+                    transform: testTransforms
+                },
+            }
+        };
+        utilsMock.getConfig.returns(mockConfig);
+        var build = require(buildPath);
+        build().then(function () {
+            test.deepEqual(buildMock.args[0][0].browserifyOptions.transform, testTransforms);
+            test.done();
+        });
+    },
 
 
 };

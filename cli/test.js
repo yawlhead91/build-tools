@@ -12,22 +12,25 @@ var path = require('path');
  */
 module.exports = function (args) {
     args = args || [];
-    config.tests = config.tests || {src: {}};
-    var keepalive = args[1] === 'server';
+    config.tests = config.tests || {};
     var testIds = _.keys(config.tests);
     var testId = args[0] || testIds[0];
-    config = config.tests[testId] || {};
-    var requires = config.requires || {};
-    for (let id in requires) {
-        if (requires.hasOwnProperty(id)) {
-            requires[id] = path.resolve(process.cwd(), requires[id]);
+    var testOptions = config.tests[testId] || {src: []};
+
+    testOptions = _.extend({}, {
+        id: testId,
+        files: testOptions.src,
+        keepalive: args[1] === 'server',
+        browserifyOptions: config.tests.browserifyOptions,
+    }, testOptions);
+
+    testOptions.requires = testOptions.requires || {};
+    for (let id in testOptions.requires) {
+        if (testOptions.requires.hasOwnProperty(id)) {
+            let requirePath = testOptions.requires[id];
+            testOptions.requires[id] = path.resolve(process.cwd(), requirePath);
         }
     }
 
-    return test({
-        id: testId,
-        files: config.src,
-        keepalive: keepalive,
-        requires: requires
-    });
+    return test(testOptions);
 };
