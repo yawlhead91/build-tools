@@ -1,4 +1,5 @@
 [![Build Status](https://travis-ci.org/mkay581/build-tools.svg?branch=master)](https://travis-ci.org/mkay581/build-tools)
+[![npm version](https://badge.fury.io/js/build-tools.svg)](https://badge.fury.io/js/build-tools)
 
 # Build Tools
 
