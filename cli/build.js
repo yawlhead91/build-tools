@@ -46,7 +46,9 @@ module.exports = function (args) {
         testConfig = testConfig || {};
         var testIds = Object.keys(testConfig);
         return Promise.mapSeries(testIds, (id) => {
-            return test(testConfig[id]);
+            let options = testConfig[id];
+            options.id = id;
+            return test(options);
         });
     };
 

@@ -44,7 +44,7 @@ module.exports = {
         var mockConfig = {
             tests: {
                 mocha: {
-                    src: files
+                    files: files
                 },
             }
         };
@@ -64,13 +64,13 @@ module.exports = {
             production: {
                 tests: {
                     qunit: {
-                        src: ['prod_test_file.js']
+                        files: ['prod_test_file.js']
                     },
                 }
             },
             tests: {
                 mocha: {
-                    src: ['root_testfile.js']
+                    files: ['root_testfile.js']
                 },
             }
         };
@@ -91,7 +91,7 @@ module.exports = {
             production: {
                 tests: {
                     mocha: {
-                        src: ['testfile.js']
+                        files: ['testfile.js']
                     },
                 }
             }
@@ -255,16 +255,16 @@ module.exports = {
         });
     },
 
-    'should pass build test configs src files to test function correctly': function (test) {
+    'should pass build test configs files to test function correctly': function (test) {
         test.expect(2);
         var firstTestConfig = {
             mocha: {
-                src: ['test/file1.js']
+                files: ['test/file1.js']
             }
         };
         var secondTestConfig = {
             mocha: {
-                src: ['tests/file2.js']
+                files: ['tests/file2.js']
             }
         };
         var mockConfig = {
@@ -273,8 +273,8 @@ module.exports = {
         utilsMock.getConfig.returns(mockConfig);
         var build = require(buildPath);
         build().then(function () {
-            test.deepEqual(testMock.args[0][0].files, firstTestConfig.mocha.src);
-            test.deepEqual(testMock.args[1][0].files, secondTestConfig.mocha.src);
+            test.deepEqual(testMock.args[0][0].files, firstTestConfig.mocha.files);
+            test.deepEqual(testMock.args[1][0].files, secondTestConfig.mocha.files);
             test.done();
         });
     },
@@ -283,12 +283,12 @@ module.exports = {
         test.expect(2);
         var firstTestConfig = {
             mocha: {
-                src: ['test/file1.js']
+                files: ['test/file1.js']
             }
         };
         var secondTestConfig = {
             qunit: {
-                src: ['tests/file2.js']
+                files: ['tests/file2.js']
             }
         };
         var mockConfig = {
