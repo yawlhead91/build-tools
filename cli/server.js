@@ -3,7 +3,10 @@ var nopt = require('nopt');
 var path = require('path');
 var Server = require('./../src/server');
 var utils = require('./../src/utils');
-var _ = require('underscore');
+
+function isObjectEmpty(object) {
+    return !object || !Object.keys(object).length;
+}
 
 /**
  * Runs server.
@@ -20,12 +23,16 @@ module.exports = function (args) {
         hostname: [String, null]
     }, {}, args, 0);
 
-    var env = options.argv.remain[0] || process.env.NODE_ENV || 'development';
+    var env = options.argv.remain[0] || process.env.NODE_ENV || 'production';
 
     if (config[env]) {
         config = config[env];
     }
-    options = _.extend(config.server, options);
+
+    if (isObjectEmpty(config)) {
+        return Promise.resolve();
+    }
+    options = Object.assign({}, config.server, options);
     return new Server(options).start();
 
 };

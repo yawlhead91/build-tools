@@ -4,16 +4,19 @@ var sinon = require('sinon');
 var mockery = require('mockery');
 var Promise = require('promise');
 
-var cleanMock,
-    copyMock,
-    browserifyMock,
-    minifyMock,
-    bannerMock,
-    serverMock,
-    sassMock;
+var copyMock;
+var browserifyMock;
+var minifyMock;
+var bannerMock;
+var serverMock;
+var sassMock;
 var serverConstructorMock;
-
-var allowables = ['util', testPath, 'promise', './bump'];
+var allowables = [
+    'util',
+    testPath,
+    'promise',
+    './bump'
+];
 
 module.exports = {
 
@@ -23,7 +26,6 @@ module.exports = {
         sinon.stub(console, 'error');
         mockery.enable({useCleanCache: true});
         mockery.warnOnUnregistered(false); // suppress non-allowed modules
-        cleanMock = sinon.stub().returns(Promise.resolve());
         copyMock = sinon.stub().returns(Promise.resolve());
         sassMock = sinon.stub().returns(Promise.resolve());
         browserifyMock = sinon.stub().returns(Promise.resolve());
@@ -33,7 +35,6 @@ module.exports = {
             start: sinon.stub().returns(Promise.resolve())
         };
         serverConstructorMock = sinon.stub().returns(serverMock);
-        mockery.registerMock('./clean', cleanMock);
         mockery.registerMock('./copy', copyMock);
         mockery.registerMock('./sassify', sassMock);
         mockery.registerMock('./browserify', browserifyMock);
@@ -54,10 +55,9 @@ module.exports = {
     },
 
     'calling with no parameters returns a resolved promise and does not call any modules': function (test) {
-        test.expect(7);
+        test.expect(6);
         var build = require(testPath);
         build().then(function () {
-            test.equal(cleanMock.callCount, 0);
             test.equal(copyMock.callCount, 0);
             test.equal(browserifyMock.callCount, 0);
             test.equal(minifyMock.callCount, 0);
@@ -69,10 +69,9 @@ module.exports = {
     },
 
     'calling with empty object returns a resolved promise and does not call any modules': function (test) {
-        test.expect(7);
+        test.expect(6);
         var build = require(testPath);
         build({}).then(function () {
-            test.equal(cleanMock.callCount, 0);
             test.equal(copyMock.callCount, 0);
             test.equal(browserifyMock.callCount, 0);
             test.equal(minifyMock.callCount, 0);
@@ -84,10 +83,9 @@ module.exports = {
     },
 
     'no dist option does not call any modules and still resolves': function (test) {
-        test.expect(7);
+        test.expect(6);
         var build = require(testPath);
         build({}).then(function () {
-            test.equal(cleanMock.callCount, 0);
             test.equal(copyMock.callCount, 0);
             test.equal(browserifyMock.callCount, 0);
             test.equal(minifyMock.callCount, 0);
@@ -99,36 +97,15 @@ module.exports = {
     },
 
     'no files option does not call any modules and still resolves': function (test) {
-        test.expect(7);
+        test.expect(6);
         var build = require(testPath);
         build({}).then(function () {
-            test.equal(cleanMock.callCount, 0);
             test.equal(copyMock.callCount, 0);
             test.equal(browserifyMock.callCount, 0);
             test.equal(minifyMock.callCount, 0);
             test.equal(bannerMock.callCount, 0);
             test.equal(serverConstructorMock.callCount, 0);
             test.equal(sassMock.callCount, 0);
-            test.done();
-        }, test.done);
-    },
-
-    'dist option without a files option does NOT fire the clean module': function (test) {
-        test.expect(1);
-        var build = require(testPath);
-        var options = {"blah": 2};
-        build({dist: options}).then(function () {
-            test.equal(cleanMock.callCount, 0);
-            test.done();
-        }, test.done);
-    },
-
-    'dist option with a files option fires the clean module with dist option': function (test) {
-        test.expect(1);
-        var build = require(testPath);
-        var options = {"blah": 2};
-        build({dist: options, files: {}}).then(function () {
-            test.deepEqual(cleanMock.args[0], [options]);
             test.done();
         }, test.done);
     },

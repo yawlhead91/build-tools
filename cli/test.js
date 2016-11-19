@@ -21,8 +21,7 @@ module.exports = function (args) {
         id: testId,
         files: testOptions.src,
         keepalive: args[1] === 'server',
-        browserifyOptions: config.tests.browserifyOptions,
-    }, testOptions);
+    }, config.tests, testOptions);
 
     testOptions.requires = testOptions.requires || {};
     for (let id in testOptions.requires) {

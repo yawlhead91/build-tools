@@ -62,8 +62,8 @@ You can also start a server based on configuration that you specify in your bt-c
 
 ```js
 module.exports = {
-    server: {
-        production: {
+    production: {
+        server: {
            hostname: 'localhost',
            staticDir: './blah',
            middleware: './myServer.js',
@@ -87,8 +87,8 @@ if you wanted to build both a main.js file and a scss file into a folder called 
 
 ```javascript
 module.exports = {
-    build: {
-        production: {
+    production: {
+        build: {
             files: {
                 'dist/app.js': ['src/main.js'],
                 'dist/styles.css': ['src/styles/main.scss']
@@ -99,12 +99,13 @@ module.exports = {
             requires: {
                 "my-code": "./app/my-script" // makes 'my-code' as a global package name in your bundle
             },
-            "browserifyOptions": {}
+            "browserifyOptions": {},
+            watch: false
         }
     },
 };
 ```
-#### Options
+#### Build Options
 
 | Option | Type | Description |
 |--------|--------|--------|
@@ -112,6 +113,7 @@ module.exports = {
 | `minifyFiles`| Object | An object containing a mapping of output files (keys) to the files that should be minified (values)
 | `requires`| Array|Object | An array containing which files to ensure are loaded externally and made available in the build. See [https://github.com/substack/node-browserify#brequirefile-opts](browserify's require option) to understand why you may want to use this. This option can also be an object containing require variable (keys) to their paths (values)
 | `browserifyOptions`| Object | [Browserify options](https://github.com/substack/node-browserify#brequirefile-opts). 
+| `watch`| Boolean | Whether to watch the built files for changes and rebuilt afterwards. Defaults to false. 
 
 
 Then you can run the build command in your terminal:
@@ -122,14 +124,16 @@ bt build
 
 #### Running builds for local development
 
-By default, the `build` command assumes a "production" build, will run tests (if applicable) and does not watch your files as you edit them. 
-If you want your files to be "watched" and built on the fly as you edit them, pass the `local` option when running the terminal command like this:
+By default, the `build` command assumes a "production" build, will run production tests (if specified in your bt-config.js file) 
+and does not watch your files as you edit them. 
+If you want your files to be "watched" and built on the fly as you edit them, pass the `local` option when running the 
+terminal command like this:
 
 ```
 bt build local
 ```
 
-And of course you can pass the same arguments with the call to customize:
+And of course you can pass the same [build arguments](#build-options) as mentioned above:
 
 ```
 bt build local --port=6500 --staticDir=./build
@@ -141,6 +145,7 @@ Arguments allowed are:
 |--------|--------|--------|
 | `port`| Number| The port number to start the server on (if `local` is passed)
 | `staticDir`| String | The path (relative to he project root) containing the files that should be served when the server starts
+| `watch`| Boolean | Whether to watch the files and rebuild if necessary. Defaults to true.
 
 #### NODE_ENV variable
 
@@ -160,7 +165,7 @@ in your environment.
 
 ### bt test
 
-The `test` command will run all tests in any given project. The following test files are supported:
+The `test` command will run all tests in any given environment. The following test files are supported:
 
   * [QUnit](http://qunitjs.com/)
   * [Mocha](https://github.com/mochajs/mocha)
@@ -170,15 +175,17 @@ Make sure you have the `tests` configuration setup in your `bt-config.js` file l
 
 ```javascript
 module.exports = {
-    "tests": {
-        "qunit": {
-          "src": ["tests/**/*"],
-        },
-        "mocha": {
-          "src": ["path/to/mocha/tests/*"],
-        },
-        "browserifyOptions": {}
-      }
+    production: {
+        "tests": {
+            "qunit": {
+              "src": ["tests/**/*"],
+            },
+            "mocha": {
+              "src": ["path/to/mocha/tests/*"],
+            },
+            "browserifyOptions": {}
+          }
+    }
 };
 
 ```
@@ -200,7 +207,7 @@ Once that's done, just run the following in your terminal:
 bt test
 ```
 
-The command will run all test files you have specified in your configuration file, headlessly.
+The command will run all test files you have specified in your production configuration, headlessly.
 
 You also have the option of running tests in the browser by doing:
 
@@ -223,7 +230,7 @@ Replacing [SEMVER] with (`major`, `minor` or `patch`) (`patch` is the default if
 
 The `bt release` command does the following:
 
-1. Runs all [tests](#bt-test) you've specified.
+1. Runs all [production tests](#bt-test), if specified.
 1. Runs a [production build](#bt-build), if specified.
 1. Ups the version of the package, which involves the exact same steps performed by the [version command](#bt-version).
 1. Publishes package to npm.

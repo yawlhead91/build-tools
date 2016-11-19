@@ -40,6 +40,8 @@ module.exports = function(options) {
         requires: {},
         files: [],
         plugins: [],
+        ignore: [],
+        exclude: [],
         browserifyOptions: {}
     }, options);
 
@@ -54,17 +56,13 @@ module.exports = function(options) {
         if (options.id === 'qunit') {
             options.requires['qunit'] = tempDir + '/tests/qunit.js';
         }
-        options.requires['test-utils'] = tempDir + '/tests/test-utils.js';
+        // options.requires['test-utils'] = tempDir + '/tests/test-utils.js';
 
         // convert files to an object for browserify process
-        var fileMap = {};
-        fileMap[tempDir + '/tests/built-tests.js'] = options.files;
-        let opts = _.extend(options.browserifyOptions, {
-            files: fileMap,
-            plugins: options.plugins,
-            requires: options.requires,
-            watch: options.keepalive,
-        });
+        let opts = _.extend(options.browserifyOptions, options);
+        opts.files = {};
+        opts.files[tempDir + '/tests/built-tests.js'] = options.files;
+        opts.watch = options.keepalive;
         return browserify(opts);
     }
 

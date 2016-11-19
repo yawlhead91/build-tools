@@ -54,6 +54,13 @@ var browserifyFile = function (destPath, srcPaths, options) {
             b.add(path);
         }.bind(this));
 
+        options.ignore.forEach((file) => {
+            b.ignore(file);
+        });
+        options.exclude.forEach((file) => {
+            b.exclude(file);
+        });
+
         // require global files
         _.each(options.requires, function (path, id) {
             // options.requires can be an array of strings or an object
@@ -122,6 +129,8 @@ var writeBrowserifyBundleStreamToFile = function (stream, destPath) {
  * @param {Object} [options.requires] - A id-url map object of global browserify requires
  * @param {Array} [options.plugins] - An array of browserify plugins options
  * @param {Array} [options.transform] - An array of browserify transforms options
+ * @param {Array} [options.ignore] - An array of package names or require refs to ignore
+ * @param {Array} [options.exclude] - An array of package names or require refs to exclude from the bundle
  * @returns {Promise} Returns a promise when complete
  */
 module.exports = function (options) {
@@ -133,6 +142,8 @@ module.exports = function (options) {
         requires: [],
         plugins: [],
         transform: [],
+        ignore: [],
+        exclude: [],
     }, options);
 
     if (!options.files) {

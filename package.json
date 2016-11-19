@@ -31,7 +31,7 @@
   "dependencies": {
     "async-promises": "^0.1.2",
     "autoprefixer": "^6.3.6",
-    "bluebird": "^3.3.5",
+    "bluebird": "^3.4.6",
     "browserify": "^13.0.0",
     "chokidar": "^1.4.3",
     "clean": "^4.0.1",

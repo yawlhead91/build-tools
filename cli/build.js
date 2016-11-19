@@ -1,11 +1,10 @@
 'use strict';
 var build = require('./../src/build');
-var _ = require('underscore');
 var nopt = require('nopt');
 var path = require('path');
 var utils = require('./../src/utils');
-var test = require('./test');
-var Promise = require("promise");
+var test = require('./../src/test');
+var Promise = require('bluebird');
 
 /**
  * Builds files specified in config file into the destination folder.
@@ -26,29 +25,48 @@ module.exports = function (args) {
         watch: [Boolean, false]
     }, {}, args, 0);
 
-    var env = argsObject.argv.remain[0];
+    // assume last argument is environment if not specified
+    var env = argsObject.argv.remain[0] || argsObject.env;
 
-    config.build = config.build || {};
-    config.build = config.build[env] || config.build['production'] || config.build;
+    if (typeof env === 'undefined') {
+        env = process.env.NODE_ENV || 'production';
+        console.warn(`There is no environment was supplied, building ${env}...`);
+    } else if (!config[env]) {
+        console.error(`There is no environment named ${env}.. bailing.`);
+        return Promise.resolve();
+    }
 
-    var buildConfig = _.extend({
+    var envConfig = config[env] ||  config;
+    var buildConfig = Object.assign({
         env: env,
-        // only run tests if this is NOT a local build, otherwise
-        // tests would run every time a watched file is edited.
-        test: env !== "local",
         staticDir: process.cwd(),
-        watch: env === "local"
-    }, config.build, argsObject);
+    }, envConfig.build, argsObject);
+
+    var runTest = function (testConfig) {
+        testConfig = testConfig || {};
+        var testIds = Object.keys(testConfig);
+        return Promise.mapSeries(testIds, (id) => {
+            testConfig.files = testConfig[id] ? testConfig[id].src : [];
+            testConfig.id = id;
+            return test(testConfig);
+        });
+    };
 
     var runTests = function () {
-        if (!buildConfig.test) {
-            return Promise.resolve();
+        var testConfigs = envConfig.tests || [];
+        if (!Array.isArray(testConfigs)) {
+            testConfigs = [testConfigs];
+        }
+        if (testConfigs.length) {
+            return Promise.mapSeries(testConfigs, (config) => {
+               return runTest(config);
+            });
         } else {
-            return test();
+            return Promise.resolve();
         }
     };
 
-    return runTests().then(function () {
-        return build(buildConfig);
+    return build(buildConfig).then(function () {
+        return runTests();
     });
 };
