@@ -178,10 +178,10 @@ module.exports = {
     production: {
         "tests": {
             "qunit": {
-              "src": ["tests/**/*"],
+              "files": ["tests/**/*"],
             },
             "mocha": {
-              "src": ["path/to/mocha/tests/*"],
+              "files": ["path/to/mocha/tests/*"],
             },
             "browserifyOptions": {}
           }
@@ -195,9 +195,9 @@ module.exports = {
 | Option | Type | Description |
 |--------|--------|--------|
 | `qunit`| Object | Options to use for qunit test compiling
-| `qunit.src`| Array | An array of file names (or [glob patterns](https://github.com/isaacs/node-glob)) to be compiled and tested using QUnit  
+| `qunit.files`| Array | An array of file paths (or [glob patterns](https://github.com/isaacs/node-glob)) to be compiled and tested using QUnit  
 | `mocha`| Object | Options to use for mocha tests
-| `mocha.src`| Array | An array of file names (or [glob patterns](https://github.com/isaacs/node-glob)) to be compiled and tested using Mocha 
+| `mocha.files`| Array | An array of file paths (or [glob patterns](https://github.com/isaacs/node-glob)) to be compiled and tested using Mocha 
 | `browserifyOptions`| Object | [Browserify options](https://github.com/substack/node-browserify#brequirefile-opts).  
 
 

@@ -6,7 +6,6 @@ var Promise = require('promise');
 var express = require('express');
 var serveStatic = require('serve-static');
 var path = require('path');
-var _ = require('underscore');
 var utils = require('./utils');
 var clean = require('./clean');
 var browserify = require('./browserify');
@@ -33,7 +32,7 @@ ncp.limit = 16;
  */
 module.exports = function(options) {
 
-    options = _.extend({}, {
+    options = Object.assign({}, {
         id: 'mocha',
         port: 7755,
         keepalive: false,
@@ -59,7 +58,7 @@ module.exports = function(options) {
         // options.requires['test-utils'] = tempDir + '/tests/test-utils.js';
 
         // convert files to an object for browserify process
-        let opts = _.extend(options.browserifyOptions, options);
+        let opts = Object.assign({}, options.browserifyOptions, options);
         opts.files = {};
         opts.files[tempDir + '/tests/built-tests.js'] = options.files;
         opts.watch = options.keepalive;

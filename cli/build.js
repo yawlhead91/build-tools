@@ -46,9 +46,7 @@ module.exports = function (args) {
         testConfig = testConfig || {};
         var testIds = Object.keys(testConfig);
         return Promise.mapSeries(testIds, (id) => {
-            testConfig.files = testConfig[id] ? testConfig[id].src : [];
-            testConfig.id = id;
-            return test(testConfig);
+            return test(testConfig[id]);
         });
     };
 
