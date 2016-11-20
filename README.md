@@ -30,7 +30,7 @@ A set of CLI commands to quickly version, package, and compile your projects.
 
 ### Node
 
-This package requires Node >=6.0.
+This package requires Node >=7.0.
 
 You can install [Node.js](http://www.nodejs.org/) via the package provided on [their site](http://www.nodejs.org).
 Installing node will also install the [Node Package Manager](https://github.com/npm/npm) (NPM) to download and
@@ -99,6 +99,7 @@ module.exports = {
             requires: {
                 "my-code": "./app/my-script" // makes 'my-code' as a global package name in your bundle
             },
+            bannerFiles: ['dist/*'],
             "browserifyOptions": {},
             watch: false
         }
@@ -112,6 +113,7 @@ module.exports = {
 | `files`| Object | An object containing a mapping of output files (keys) to their source files (values)
 | `minifyFiles`| Object | An object containing a mapping of output files (keys) to the files that should be minified (values)
 | `requires`| Array|Object | An array containing which files to ensure are loaded externally and made available in the build. See [https://github.com/substack/node-browserify#brequirefile-opts](browserify's require option) to understand why you may want to use this. This option can also be an object containing require variable (keys) to their paths (values)
+| `bannerFiles`| Array | Files that a banner will be added to (after build has completed) 
 | `browserifyOptions`| Object | [Browserify options](https://github.com/substack/node-browserify#brequirefile-opts). 
 | `watch`| Boolean | Whether to watch the built files for changes and rebuilt afterwards. Defaults to false. 
 
