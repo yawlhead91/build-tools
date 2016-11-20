@@ -111,7 +111,7 @@ module.exports = function (args) {
             let testIds = Object.keys(testConfig);
             return Promise.mapSeries(testIds, (testId) => {
                 let options = testConfig[testId];
-                options.browserifyOptions = testConfig.browserifyOptions;
+                options.browserifyOptions = options.browserifyOptions || testConfig.browserifyOptions;
                 options.id = testId;
                 options.env = env;
                 return test(options);

@@ -247,6 +247,100 @@ module.exports = {
         });
     },
 
+    'should pass appropriate root-level config browserify options to test process if browserify options are at the tests level': function (test) {
+        test.expect(1);
+        bumpMockPromise.resolve('0.0.5');
+        promptMockPromise.resolve('');
+        var browserifyOptions = {
+            transform: [{my: 'transform'}],
+            require: {}
+        };
+        var mockConfig = {
+            tests: {
+                mocha: {},
+                browserifyOptions
+            }
+        };
+        utilsMock.getConfig.returns(mockConfig);
+        var release = require(releasePath);
+        release().then(function () {
+            test.deepEqual(testMock.args[0][0].browserifyOptions, browserifyOptions);
+            test.done();
+        });
+    },
+
+    'should pass appropriate root-level config browserify options to test process if browserify options are at the test-type level': function (test) {
+        test.expect(1);
+        bumpMockPromise.resolve('0.0.5');
+        promptMockPromise.resolve('');
+        var browserifyOptions = {
+            transform: [{my: 'transform'}],
+            require: {}
+        };
+        var mockConfig = {
+            tests: {
+                mocha: {
+                    browserifyOptions
+                },
+            }
+        };
+        utilsMock.getConfig.returns(mockConfig);
+        var release = require(releasePath);
+        release().then(function () {
+            test.deepEqual(testMock.args[0][0].browserifyOptions, browserifyOptions);
+            test.done();
+        });
+    },
+
+    'should pass appropriate production level config browserify options to test process if browserify options are at the tests level': function (test) {
+        test.expect(1);
+        bumpMockPromise.resolve('0.0.5');
+        promptMockPromise.resolve('');
+        var browserifyOptions = {
+            transform: [{my: 'transform'}],
+            require: {}
+        };
+        var mockConfig = {
+            production: {
+                tests: {
+                    mocha: {},
+                    browserifyOptions
+                }
+            }
+        };
+        utilsMock.getConfig.returns(mockConfig);
+        var release = require(releasePath);
+        release().then(function () {
+            test.deepEqual(testMock.args[0][0].browserifyOptions, browserifyOptions);
+            test.done();
+        });
+    },
+
+    'should pass appropriate production config browserify options to test process if browserify options are at the test-type level': function (test) {
+        test.expect(1);
+        bumpMockPromise.resolve('0.0.5');
+        promptMockPromise.resolve('');
+        var browserifyOptions = {
+            transform: [{my: 'transform'}],
+            require: {}
+        };
+        var mockConfig = {
+            production: {
+                tests: {
+                    mocha: {
+                        browserifyOptions
+                    },
+                }
+            }
+        };
+        utilsMock.getConfig.returns(mockConfig);
+        var release = require(releasePath);
+        release().then(function () {
+            test.deepEqual(testMock.args[0][0].browserifyOptions, browserifyOptions);
+            test.done();
+        });
+    },
+
     'should pass updated version number from bump to version function': function (test) {
         test.expect(1);
         var newVersionNbr = "9.95.0";
