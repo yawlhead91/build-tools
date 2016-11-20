@@ -1,7 +1,7 @@
 {
   "name": "build-tools",
   "description": "Build tools",
-  "version": "6.0.5",
+  "version": "6.0.6",
   "homepage": "https://github.com/mkay581/build-tools",
   "author": {
     "name": "Mark Kennedy",
