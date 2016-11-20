@@ -17,7 +17,10 @@ var btConfigMock;
 var cologMock;
 var spawnMock;
 var spawnChildProcessMock;
-var allowables = ['./../../cli/release'];
+var allowables = [
+    './../../cli/release',
+    'bluebird'
+];
 
 function createPromise () {
     let obj = {};
@@ -86,12 +89,14 @@ module.exports = {
     },
 
     'should run tests if there is a production level test configuration': function (test) {
-        test.expect(1);
+        test.expect(3);
         var testFiles = ['testo.js'];
         var mockConfig = {
             production: {
                 tests: {
-                    files: testFiles,
+                    mocha: {
+                        files: testFiles,
+                    }
                 }
             }
         };
@@ -100,7 +105,47 @@ module.exports = {
         promptMockPromise.resolve('');
         var release = require(releasePath);
         release(['patch']).then(function () {
-            test.deepEqual(testMock.args[0][0].files, testFiles);
+            let assertedTestOptions = testMock.args[0][0];
+            test.equal(assertedTestOptions.env, 'production');
+            test.equal(assertedTestOptions.id, 'mocha');
+            test.deepEqual(assertedTestOptions.files, testFiles);
+            test.done();
+        });
+    },
+
+    'should run multiple tests if they are multiple test configurations in production level configuration': function (test) {
+        test.expect(6);
+        var testFiles = ['testo.js'];
+        var qunitTestFiles = ['qunit-test.js'];
+        var mockConfig = {
+            production: {
+                tests: [
+                    {
+                        mocha: {
+                            files: testFiles,
+                        }
+                    },
+                    {
+                        qunit: {
+                            files: qunitTestFiles,
+                        }
+                    }
+                ]
+            }
+        };
+        utilsMock.getConfig.returns(mockConfig);
+        bumpMockPromise.resolve('0.0.5');
+        promptMockPromise.resolve('');
+        var release = require(releasePath);
+        release(['patch']).then(function () {
+            let firstAssertedTestOptions = testMock.args[0][0];
+            test.equal(firstAssertedTestOptions.env, 'production');
+            test.equal(firstAssertedTestOptions.id, 'mocha');
+            test.deepEqual(firstAssertedTestOptions.files, testFiles);
+            let secondAssertedTestOptions = testMock.args[1][0];
+            test.equal(secondAssertedTestOptions.env, 'production');
+            test.equal(secondAssertedTestOptions.id, 'qunit');
+            test.deepEqual(secondAssertedTestOptions.files, qunitTestFiles);
             test.done();
         });
     },

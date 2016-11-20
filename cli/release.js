@@ -12,6 +12,7 @@ var git = require('gitty');
 var log = require('colog');
 var cmd = require('node-cmd');
 var spawn = require('child_process').spawn;
+var Promise = require('bluebird');
 
 const HELPER_TEXT = '\n' +
     '\n' +
@@ -94,8 +95,24 @@ module.exports = function (args) {
 
 
     let nextVersion;
-    let testConfig = Object.assign({}, envConfig.tests, {env});
-    return test(testConfig)
+    let runTests = function () {
+        let testConfigs = envConfig.tests || [];
+        if (!Array.isArray(testConfigs)) {
+            testConfigs = [testConfigs];
+        }
+        return Promise.mapSeries(testConfigs, (testConfig) => {
+            let testIds = Object.keys(testConfig);
+            return Promise.mapSeries(testIds, (testId) => {
+                let options = testConfig[testId];
+                options.browserifyOptions = testConfig.browserifyOptions;
+                options.id = testId;
+                options.env = env;
+                return test(options);
+            });
+        });
+    };
+
+    return runTests()
         .then(function () {
             return bump(semVersionType);
         })
