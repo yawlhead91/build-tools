@@ -39,7 +39,6 @@ var sassify = require('./sassify');
         options = _.extend({
             env: '',
             files: null,
-            dist: null,
             minifyFiles: null,
             bannerFiles: null,
             watch: options.env === 'local',

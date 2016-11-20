@@ -1,11 +1,12 @@
 'use strict';
 var sinon = require('sinon');
 var mockery = require('mockery');
-var Promise = require("promise");
+var Promise = require('bluebird');
 var releasePath = './../cli/release';
-var testMock,
-    buildMock,
-    versionMock;
+var testMock;
+var buildMock;
+var versionMock;
+var utilsMock;
 var promptMock;
 var promptMockPromise;
 var bumpMock;
@@ -16,7 +17,7 @@ var btConfigMock;
 var cologMock;
 var spawnMock;
 var spawnChildProcessMock;
-var allowables = ['./../../cli/release', './../src/utils'];
+var allowables = ['./../../cli/release'];
 
 function createPromise () {
     let obj = {};
@@ -49,9 +50,9 @@ module.exports = {
         };
         githubConstructor = sinon.stub().returns(githubApiMock);
         mockery.registerMock('github', githubConstructor);
-        mockery.registerMock('./test', testMock);
+        mockery.registerMock('./../src/test', testMock);
         mockery.registerMock('./../src/prompt', promptMock);
-        mockery.registerMock('./build', buildMock);
+        mockery.registerMock('./../src/build', buildMock);
         cologMock = {
             success: sinon.stub(),
             warning: sinon.stub()
@@ -71,6 +72,10 @@ module.exports = {
         mockery.registerMock('child_process', {
             spawn: spawnMock
         });
+        utilsMock = {
+            getConfig: sinon.stub()
+        };
+        mockery.registerMock('./../src/utils', utilsMock);
         cb();
     },
 
@@ -80,13 +85,22 @@ module.exports = {
         cb();
     },
 
-    'should run tests': function (test) {
+    'should run tests if there is a production level test configuration': function (test) {
         test.expect(1);
+        var testFiles = ['testo.js'];
+        var mockConfig = {
+            production: {
+                tests: {
+                    files: testFiles,
+                }
+            }
+        };
+        utilsMock.getConfig.returns(mockConfig);
         bumpMockPromise.resolve('0.0.5');
         promptMockPromise.resolve('');
         var release = require(releasePath);
         release(['patch']).then(function () {
-            test.equal(testMock.callCount, 1);
+            test.deepEqual(testMock.args[0][0].files, testFiles);
             test.done();
         });
     },
@@ -114,13 +128,34 @@ module.exports = {
         });
     },
 
-    'should pass prod and test argument that is false to build function': function (test) {
-        test.expect(1);
+    'should pass appropriate options to build': function (test) {
+        test.expect(6);
         bumpMockPromise.resolve('0.0.5');
         promptMockPromise.resolve('');
+        var testFiles = ['testo.js'];
+        var requires = {'my': 'file.js'};
+        var exclude = ['exclude.file.js'];
+        var ignore = ['ignored.js'];
+        var mockConfig = {
+            production: {
+                build: {
+                    files: testFiles,
+                    requires: requires,
+                    exclude: exclude,
+                    ignore: ignore,
+                }
+            }
+        };
+        utilsMock.getConfig.returns(mockConfig);
         var release = require(releasePath);
         release().then(function () {
-            test.deepEqual(buildMock.args[0][0], ['prod', '--test=false']);
+            var assertedBuildOptions = buildMock.args[0][0];
+            test.equal(assertedBuildOptions.env, 'production');
+            test.ok(!assertedBuildOptions.test);
+            test.deepEqual(assertedBuildOptions.files, testFiles);
+            test.deepEqual(assertedBuildOptions.requires, requires);
+            test.deepEqual(assertedBuildOptions.exclude, exclude);
+            test.deepEqual(assertedBuildOptions.ignore, ignore);
             test.done();
         });
     },
@@ -155,7 +190,7 @@ module.exports = {
         promptMockPromise.resolve('');
         let token = 'uebyx';
         btConfigMock = {github: {token: token}};
-        mockery.registerMock(process.cwd() + '/bt-config', btConfigMock);
+        utilsMock.getConfig.returns(btConfigMock);
         var release = require(releasePath);
         release(['patch']).then(function () {
             test.equal(githubApiMock.authenticate.args[0][0].type, 'oauth');

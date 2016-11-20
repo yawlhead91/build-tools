@@ -1,13 +1,12 @@
 "use strict";
-var test = require('./test');
+var test = require('./../src/test');
 var version = require('./../src/version');
 var bump = require('./../src/bump');
-var build = require('./build');
+var build = require('./../src/build');
 var fs = require('fs-extra');
 var GitHubApi = require('github');
 var nopt = require('nopt');
 var utils = require('./../src/utils');
-var _ = require('underscore');
 var prompt = require('./../src/prompt');
 var git = require('gitty');
 var log = require('colog');
@@ -37,6 +36,8 @@ module.exports = function (args) {
     }, {}, args, 0);
 
     let semVersionType = args[0] || 'patch';
+    let env = 'production';
+    let envConfig = config[env] || {};
 
 
     let publishToNpm = function (version) {
@@ -93,7 +94,8 @@ module.exports = function (args) {
 
 
     let nextVersion;
-    return test()
+    let testConfig = Object.assign({}, envConfig.tests, {env});
+    return test(testConfig)
         .then(function () {
             return bump(semVersionType);
         })
@@ -105,9 +107,10 @@ module.exports = function (args) {
             }
         })
         .then(() => {
-            // we are disabling tests from being ran
-            // during build because we've already done it above
-            return build(['prod', '--test=false']);
+            let buildConfig = Object.assign({}, envConfig.build, {
+                env: env
+            });
+            return build(buildConfig);
         })
         .then(() => {
             return prompt({guidanceText: HELPER_TEXT});

@@ -209,6 +209,12 @@ bt test
 
 The command will run all test files you have specified in your production configuration, headlessly.
 
+If you want to run tests for another environment (and you have that environment set up in your configuration file), you can do:
+
+```
+bt test --env=development
+```
+
 You also have the option of running tests in the browser by doing:
 
 ```
