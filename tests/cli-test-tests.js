@@ -6,7 +6,6 @@ var testStub;
 var allowables = [
     'nopt',
     'path',
-    'underscore'
 ];
 var utilsMock;
 
@@ -50,19 +49,83 @@ module.exports = {
         });
     },
 
-    'should call test function with root level browserify options when root level configuration options are present': function (test) {
+    'should call test function with root level browserify options when browserify options are at the test-type level': function (test) {
         test.expect(1);
         var testBrowserifyOptions = {
             myOption: 'test',
         };
         var mockConfig = {
             tests: {
+                mocha: {
+                    browserifyOptions: testBrowserifyOptions,
+                }
+            }
+        };
+        utilsMock.getConfig.returns(mockConfig);
+        var cliTest = require('./../cli/test');
+        cliTest().then(function () {
+            test.deepEqual(testStub.args[0][0].browserifyOptions, testBrowserifyOptions);
+            test.done();
+        });
+    },
+
+    'should call test function with root level browserify options when browserify options are at the tests level': function (test) {
+        test.expect(1);
+        var testBrowserifyOptions = {
+            myOption: 'test',
+        };
+        var mockConfig = {
+            tests: {
+                mocha: {},
                 browserifyOptions: testBrowserifyOptions,
             }
         };
         utilsMock.getConfig.returns(mockConfig);
         var cliTest = require('./../cli/test');
         cliTest().then(function () {
+            test.deepEqual(testStub.args[0][0].browserifyOptions, testBrowserifyOptions);
+            test.done();
+        });
+    },
+
+    'should call test function with environment level browserify options when browserify options are at the test-type level': function (test) {
+        test.expect(1);
+        var testBrowserifyOptions = {
+            myOption: 'test',
+        };
+        var mockConfig = {
+            production: {
+                tests: {
+                    mocha: {
+                        browserifyOptions: testBrowserifyOptions,
+                    }
+                }
+            }
+        };
+        utilsMock.getConfig.returns(mockConfig);
+        var cliTest = require('./../cli/test');
+        cliTest(['--env=production']).then(function () {
+            test.deepEqual(testStub.args[0][0].browserifyOptions, testBrowserifyOptions);
+            test.done();
+        });
+    },
+
+    'should call test function with browserify options when browserify options are at the test level': function (test) {
+        test.expect(1);
+        var testBrowserifyOptions = {
+            myOption: 'test',
+        };
+        var mockConfig = {
+            production: {
+                tests: {
+                    mocha: {},
+                    browserifyOptions: testBrowserifyOptions,
+                }
+            }
+        };
+        utilsMock.getConfig.returns(mockConfig);
+        var cliTest = require('./../cli/test');
+        cliTest(['--env=production']).then(function () {
             test.deepEqual(testStub.args[0][0].browserifyOptions, testBrowserifyOptions);
             test.done();
         });
