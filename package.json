@@ -42,7 +42,7 @@
     "express": "^4.13.3",
     "fs-extra": "^0.30.0",
     "ftp-deploy": "^1.1.0",
-    "github": "^2.3.0",
+    "github": "^6.1.0",
     "gitty": "^3.3.6",
     "glob": "^4.5.3",
     "glob-promise": "^1.0.6",

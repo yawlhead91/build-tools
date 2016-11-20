@@ -75,6 +75,11 @@ module.exports = function (args) {
                 followRedirects: false, // default: true; there's currently an issue with non-get redirects, so allow ability to disable follow-redirects
                 timeout: 5000
             });
+            // bail if github config token isn't specified
+            if (!githubConfig.token) {
+                console.warn('There is no github token set in configuration. Release will not be created on github.');
+                return resolve();
+            }
             github.authenticate({
                 type: 'oauth',
                 token: githubConfig.token
@@ -88,6 +93,7 @@ module.exports = function (args) {
                 prerelease: options.prerelease || githubConfig.prerelease || false
             }, function(err, res) {
                 if (err) throw err;
+                log.success(`Published release ${tagName} to Github!`);
                 resolve(res);
             });
         });
@@ -143,8 +149,5 @@ module.exports = function (args) {
         })
         .then(() => {
             return publishToNpm(nextVersion);
-        })
-        .then(() => {
-            log.success('Published release ' + nextVersion + ' to Github');
         })
 };

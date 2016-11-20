@@ -13,7 +13,7 @@ var bumpMock;
 var bumpMockPromise;
 var githubApiMock;
 var githubConstructor;
-var btConfigMock;
+var mockConfig;
 var cologMock;
 var spawnMock;
 var spawnChildProcessMock;
@@ -234,12 +234,52 @@ module.exports = {
         bumpMockPromise.resolve('0.0.6');
         promptMockPromise.resolve('');
         let token = 'uebyx';
-        btConfigMock = {github: {token: token}};
-        utilsMock.getConfig.returns(btConfigMock);
+        mockConfig = {github: {token: token}};
+        utilsMock.getConfig.returns(mockConfig);
         var release = require(releasePath);
         release(['patch']).then(function () {
             test.equal(githubApiMock.authenticate.args[0][0].type, 'oauth');
             test.equal(githubApiMock.authenticate.args[0][0].token, token);
+            test.done();
+        });
+    },
+
+    'uploads a release with correct options when github token is specified in configuration': function (test) {
+        test.expect(5);
+        bumpMockPromise.resolve('0.0.6');
+        promptMockPromise.resolve('');
+        let token = 'uebyx';
+        mockConfig = {
+            github: {
+                token: token,
+                repo: 'myRepo',
+                user: 'johnDoe'
+            }
+        };
+        utilsMock.getConfig.returns(mockConfig);
+        var release = require(releasePath);
+        release().then(function () {
+            let assertedCreateReleaseOptions = githubApiMock.repos.createRelease.args[0][0];
+            test.equal(assertedCreateReleaseOptions.repo, 'myRepo');
+            test.equal(assertedCreateReleaseOptions.user, 'johnDoe');
+            test.equal(assertedCreateReleaseOptions.tag_name, 'v0.0.6');
+            test.equal(assertedCreateReleaseOptions.draft, false);
+            test.equal(assertedCreateReleaseOptions.prerelease, false);
+            test.done();
+        });
+    },
+
+    'does NOT create a release when no github token is present in configuration': function (test) {
+        test.expect(1);
+        bumpMockPromise.resolve('0.0.6');
+        promptMockPromise.resolve('');
+        var mockConfig = {
+            production: {}
+        };
+        utilsMock.getConfig.returns(mockConfig);
+        var release = require(releasePath);
+        release().then(function () {
+            test.equal(githubApiMock.repos.createRelease.callCount, 0);
             test.done();
         });
     },
@@ -249,8 +289,8 @@ module.exports = {
         bumpMockPromise.resolve('0.0.6');
         promptMockPromise.resolve('');
         let token = 'uebyx';
-        btConfigMock = {github: {token: token}};
-        mockery.registerMock(process.cwd() + '/bt-config', btConfigMock);
+        mockConfig = {github: {token: token}};
+        mockery.registerMock(process.cwd() + '/bt-config', mockConfig);
         var release = require(releasePath);
         release(['patch']).then(function () {
             test.equal(spawnMock.args[0][0], 'npm');
