@@ -38,8 +38,9 @@ module.exports = function (args) {
 
     let semVersionType = args[0] || 'patch';
     let env = 'production';
-    let envConfig = config[env] || {};
 
+    // if there is no production-level config, assume root-level config is production
+    let envConfig = config[env] || config || {};
 
     let publishToNpm = function (version) {
         return new Promise((resolve) => {

@@ -34,7 +34,7 @@ var browserifyFile = function (destPath, srcPaths, options) {
                 path = utils.scopePaths(path);
                 finalPaths.push(path);
             }
-        }.bind(this));
+        });
 
         // add required parameters for watchify
         options.cache = {};
@@ -52,7 +52,7 @@ var browserifyFile = function (destPath, srcPaths, options) {
         // must add each path individual unfortunately.
         finalPaths.forEach(function (path) {
             b.add(path);
-        }.bind(this));
+        });
 
         options.ignore.forEach((file) => {
             b.ignore(file);

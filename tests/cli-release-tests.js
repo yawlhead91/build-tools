@@ -173,18 +173,18 @@ module.exports = {
         });
     },
 
-    'should pass appropriate options to build': function (test) {
+    'should pass production environment build options to build call': function (test) {
         test.expect(6);
         bumpMockPromise.resolve('0.0.5');
         promptMockPromise.resolve('');
-        var testFiles = ['testo.js'];
+        var buildFiles = ['testo.js'];
         var requires = {'my': 'file.js'};
         var exclude = ['exclude.file.js'];
         var ignore = ['ignored.js'];
         var mockConfig = {
             production: {
                 build: {
-                    files: testFiles,
+                    files: buildFiles,
                     requires: requires,
                     exclude: exclude,
                     ignore: ignore,
@@ -197,10 +197,52 @@ module.exports = {
             var assertedBuildOptions = buildMock.args[0][0];
             test.equal(assertedBuildOptions.env, 'production');
             test.ok(!assertedBuildOptions.test);
-            test.deepEqual(assertedBuildOptions.files, testFiles);
+            test.deepEqual(assertedBuildOptions.files, buildFiles);
             test.deepEqual(assertedBuildOptions.requires, requires);
             test.deepEqual(assertedBuildOptions.exclude, exclude);
             test.deepEqual(assertedBuildOptions.ignore, ignore);
+            test.done();
+        });
+    },
+
+    'should pass appropriate root-level environment options to build if there is no production level options': function (test) {
+        test.expect(2);
+        bumpMockPromise.resolve('0.0.5');
+        promptMockPromise.resolve('');
+        var buildFiles = ['testo.js'];
+        var mockConfig = {
+            build: {
+                files: buildFiles,
+            }
+        };
+        utilsMock.getConfig.returns(mockConfig);
+        var release = require(releasePath);
+        release().then(function () {
+            var assertedBuildOptions = buildMock.args[0][0];
+            test.equal(assertedBuildOptions.env, 'production');
+            test.deepEqual(assertedBuildOptions.files, buildFiles);
+            test.done();
+        });
+    },
+
+    'should pass appropriate root-level config test options to test process if there is no production level config': function (test) {
+        test.expect(2);
+        bumpMockPromise.resolve('0.0.5');
+        promptMockPromise.resolve('');
+        var testFiles = ['testo.js'];
+        var mockConfig = {
+            tests: {
+                mocha: {
+                    files: testFiles,
+                }
+            }
+        };
+        utilsMock.getConfig.returns(mockConfig);
+        var release = require(releasePath);
+        release().then(function () {
+            var assertedTestOptions = testMock.args[0][0];
+            test.equal(assertedTestOptions.id, 'mocha');
+            test.deepEqual(assertedTestOptions.files, testFiles);
             test.done();
         });
     },
