@@ -1,6 +1,6 @@
 {
   "name": "build-tools",
-  "description": "Build tools",
+  "description": "A set of CLI commands to develop, package, and release web apps that use ES6",
   "version": "6.0.7",
   "homepage": "https://github.com/mkay581/build-tools",
   "author": {
@@ -69,11 +69,13 @@
     "build",
     "release management",
     "packaging",
+    "es6",
     "deployment",
     "deploy",
     "publish",
     "releases",
-    "release"
+    "release",
+    "web framework"
   ],
   "devDependencies": {
     "mockery": "^1.7.0",

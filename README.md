@@ -3,12 +3,15 @@
 
 # Build Tools
 
-A set of CLI commands to quickly version, package, and compile your projects.
+This package makes it easy to develop web applications that use the latest ES6 syntax. It can also work for smaller
+projects like libraries and NPM packages.
+It does this by exposing a small set of easy-to-use CLI commands to quickly compile files, test, deploy, and even 
+create releases for your entire project. 
 
 ## Benefits
 
 * Compiles all JS files using [Browserify](https://github.com/substack/node-browserify)
-* Transpiles all files using [Babel](https://github.com/babel/babel) to support latest ES code
+* Transpiles all files with latest ES6 code via [Babel](https://github.com/babel/babel)
 * Supports [SASS](http://sass-lang.com/) files (.scss)
 * Includes a built-in node server that allows for optional middleware
 * Full Git and NPM integration; Packages projects by creating git version tags, pushing to master branch, and versioning your project as a NPM package
