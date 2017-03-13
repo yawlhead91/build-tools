@@ -11,6 +11,7 @@ var clean = require('./clean');
 var browserify = require('./browserify');
 var qunit = require('node-qunit-phantomjs');
 var Server = require('./server');
+var phantomjs = require('phantomjs-prebuilt');
 
 var server;
 var tempDir = process.cwd() + '/tmp';
@@ -66,8 +67,7 @@ module.exports = function(options) {
     }
 
     function runMochaTest() {
-        var binPath = process.cwd() + '/node_modules/.bin/phantomjs';
-        var child = spawn(binPath, [
+        var child = spawn(phantomjs.path, [
             process.cwd() + '/node_modules/mocha-phantomjs-core/mocha-phantomjs-core.js',
             tempDir + '/tests/index.html'
         ]);
