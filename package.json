@@ -1,7 +1,7 @@
 {
   "name": "build-tools",
   "description": "A set of CLI commands to develop, package, and release web apps that use ES6",
-  "version": "6.0.10",
+  "version": "6.0.11",
   "homepage": "https://github.com/mkay581/build-tools",
   "author": {
     "name": "Mark Kennedy",
