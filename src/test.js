@@ -68,7 +68,7 @@ module.exports = function(options) {
 
     function runMochaTest() {
         let child = spawn(phantomjs.path, [
-            process.cwd() + '/node_modules/mocha-phantomjs-core/mocha-phantomjs-core.js',
+            require.resolve('mocha-phantomjs-core'),
             tempDir + '/tests/index.html'
         ]);
         return new Promise(function (resolve, reject) {
