@@ -29,6 +29,7 @@
     "test": "nodeunit tests"
   },
   "dependencies": {
+    "asap": "^2.0.5",
     "async-promises": "^0.2.0",
     "autoprefixer": "^7.1.1",
     "bluebird": "^3.5.0",
@@ -54,6 +55,7 @@
     "nopt": "^4.0.1",
     "phantomjs-prebuilt": "^2.1.14",
     "promise": "^7.1.1",
+    "qunit-phantomjs-runner": "^2.3.0",
     "replace": "^0.3.0",
     "scp2": "^0.5.0",
     "semver": "^5.3.0",
