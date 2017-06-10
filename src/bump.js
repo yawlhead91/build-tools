@@ -1,5 +1,3 @@
-'use strict';
-let Promise = require('promise');
 let fs = require('fs-extra');
 let semver = require('semver');
 let _ = require('underscore');
@@ -12,8 +10,13 @@ let _ = require('underscore');
  */
 module.exports = function (type) {
 
-    let promises = [],
-        files = ['package.json'];
+    let promises = [];
+    // order of files matters here. if the versions of the files are out of sync, the
+    // version bump of the first will win and all other files will be updated to that.
+    let files = [
+        'package.json',
+        'package-lock.json'
+    ];
 
     type = type || 'patch';
 
@@ -44,7 +47,9 @@ module.exports = function (type) {
     _.each(validateFiles(files), function (map, path) {
         promises.push(new Promise(function (resolve, reject) {
             prevVersion = map.currentVersion;
-            nextVersion = semver.inc(map.currentVersion, type);
+            if (!nextVersion) {
+                nextVersion = semver.inc(prevVersion, type);
+            }
             if (map.contents && nextVersion) {
                 map.contents.version = nextVersion;
                 map.contents = JSON.stringify(map.contents, null, 2) + "\n";
@@ -58,6 +63,6 @@ module.exports = function (type) {
         }));
     });
     return Promise.all(promises).then(function () {
-        return Promise.resolve(nextVersion);
+        return nextVersion;
     }).catch(console.log);
 };

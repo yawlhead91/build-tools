@@ -1,4 +1,3 @@
-"use strict";
 let test = require('./../src/test');
 let version = require('./../src/version');
 let bump = require('./../src/bump');
