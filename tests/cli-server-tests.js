@@ -1,11 +1,11 @@
 'use strict';
-var sinon = require('sinon');
-var mockery = require('mockery');
-var Promise = require("promise");
-var serverMock;
-var serverConstructor;
-var utilsMock;
-var allowables = [
+let sinon = require('sinon');
+let mockery = require('mockery');
+let Promise = require("promise");
+let serverMock;
+let serverConstructor;
+let utilsMock;
+let allowables = [
     'nopt',
     'path',
 ];
@@ -36,7 +36,7 @@ module.exports = {
 
     'should NOT call server when no config options are passed and no options are in config file': function (test) {
         test.expect(1);
-        var server = require('./../cli/server');
+        let server = require('./../cli/server');
         server().then(function () {
             test.equal(serverConstructor.callCount, 0);
             test.done();
@@ -45,7 +45,7 @@ module.exports = {
 
     'should call server with root level config server options in config file when no arguments are passed': function (test) {
         test.expect(4);
-        var mockConfig = {
+        let mockConfig = {
             server: {
                 hostname: 'beep',
                 staticDir: './bop',
@@ -54,9 +54,9 @@ module.exports = {
             }
         };
         utilsMock.getConfig.returns(mockConfig);
-        var server = require('./../cli/server');
+        let server = require('./../cli/server');
         server().then(function () {
-            var assertedServerOptions = serverConstructor.args[0][0];
+            let assertedServerOptions = serverConstructor.args[0][0];
             test.equal(assertedServerOptions.hostname, 'beep');
             test.equal(assertedServerOptions.staticDir, './bop');
             test.equal(assertedServerOptions.middleware, './bloop.js');
@@ -67,7 +67,7 @@ module.exports = {
 
     'should call server with production level config server options in config file when no arguments are passed': function (test) {
         test.expect(4);
-        var mockConfig = {
+        let mockConfig = {
             production: {
                 server: {
                     hostname: 'beep',
@@ -78,9 +78,9 @@ module.exports = {
             }
         };
         utilsMock.getConfig.returns(mockConfig);
-        var server = require('./../cli/server');
+        let server = require('./../cli/server');
         server().then(function () {
-            var assertedServerOptions = serverConstructor.args[0][0];
+            let assertedServerOptions = serverConstructor.args[0][0];
             test.equal(assertedServerOptions.hostname, 'beep');
             test.equal(assertedServerOptions.staticDir, './bop');
             test.equal(assertedServerOptions.middleware, './bloop.js');
@@ -91,7 +91,7 @@ module.exports = {
 
     'should call server with custom config server options in config file when no arguments are passed': function (test) {
         test.expect(4);
-        var mockConfig = {
+        let mockConfig = {
             myCustomEnv: {
                 server: {
                     hostname: 'beep',
@@ -102,9 +102,9 @@ module.exports = {
             }
         };
         utilsMock.getConfig.returns(mockConfig);
-        var server = require('./../cli/server');
+        let server = require('./../cli/server');
         server(['myCustomEnv']).then(function () {
-            var assertedServerOptions = serverConstructor.args[0][0];
+            let assertedServerOptions = serverConstructor.args[0][0];
             test.equal(assertedServerOptions.hostname, 'beep');
             test.equal(assertedServerOptions.staticDir, './bop');
             test.equal(assertedServerOptions.middleware, './bloop.js');

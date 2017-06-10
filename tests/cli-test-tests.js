@@ -1,13 +1,13 @@
 'use strict';
-var sinon = require('sinon');
-var mockery = require('mockery');
-var Promise = require('bluebird');
-var testStub;
-var allowables = [
+let sinon = require('sinon');
+let mockery = require('mockery');
+let Promise = require('bluebird');
+let testStub;
+let allowables = [
     'nopt',
     'path',
 ];
-var utilsMock;
+let utilsMock;
 
 module.exports = {
 
@@ -33,8 +33,8 @@ module.exports = {
 
     'should call test function with correct files option when mocha src files are in config': function (test) {
         test.expect(1);
-        var testSourceFilePath = 'tests/scroll-tests.js';
-        var mockConfig = {
+        let testSourceFilePath = 'tests/scroll-tests.js';
+        let mockConfig = {
             tests: {
                 mocha: {
                     files: [testSourceFilePath],
@@ -42,7 +42,7 @@ module.exports = {
             }
         };
         utilsMock.getConfig.returns(mockConfig);
-        var cliTest = require('./../cli/test');
+        let cliTest = require('./../cli/test');
         cliTest().then(function () {
             test.equal(testStub.args[0][0].files[0], testSourceFilePath);
             test.done();
@@ -51,10 +51,10 @@ module.exports = {
 
     'should call test function with root level browserify options when browserify options are at the test-type level': function (test) {
         test.expect(1);
-        var testBrowserifyOptions = {
+        let testBrowserifyOptions = {
             myOption: 'test',
         };
-        var mockConfig = {
+        let mockConfig = {
             tests: {
                 mocha: {
                     browserifyOptions: testBrowserifyOptions,
@@ -62,7 +62,7 @@ module.exports = {
             }
         };
         utilsMock.getConfig.returns(mockConfig);
-        var cliTest = require('./../cli/test');
+        let cliTest = require('./../cli/test');
         cliTest().then(function () {
             test.deepEqual(testStub.args[0][0].browserifyOptions, testBrowserifyOptions);
             test.done();
@@ -71,17 +71,17 @@ module.exports = {
 
     'should call test function with root level browserify options when browserify options are at the tests level': function (test) {
         test.expect(1);
-        var testBrowserifyOptions = {
+        let testBrowserifyOptions = {
             myOption: 'test',
         };
-        var mockConfig = {
+        let mockConfig = {
             tests: {
                 mocha: {},
                 browserifyOptions: testBrowserifyOptions,
             }
         };
         utilsMock.getConfig.returns(mockConfig);
-        var cliTest = require('./../cli/test');
+        let cliTest = require('./../cli/test');
         cliTest().then(function () {
             test.deepEqual(testStub.args[0][0].browserifyOptions, testBrowserifyOptions);
             test.done();
@@ -90,10 +90,10 @@ module.exports = {
 
     'should call test function with environment level browserify options when browserify options are at the test-type level': function (test) {
         test.expect(1);
-        var testBrowserifyOptions = {
+        let testBrowserifyOptions = {
             myOption: 'test',
         };
-        var mockConfig = {
+        let mockConfig = {
             production: {
                 tests: {
                     mocha: {
@@ -103,7 +103,7 @@ module.exports = {
             }
         };
         utilsMock.getConfig.returns(mockConfig);
-        var cliTest = require('./../cli/test');
+        let cliTest = require('./../cli/test');
         cliTest(['--env=production']).then(function () {
             test.deepEqual(testStub.args[0][0].browserifyOptions, testBrowserifyOptions);
             test.done();
@@ -112,10 +112,10 @@ module.exports = {
 
     'should call test function with browserify options when browserify options are at the test level': function (test) {
         test.expect(1);
-        var testBrowserifyOptions = {
+        let testBrowserifyOptions = {
             myOption: 'test',
         };
-        var mockConfig = {
+        let mockConfig = {
             production: {
                 tests: {
                     mocha: {},
@@ -124,7 +124,7 @@ module.exports = {
             }
         };
         utilsMock.getConfig.returns(mockConfig);
-        var cliTest = require('./../cli/test');
+        let cliTest = require('./../cli/test');
         cliTest(['--env=production']).then(function () {
             test.deepEqual(testStub.args[0][0].browserifyOptions, testBrowserifyOptions);
             test.done();
@@ -133,8 +133,8 @@ module.exports = {
 
     'should call test function with root level config options when root level configuration options are present': function (test) {
         test.expect(2);
-        var testFiles = ['testFile.js'];
-        var mockConfig = {
+        let testFiles = ['testFile.js'];
+        let mockConfig = {
             tests: {
                 mocha: {
                     files: testFiles,
@@ -142,7 +142,7 @@ module.exports = {
             }
         };
         utilsMock.getConfig.returns(mockConfig);
-        var cliTest = require('./../cli/test');
+        let cliTest = require('./../cli/test');
         cliTest().then(function () {
             let assertedTestOptions = testStub.args[0][0];
             test.deepEqual(assertedTestOptions.files, testFiles);
@@ -153,8 +153,8 @@ module.exports = {
 
     'should test with development config when there is one if no test environment is supplied': function (test) {
         test.expect(2);
-        var testFiles = ['test.js'];
-        var mockConfig = {
+        let testFiles = ['test.js'];
+        let mockConfig = {
             development: {
                 tests: {
                     mocha: {
@@ -164,7 +164,7 @@ module.exports = {
             }
         };
         utilsMock.getConfig.returns(mockConfig);
-        var cliTest = require('./../cli/test');
+        let cliTest = require('./../cli/test');
         cliTest().then(function () {
             let assertedTestOptions = testStub.args[0][0];
             test.deepEqual(assertedTestOptions.files, testFiles);
@@ -175,8 +175,8 @@ module.exports = {
 
     'should pass correct test options when test type is passed': function (test) {
         test.expect(2);
-        var testFiles = ['test.js'];
-        var mockConfig = {
+        let testFiles = ['test.js'];
+        let mockConfig = {
             tests: {
                 qunit: {
                     files: testFiles,
@@ -184,7 +184,7 @@ module.exports = {
             }
         };
         utilsMock.getConfig.returns(mockConfig);
-        var cliTest = require('./../cli/test');
+        let cliTest = require('./../cli/test');
         cliTest(['qunit']).then(function () {
             let assertedTestOptions = testStub.args[0][0];
             test.deepEqual(assertedTestOptions.files, testFiles);
@@ -195,8 +195,8 @@ module.exports = {
 
     'should pass keepalive as true in test options when server command is used': function (test) {
         test.expect(1);
-        var testFiles = ['test.js'];
-        var mockConfig = {
+        let testFiles = ['test.js'];
+        let mockConfig = {
             tests: {
                 qunit: {
                     files: testFiles,
@@ -204,7 +204,7 @@ module.exports = {
             }
         };
         utilsMock.getConfig.returns(mockConfig);
-        var cliTest = require('./../cli/test');
+        let cliTest = require('./../cli/test');
         cliTest(['qunit', 'server']).then(function () {
             let assertedTestOptions = testStub.args[0][0];
             test.equal(assertedTestOptions.keepalive, true);
@@ -214,8 +214,8 @@ module.exports = {
 
     'should not pass keepalive true when trying to start test server when there is a test configuration with multiple test types': function (test) {
         test.expect(1);
-        var testFiles = ['test.js'];
-        var mockConfig = {
+        let testFiles = ['test.js'];
+        let mockConfig = {
             tests: {
                 qunit: {
                     files: testFiles,
@@ -226,7 +226,7 @@ module.exports = {
             }
         };
         utilsMock.getConfig.returns(mockConfig);
-        var cliTest = require('./../cli/test');
+        let cliTest = require('./../cli/test');
         cliTest(['test', 'server']).then(function () {
             test.ok(!testStub.args[0][0].keepalive);
             test.done();
@@ -235,14 +235,14 @@ module.exports = {
 
     'should not pass keepalive true when trying to start test server when there are multiple test configurations with same test type': function (test) {
         test.expect(1);
-        var mockConfig = {
+        let mockConfig = {
             tests: [
                 {mocha: {files: ['test1.js']}},
                 {mocha: {files: ['test2.js']}}
             ]
         };
         utilsMock.getConfig.returns(mockConfig);
-        var cliTest = require('./../cli/test');
+        let cliTest = require('./../cli/test');
         cliTest(['test', 'server']).then(function () {
             test.ok(!testStub.args[0][0].keepalive);
             test.done();
@@ -251,14 +251,14 @@ module.exports = {
 
     'should not pass keepalive true when trying to start test types server when there are multiple test configurations with same test type': function (test) {
         test.expect(1);
-        var mockConfig = {
+        let mockConfig = {
             tests: [
                 {mocha: {files: ['test1.js']}},
                 {mocha: {files: ['test2.js']}}
             ]
         };
         utilsMock.getConfig.returns(mockConfig);
-        var cliTest = require('./../cli/test');
+        let cliTest = require('./../cli/test');
         cliTest(['mocha', 'server']).then(function () {
             test.ok(!testStub.args[0][0].keepalive);
             test.done();
@@ -267,8 +267,8 @@ module.exports = {
 
     'should pass keepalive as true for the passed test type if there is only one configuration for the passed test type': function (test) {
         test.expect(1);
-        var testFiles = ['test.js'];
-        var mockConfig = {
+        let testFiles = ['test.js'];
+        let mockConfig = {
             tests: {
                 qunit: {
                     files: testFiles,
@@ -279,7 +279,7 @@ module.exports = {
             }
         };
         utilsMock.getConfig.returns(mockConfig);
-        var cliTest = require('./../cli/test');
+        let cliTest = require('./../cli/test');
         cliTest(['qunit', 'server']).then(function () {
             test.equal(testStub.args[0][0].keepalive, true);
             test.done();

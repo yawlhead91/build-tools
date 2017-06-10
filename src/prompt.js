@@ -1,6 +1,6 @@
 "use strict";
-var fs = require('fs-extra');
-var editor = require('editor');
+let fs = require('fs-extra');
+let editor = require('editor');
 
 const DEFAULT_GUIDANCE_TEXT = '\n' +
     '\n' +

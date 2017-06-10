@@ -1,12 +1,12 @@
 'use strict';
-var fs = require('fs-extra');
-var _ = require('underscore');
-var Promise = require('bluebird');
-var glob = require('glob-promise');
-var path = require('path');
-var chokidar = require('chokidar');
-var watcher = chokidar.watch([], {ignoreInitial: true});
-var async = require('async-promises');
+let fs = require('fs-extra');
+let _ = require('underscore');
+let Promise = require('bluebird');
+let glob = require('glob-promise');
+let path = require('path');
+let chokidar = require('chokidar');
+let watcher = chokidar.watch([], {ignoreInitial: true});
+let async = require('async-promises');
 
 /**
  * Copies files to designated locations.
@@ -72,7 +72,7 @@ module.exports = function (options) {
      * @returns {Promise} Returns a promise when done
      */
     function copyFile(srcPath, destPath) {
-        var srcFileInfo = path.parse(srcPath) || {};
+        let srcFileInfo = path.parse(srcPath) || {};
         if (!path.extname(destPath) && srcFileInfo.ext) {
             // destination is a directory!
             return copyFileIntoDirectory(srcPath, destPath);

@@ -1,6 +1,6 @@
 'use strict';
-var version = require('./../src/version');
-var git = require('gitty');
+let version = require('./../src/version');
+let git = require('gitty');
 
 /**
  * Bumps the version of the npm package, commits it as an
@@ -10,9 +10,9 @@ var git = require('gitty');
  */
 module.exports = function (args) {
 
-    var localRepo = git(process.cwd());
+    let localRepo = git(process.cwd());
 
-    var ensureCleanWorkingDirectory = function () {
+    let ensureCleanWorkingDirectory = function () {
         return new Promise(function (resolve, reject) {
             localRepo.status(function (err, status) {
                 if (err) return reject(err);

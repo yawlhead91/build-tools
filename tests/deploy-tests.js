@@ -1,15 +1,15 @@
 'use strict';
-var sinon = require('sinon');
-var deployPath = './../src/deploy';
-var mockery = require('mockery');
+let sinon = require('sinon');
+let deployPath = './../src/deploy';
+let mockery = require('mockery');
 
-var globMock;
-var scp2ClientMock;
-var fsMock;
-var isDirectoryMock;
-var scp2Constructor;
+let globMock;
+let scp2ClientMock;
+let fsMock;
+let isDirectoryMock;
+let scp2Constructor;
 
-var allowables = ['util', deployPath, 'underscore', 'async-promises', 'path'];
+let allowables = ['util', deployPath, 'underscore', 'async-promises', 'path'];
 
 module.exports = {
 
@@ -52,7 +52,7 @@ module.exports = {
 
     'should reject if no hostname is supplied': function (test) {
         test.expect(1);
-        var deploy = require(deployPath);
+        let deploy = require(deployPath);
         deploy().catch(function (err) {
             test.ok(err);
             test.done();
@@ -61,7 +61,7 @@ module.exports = {
 
     'should reject if a protocol is passed that is NOT "sftp"': function (test) {
         test.expect(1);
-        var deploy = require(deployPath);
+        let deploy = require(deployPath);
         deploy({
             hostname: '55.55.555.55',
             protocol: 'blah'
@@ -73,8 +73,8 @@ module.exports = {
 
     'should reject if "path" option points to a directory that doesnt exist': function (test) {
         test.expect(1);
-        var deploy = require(deployPath);
-        var testPath = 'test/path';
+        let deploy = require(deployPath);
+        let testPath = 'test/path';
         fsMock.existsSync.withArgs(testPath).returns(false);
         deploy({
             hostname: '55.55.555.55',
@@ -87,8 +87,8 @@ module.exports = {
 
     'should pass correct options to scp2 client': function (test) {
         test.expect(4);
-        var deploy = require(deployPath);
-        var testPath = 'test/path';
+        let deploy = require(deployPath);
+        let testPath = 'test/path';
         fsMock.existsSync.withArgs(testPath).returns(true);
         deploy({
             hostname: '55.55.555.55',
@@ -96,7 +96,7 @@ module.exports = {
             username: 'bob',
             password: 'secret'
         }).then(function () {
-            var args = scp2Constructor.args[0][0];
+            let args = scp2Constructor.args[0][0];
             test.equal(args.host, '55.55.555.55');
             test.equal(args.path, testPath);
             test.equal(args.username, 'bob');

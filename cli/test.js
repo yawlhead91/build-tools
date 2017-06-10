@@ -1,8 +1,8 @@
 'use strict';
-var test = require('./../src/test');
-var utils = require('./../src/utils');
-var nopt = require('nopt');
-var Promise = require('bluebird');
+let test = require('./../src/test');
+let utils = require('./../src/utils');
+let nopt = require('nopt');
+let Promise = require('bluebird');
 
 /**
  * Runs tests.
@@ -10,24 +10,24 @@ var Promise = require('bluebird');
  * @returns {*}
  */
 module.exports = function (args) {
-    var config = utils.getConfig() || {};
+    let config = utils.getConfig() || {};
     args = args || [];
 
-    var argsObject = nopt({
+    let argsObject = nopt({
         env: [String],
         files: [null],
         type: [String, null],
         server: [Boolean, false],
     }, {}, args, 0);
 
-    var env = argsObject.env || process.env.NODE_ENV || 'development';
+    let env = argsObject.env || process.env.NODE_ENV || 'development';
 
     // assume last argument is the server boolean
-    var remainingArgs = argsObject.argv.remain;
-    var server = argsObject.server || remainingArgs[remainingArgs.length - 1] === 'server' ? true : false;
+    let remainingArgs = argsObject.argv.remain;
+    let server = argsObject.server || remainingArgs[remainingArgs.length - 1] === 'server' ? true : false;
 
-    var envConfig = config[env] || config || {};
-    var testConfigs = envConfig.tests || [];
+    let envConfig = config[env] || config || {};
+    let testConfigs = envConfig.tests || [];
 
     if (!testConfigs.length) {
         // not an array
@@ -45,7 +45,7 @@ module.exports = function (args) {
      * @returns {boolean}
      */
     let determineKeepAlive = function () {
-        var testType = argsObject.type || remainingArgs[0]; // assume first argument is test type
+        let testType = argsObject.type || remainingArgs[0]; // assume first argument is test type
         // we only keep server alive if user explicitly
         // wants it by using it in a CLI command ONLY and
         // there is only one test

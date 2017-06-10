@@ -1,22 +1,22 @@
 'use strict';
 
-var fs = require('fs-extra');
-var spawn = require('child_process').spawn;
-var Promise = require('promise');
-var express = require('express');
-var serveStatic = require('serve-static');
-var path = require('path');
-var utils = require('./utils');
-var clean = require('./clean');
-var browserify = require('./browserify');
-var qunit = require('node-qunit-phantomjs');
-var Server = require('./server');
-var phantomjs = require('phantomjs-prebuilt');
+let fs = require('fs-extra');
+let spawn = require('child_process').spawn;
+let Promise = require('promise');
+let express = require('express');
+let serveStatic = require('serve-static');
+let path = require('path');
+let utils = require('./utils');
+let clean = require('./clean');
+let browserify = require('./browserify');
+let qunit = require('node-qunit-phantomjs');
+let Server = require('./server');
+let phantomjs = require('phantomjs-prebuilt');
 
-var server;
-var tempDir = process.cwd() + '/tmp';
+let server;
+let tempDir = process.cwd() + '/tmp';
 
-var ncp = require('ncp').ncp;
+let ncp = require('ncp').ncp;
 ncp.limit = 16;
 
 /**
@@ -67,7 +67,7 @@ module.exports = function(options) {
     }
 
     function runMochaTest() {
-        var child = spawn(phantomjs.path, [
+        let child = spawn(phantomjs.path, [
             process.cwd() + '/node_modules/mocha-phantomjs-core/mocha-phantomjs-core.js',
             tempDir + '/tests/index.html'
         ]);
@@ -109,7 +109,7 @@ module.exports = function(options) {
     }
 
     function test() {
-        var promise;
+        let promise;
 
         console.log('running ' + options.id + ' tests...');
         if (options.id.toLowerCase() === 'qunit') {
@@ -131,7 +131,7 @@ module.exports = function(options) {
     }
 
     function copyFiles() {
-        var testsDir = tempDir + '/tests/',
+        let testsDir = tempDir + '/tests/',
             internalPath = path.join(__dirname, '/test');
         console.log('copying test files over');
         return new Promise(function (resolve, reject) {
@@ -160,7 +160,7 @@ module.exports = function(options) {
     }
 
     function getServer() {
-        var folders = ['.' + tempDir, tempDir + '/tests'];
+        let folders = ['.' + tempDir, tempDir + '/tests'];
         if (!server) {
             server = new Server({
                 port: options.port,

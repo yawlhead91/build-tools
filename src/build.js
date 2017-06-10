@@ -1,14 +1,14 @@
 'use strict';
-var Promise = require('promise');
-var utils = require('./utils');
-var banner = require('./banner');
-var minify = require('./minify');
-var Server = require('./server');
-var _ = require('underscore');
-var copy = require('./copy');
-var browserify = require('./browserify');
-var path = require('path');
-var sassify = require('./sassify');
+let Promise = require('promise');
+let utils = require('./utils');
+let banner = require('./banner');
+let minify = require('./minify');
+let Server = require('./server');
+let _ = require('underscore');
+let copy = require('./copy');
+let browserify = require('./browserify');
+let path = require('path');
+let sassify = require('./sassify');
 
 /**
  * Browserifies, minifies, and creates banners for passed files.
@@ -49,10 +49,10 @@ var sassify = require('./sassify');
 
         options.browserifyOptions.debug = options.browserifyOptions.debug || options.env === 'local';
 
-        var browserifyOptions = _.extend({}, options.browserifyOptions, options);
+        let browserifyOptions = _.extend({}, options.browserifyOptions, options);
         // to restrict so that only JS files are passed into browserify,
         browserifyOptions.files = {};
-        var copyOptions = {files: {}, watch: options.watch},
+        let copyOptions = {files: {}, watch: options.watch},
             sassOptions = {files: {}, watch: options.watch};
         // only copy only non-js files
         _.each(options.files, function (srcPaths, destPath) {

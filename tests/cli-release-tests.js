@@ -1,23 +1,23 @@
 'use strict';
-var sinon = require('sinon');
-var mockery = require('mockery');
-var Promise = require('bluebird');
-var releasePath = './../cli/release';
-var testMock;
-var buildMock;
-var versionMock;
-var utilsMock;
-var promptMock;
-var promptMockPromise;
-var bumpMock;
-var bumpMockPromise;
-var githubApiMock;
-var githubConstructor;
-var mockConfig;
-var cologMock;
-var spawnMock;
-var spawnChildProcessMock;
-var allowables = [
+let sinon = require('sinon');
+let mockery = require('mockery');
+let Promise = require('bluebird');
+let releasePath = './../cli/release';
+let testMock;
+let buildMock;
+let versionMock;
+let utilsMock;
+let promptMock;
+let promptMockPromise;
+let bumpMock;
+let bumpMockPromise;
+let githubApiMock;
+let githubConstructor;
+let mockConfig;
+let cologMock;
+let spawnMock;
+let spawnChildProcessMock;
+let allowables = [
     './../../cli/release',
     'bluebird'
 ];
@@ -90,8 +90,8 @@ module.exports = {
 
     'should run tests if there is a production level test configuration': function (test) {
         test.expect(3);
-        var testFiles = ['testo.js'];
-        var mockConfig = {
+        let testFiles = ['testo.js'];
+        let mockConfig = {
             production: {
                 tests: {
                     mocha: {
@@ -103,7 +103,7 @@ module.exports = {
         utilsMock.getConfig.returns(mockConfig);
         bumpMockPromise.resolve('0.0.5');
         promptMockPromise.resolve('');
-        var release = require(releasePath);
+        let release = require(releasePath);
         release(['patch']).then(function () {
             let assertedTestOptions = testMock.args[0][0];
             test.equal(assertedTestOptions.env, 'production');
@@ -115,9 +115,9 @@ module.exports = {
 
     'should run multiple tests if they are multiple test configurations in production level configuration': function (test) {
         test.expect(6);
-        var testFiles = ['testo.js'];
-        var qunitTestFiles = ['qunit-test.js'];
-        var mockConfig = {
+        let testFiles = ['testo.js'];
+        let qunitTestFiles = ['qunit-test.js'];
+        let mockConfig = {
             production: {
                 tests: [
                     {
@@ -136,7 +136,7 @@ module.exports = {
         utilsMock.getConfig.returns(mockConfig);
         bumpMockPromise.resolve('0.0.5');
         promptMockPromise.resolve('');
-        var release = require(releasePath);
+        let release = require(releasePath);
         release(['patch']).then(function () {
             let firstAssertedTestOptions = testMock.args[0][0];
             test.equal(firstAssertedTestOptions.env, 'production');
@@ -154,7 +154,7 @@ module.exports = {
         test.expect(1);
         bumpMockPromise.resolve(null);
         promptMockPromise.resolve('');
-        var release = require(releasePath);
+        let release = require(releasePath);
         release(['patch']).catch(function (err) {
             test.ok(err);
             test.done();
@@ -165,8 +165,8 @@ module.exports = {
         test.expect(1);
         bumpMockPromise.resolve('0.0.5');
         promptMockPromise.resolve('');
-        var release = require(releasePath);
-        var type = 'patch';
+        let release = require(releasePath);
+        let type = 'patch';
         release([type]).then(function () {
             test.deepEqual(bumpMock.args[0], [type]);
             test.done();
@@ -177,11 +177,11 @@ module.exports = {
         test.expect(6);
         bumpMockPromise.resolve('0.0.5');
         promptMockPromise.resolve('');
-        var buildFiles = ['testo.js'];
-        var requires = {'my': 'file.js'};
-        var exclude = ['exclude.file.js'];
-        var ignore = ['ignored.js'];
-        var mockConfig = {
+        let buildFiles = ['testo.js'];
+        let requires = {'my': 'file.js'};
+        let exclude = ['exclude.file.js'];
+        let ignore = ['ignored.js'];
+        let mockConfig = {
             production: {
                 build: {
                     files: buildFiles,
@@ -192,9 +192,9 @@ module.exports = {
             }
         };
         utilsMock.getConfig.returns(mockConfig);
-        var release = require(releasePath);
+        let release = require(releasePath);
         release().then(function () {
-            var assertedBuildOptions = buildMock.args[0][0];
+            let assertedBuildOptions = buildMock.args[0][0];
             test.equal(assertedBuildOptions.env, 'production');
             test.ok(!assertedBuildOptions.test);
             test.deepEqual(assertedBuildOptions.files, buildFiles);
@@ -209,16 +209,16 @@ module.exports = {
         test.expect(2);
         bumpMockPromise.resolve('0.0.5');
         promptMockPromise.resolve('');
-        var buildFiles = ['testo.js'];
-        var mockConfig = {
+        let buildFiles = ['testo.js'];
+        let mockConfig = {
             build: {
                 files: buildFiles,
             }
         };
         utilsMock.getConfig.returns(mockConfig);
-        var release = require(releasePath);
+        let release = require(releasePath);
         release().then(function () {
-            var assertedBuildOptions = buildMock.args[0][0];
+            let assertedBuildOptions = buildMock.args[0][0];
             test.equal(assertedBuildOptions.env, 'production');
             test.deepEqual(assertedBuildOptions.files, buildFiles);
             test.done();
@@ -229,8 +229,8 @@ module.exports = {
         test.expect(2);
         bumpMockPromise.resolve('0.0.5');
         promptMockPromise.resolve('');
-        var testFiles = ['testo.js'];
-        var mockConfig = {
+        let testFiles = ['testo.js'];
+        let mockConfig = {
             tests: {
                 mocha: {
                     files: testFiles,
@@ -238,9 +238,9 @@ module.exports = {
             }
         };
         utilsMock.getConfig.returns(mockConfig);
-        var release = require(releasePath);
+        let release = require(releasePath);
         release().then(function () {
-            var assertedTestOptions = testMock.args[0][0];
+            let assertedTestOptions = testMock.args[0][0];
             test.equal(assertedTestOptions.id, 'mocha');
             test.deepEqual(assertedTestOptions.files, testFiles);
             test.done();
@@ -251,18 +251,18 @@ module.exports = {
         test.expect(1);
         bumpMockPromise.resolve('0.0.5');
         promptMockPromise.resolve('');
-        var browserifyOptions = {
+        let browserifyOptions = {
             transform: [{my: 'transform'}],
             require: {}
         };
-        var mockConfig = {
+        let mockConfig = {
             tests: {
                 mocha: {},
                 browserifyOptions
             }
         };
         utilsMock.getConfig.returns(mockConfig);
-        var release = require(releasePath);
+        let release = require(releasePath);
         release().then(function () {
             test.deepEqual(testMock.args[0][0].browserifyOptions, browserifyOptions);
             test.done();
@@ -273,11 +273,11 @@ module.exports = {
         test.expect(1);
         bumpMockPromise.resolve('0.0.5');
         promptMockPromise.resolve('');
-        var browserifyOptions = {
+        let browserifyOptions = {
             transform: [{my: 'transform'}],
             require: {}
         };
-        var mockConfig = {
+        let mockConfig = {
             tests: {
                 mocha: {
                     browserifyOptions
@@ -285,7 +285,7 @@ module.exports = {
             }
         };
         utilsMock.getConfig.returns(mockConfig);
-        var release = require(releasePath);
+        let release = require(releasePath);
         release().then(function () {
             test.deepEqual(testMock.args[0][0].browserifyOptions, browserifyOptions);
             test.done();
@@ -296,11 +296,11 @@ module.exports = {
         test.expect(1);
         bumpMockPromise.resolve('0.0.5');
         promptMockPromise.resolve('');
-        var browserifyOptions = {
+        let browserifyOptions = {
             transform: [{my: 'transform'}],
             require: {}
         };
-        var mockConfig = {
+        let mockConfig = {
             production: {
                 tests: {
                     mocha: {},
@@ -309,7 +309,7 @@ module.exports = {
             }
         };
         utilsMock.getConfig.returns(mockConfig);
-        var release = require(releasePath);
+        let release = require(releasePath);
         release().then(function () {
             test.deepEqual(testMock.args[0][0].browserifyOptions, browserifyOptions);
             test.done();
@@ -320,11 +320,11 @@ module.exports = {
         test.expect(1);
         bumpMockPromise.resolve('0.0.5');
         promptMockPromise.resolve('');
-        var browserifyOptions = {
+        let browserifyOptions = {
             transform: [{my: 'transform'}],
             require: {}
         };
-        var mockConfig = {
+        let mockConfig = {
             production: {
                 tests: {
                     mocha: {
@@ -334,7 +334,7 @@ module.exports = {
             }
         };
         utilsMock.getConfig.returns(mockConfig);
-        var release = require(releasePath);
+        let release = require(releasePath);
         release().then(function () {
             test.deepEqual(testMock.args[0][0].browserifyOptions, browserifyOptions);
             test.done();
@@ -343,10 +343,10 @@ module.exports = {
 
     'should pass updated version number from bump to version function': function (test) {
         test.expect(1);
-        var newVersionNbr = "9.95.0";
+        let newVersionNbr = "9.95.0";
         promptMockPromise.resolve('');
         bumpMockPromise.resolve(newVersionNbr);
-        var release = require(releasePath);
+        let release = require(releasePath);
         release().then(function () {
             test.deepEqual(versionMock.args[0][0], newVersionNbr);
             test.done();
@@ -358,7 +358,7 @@ module.exports = {
         bumpMockPromise.resolve('0.0.5');
         let testNotes = 'blah';
         promptMockPromise.resolve(testNotes);
-        var release = require(releasePath);
+        let release = require(releasePath);
         release().then(function () {
             test.deepEqual(versionMock.args[0][1].commitMessage, testNotes);
             test.done();
@@ -372,7 +372,7 @@ module.exports = {
         let token = 'uebyx';
         mockConfig = {github: {token: token}};
         utilsMock.getConfig.returns(mockConfig);
-        var release = require(releasePath);
+        let release = require(releasePath);
         release(['patch']).then(function () {
             test.equal(githubApiMock.authenticate.args[0][0].type, 'oauth');
             test.equal(githubApiMock.authenticate.args[0][0].token, token);
@@ -393,7 +393,7 @@ module.exports = {
             }
         };
         utilsMock.getConfig.returns(mockConfig);
-        var release = require(releasePath);
+        let release = require(releasePath);
         release().then(function () {
             let assertedCreateReleaseOptions = githubApiMock.repos.createRelease.args[0][0];
             test.equal(assertedCreateReleaseOptions.repo, 'myRepo');
@@ -409,11 +409,11 @@ module.exports = {
         test.expect(1);
         bumpMockPromise.resolve('0.0.6');
         promptMockPromise.resolve('');
-        var mockConfig = {
+        let mockConfig = {
             production: {}
         };
         utilsMock.getConfig.returns(mockConfig);
-        var release = require(releasePath);
+        let release = require(releasePath);
         release().then(function () {
             test.equal(githubApiMock.repos.createRelease.callCount, 0);
             test.done();
@@ -427,7 +427,7 @@ module.exports = {
         let token = 'uebyx';
         mockConfig = {github: {token: token}};
         mockery.registerMock(process.cwd() + '/bt-config', mockConfig);
-        var release = require(releasePath);
+        let release = require(releasePath);
         release(['patch']).then(function () {
             test.equal(spawnMock.args[0][0], 'npm');
             test.deepEqual(spawnMock.args[0][1], ['publish']);

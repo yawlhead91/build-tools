@@ -7,7 +7,7 @@ module.exports = {
      * @param paths
      */
     scopePaths: function (paths) {
-        var scope = function (path) {
+        let scope = function (path) {
             return process.cwd() + '/' + path;
         };
         if (typeof paths === 'string') {
@@ -24,7 +24,7 @@ module.exports = {
      * @returns {undefined|Object}
      */
     getConfig: function () {
-        var rootPath = process.cwd(),
+        let rootPath = process.cwd(),
             config;
         try {
             config = require(rootPath + '/bt-config');

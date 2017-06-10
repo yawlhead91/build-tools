@@ -1,12 +1,12 @@
 'use strict';
-var testPath = './../src/clean';
-var sinon = require('sinon');
+let testPath = './../src/clean';
+let sinon = require('sinon');
 
 module.exports = {
 
     'should resolve immediately when called with no arguments': function (test) {
         test.expect(1);
-        var clean = require(testPath);
+        let clean = require(testPath);
         clean().then(function () {
             test.ok('true');
             test.done();
@@ -15,7 +15,7 @@ module.exports = {
 
     'should resolve immediately when called with empty array as first argument': function (test) {
         test.expect(1);
-        var clean = require(testPath);
+        let clean = require(testPath);
         clean([]).then(function () {
             test.ok('true');
             test.done();

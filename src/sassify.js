@@ -1,13 +1,13 @@
 "use strict";
-var sass = require('node-sass');
-var Promise = require('bluebird');
-var _ = require('underscore');
-var fs = require('fs-extra');
-var path = require("path");
-var chokidar = require('chokidar');
-var postcss = require('postcss');
+let sass = require('node-sass');
+let Promise = require('bluebird');
+let _ = require('underscore');
+let fs = require('fs-extra');
+let path = require("path");
+let chokidar = require('chokidar');
+let postcss = require('postcss');
 
-var watchFile = function (sourceFile, destinationFile) {
+let watchFile = function (sourceFile, destinationFile) {
     return new Promise(function (resolve) {
         chokidar.watch(sourceFile, {ignoreInitial: true}).on('all', function (state, src) {
             console.log(src + ' has been updated... sassifying it.');
@@ -24,7 +24,7 @@ var watchFile = function (sourceFile, destinationFile) {
  * @param dest
  * @returns {*|exports|module.exports}
  */
-var ensureDestinationDir = function (dest) {
+let ensureDestinationDir = function (dest) {
     return new Promise(function (resolve, reject) {
         fs.ensureDir(path.dirname(dest), function (err) {
             if (!err) {
@@ -36,7 +36,7 @@ var ensureDestinationDir = function (dest) {
     });
 };
 
-var sassifyFile = function (sourceFile, destinationFile) {
+let sassifyFile = function (sourceFile, destinationFile) {
     return ensureDestinationDir(destinationFile).then(function () {
         return new Promise(function (resolve, reject) {
             sass.render({
@@ -62,7 +62,7 @@ var sassifyFile = function (sourceFile, destinationFile) {
     });
 };
 
-var runPostCss = function (css, destFile) {
+let runPostCss = function (css, destFile) {
     return postcss([require('autoprefixer'), require('cssnano')])
         .process(css, {from: destFile, to: destFile})
         .then(function (result) {

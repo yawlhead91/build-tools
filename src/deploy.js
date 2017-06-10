@@ -1,11 +1,11 @@
 'use strict';
-var _ = require('underscore');
-var fs = require('fs');
-var Client = require('scp2').Client;
-var glob = require('glob-promise');
-var async = require('async-promises');
-var path = require('path');
-var isGlobPath = require("glob").hasMagic;
+let _ = require('underscore');
+let fs = require('fs');
+let Client = require('scp2').Client;
+let glob = require('glob-promise');
+let async = require('async-promises');
+let path = require('path');
+let isGlobPath = require("glob").hasMagic;
 /**
  * Deploys files to a server instance using SFTP.
  * @returns {Promise} Returns a promise that resolves when completed
@@ -35,7 +35,7 @@ module.exports = function (options) {
     }
 
     if (!fs.existsSync(options.path)) {
-        var e = new Error(options.path + ' does not exist');
+        let e = new Error(options.path + ' does not exist');
         return Promise.reject(e);
     }
 
@@ -72,7 +72,7 @@ module.exports = function (options) {
 
     function uploadFile (file) {
         return new Promise((resolve, reject) => {
-            var localFile = path.relative(options.path, file),
+            let localFile = path.relative(options.path, file),
                 remoteFile = path.join(options.remoteDir, localFile);
             client.upload(file, '.'+remoteFile, function(err){
                 if (err) {
@@ -93,7 +93,7 @@ module.exports = function (options) {
         }
 
         return async.eachSeries(paths, function (p) {
-            var stats = fs.statSync(p);
+            let stats = fs.statSync(p);
             if(stats.isDirectory()){
                 // directories are automatically created by uploadFile()
                 return Promise.resolve();

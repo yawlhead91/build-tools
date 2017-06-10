@@ -1,12 +1,12 @@
 'use strict';
-var sinon = require('sinon');
-var bumpPath = './../src/bump';
-var mockery = require('mockery');
+let sinon = require('sinon');
+let bumpPath = './../src/bump';
+let mockery = require('mockery');
 
-var semVerMock;
-var fsMock;
+let semVerMock;
+let fsMock;
 
-var allowables = [bumpPath, 'underscore', 'promise', 'semver'];
+let allowables = [bumpPath, 'underscore', 'promise', 'semver'];
 
 module.exports = {
 
@@ -32,7 +32,7 @@ module.exports = {
         let version = '0.0.2';
         let config = {version: version};
         mockery.registerMock(process.cwd() + '/package.json', config);
-        var bump = require(bumpPath);
+        let bump = require(bumpPath);
         bump().then(function (nextVersion) {
             test.equal(nextVersion, '0.0.3');
             test.done();
@@ -44,7 +44,7 @@ module.exports = {
         let version = '0.0.2';
         let config = {version: version};
         mockery.registerMock(process.cwd() + '/package.json', config);
-        var bump = require(bumpPath);
+        let bump = require(bumpPath);
         bump('patch').then(function (nextVersion) {
             test.equal(nextVersion, '0.0.3');
             test.done();
@@ -56,7 +56,7 @@ module.exports = {
         let version = '0.0.2';
         let config = {version: version};
         mockery.registerMock(process.cwd() + '/package.json', config);
-        var bump = require(bumpPath);
+        let bump = require(bumpPath);
         bump('minor').then(function (nextVersion) {
             test.equal(nextVersion, '0.1.0');
             test.done();
@@ -68,7 +68,7 @@ module.exports = {
         let version = '0.0.2';
         let config = {version: version};
         mockery.registerMock(process.cwd() + '/package.json', config);
-        var bump = require(bumpPath);
+        let bump = require(bumpPath);
         bump('major').then(function (nextVersion) {
             test.equal(nextVersion, '1.0.0');
             test.done();

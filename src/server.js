@@ -1,10 +1,10 @@
 'use strict';
 
-var Promise = require('promise');
-var express = require('express');
-var serveStatic = require('serve-static');
-var _ = require('underscore');
-var path = require('path');
+let Promise = require('promise');
+let express = require('express');
+let serveStatic = require('serve-static');
+let _ = require('underscore');
+let path = require('path');
 
 class Server {
 

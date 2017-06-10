@@ -1,14 +1,14 @@
 'use strict';
 
-var Promise = require('promise');
-var _ = require('underscore');
-var fs = require('fs-extra');
-var glob = require('glob');
-var browserify = require('browserify');
-var watchify = require('watchify');
-var utils = require('./utils');
-var path = require("path");
-var envify = require('envify/custom');
+let Promise = require('promise');
+let _ = require('underscore');
+let fs = require('fs-extra');
+let glob = require('glob');
+let browserify = require('browserify');
+let watchify = require('watchify');
+let utils = require('./utils');
+let path = require("path");
+let envify = require('envify/custom');
 
 /**
  * Browserifies a single file bundle.
@@ -18,8 +18,8 @@ var envify = require('envify/custom');
  * @param {Object|Array} [options.requires] - Required files
  * @returns {Promise}
  */
-var browserifyFile = function (destPath, srcPaths, options) {
-    var stream,
+let browserifyFile = function (destPath, srcPaths, options) {
+    let stream,
         b,
         finalPaths = [];
     return new Promise(function (resolve, reject) {
@@ -103,8 +103,8 @@ var browserifyFile = function (destPath, srcPaths, options) {
  * @param {string} destPath - The destination file
  * @private
  */
-var writeBrowserifyBundleStreamToFile = function (stream, destPath) {
-    var data = '';
+let writeBrowserifyBundleStreamToFile = function (stream, destPath) {
+    let data = '';
     return new Promise(function (resolve, reject) {
         stream.on('error', reject);
         stream.on('data', function (d) {
@@ -135,7 +135,7 @@ var writeBrowserifyBundleStreamToFile = function (stream, destPath) {
  */
 module.exports = function (options) {
 
-    var promises = [];
+    let promises = [];
 
     options = _.extend({
         files: null,

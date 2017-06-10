@@ -1,15 +1,15 @@
 'use strict';
-var sinon = require('sinon');
-var serverPath = './../src/server';
-var mockery = require('mockery');
+let sinon = require('sinon');
+let serverPath = './../src/server';
+let mockery = require('mockery');
 
-var expressMock;
-var httpMock;
-var Server;
-var expressConstructorMock;
-var serverMock;
+let expressMock;
+let httpMock;
+let Server;
+let expressConstructorMock;
+let serverMock;
 
-var allowables = ['util', serverPath, 'promise', 'underscore'];
+let allowables = ['util', serverPath, 'promise', 'underscore'];
 
 module.exports = {
 
@@ -44,22 +44,22 @@ module.exports = {
 
     'should pass express instance to createServer on instantiation': function (test) {
         test.expect(1);
-        var server = new Server();
+        let server = new Server();
         test.deepEqual(httpMock.createServer.args[0][0], expressMock);
         test.done();
     },
 
     'should pass the express instance to the middleware function in options on instantiation': function (test) {
         test.expect(1);
-        var myMiddleware = sinon.spy();
-        var server = new Server({middleware: myMiddleware});
+        let myMiddleware = sinon.spy();
+        let server = new Server({middleware: myMiddleware});
         test.deepEqual(myMiddleware.args[0][0], expressMock);
         test.done();
     },
 
     'should call listen method with default port of 7000 on server instance when starting': function (test) {
         test.expect(1);
-        var server = new Server();
+        let server = new Server();
         server.start().then(function () {
             test.deepEqual(serverMock.listen.args[0][0], 7000);
             test.done();
@@ -68,7 +68,7 @@ module.exports = {
 
     'should call listen method with port specified in options to server instance when starting': function (test) {
         test.expect(1);
-        var server = new Server({port: 8});
+        let server = new Server({port: 8});
         server.start().then(function () {
             test.deepEqual(serverMock.listen.args[0][0], 8);
             test.done();

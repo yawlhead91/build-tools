@@ -1,17 +1,17 @@
 'use strict';
-var testPath = './../src/build';
-var sinon = require('sinon');
-var mockery = require('mockery');
-var Promise = require('promise');
+let testPath = './../src/build';
+let sinon = require('sinon');
+let mockery = require('mockery');
+let Promise = require('promise');
 
-var copyMock;
-var browserifyMock;
-var minifyMock;
-var bannerMock;
-var serverMock;
-var sassMock;
-var serverConstructorMock;
-var allowables = [
+let copyMock;
+let browserifyMock;
+let minifyMock;
+let bannerMock;
+let serverMock;
+let sassMock;
+let serverConstructorMock;
+let allowables = [
     'util',
     testPath,
     'promise',
@@ -56,7 +56,7 @@ module.exports = {
 
     'calling with no parameters returns a resolved promise and does not call any modules': function (test) {
         test.expect(6);
-        var build = require(testPath);
+        let build = require(testPath);
         build().then(function () {
             test.equal(copyMock.callCount, 0);
             test.equal(browserifyMock.callCount, 0);
@@ -70,7 +70,7 @@ module.exports = {
 
     'calling with empty object returns a resolved promise and does not call any modules': function (test) {
         test.expect(6);
-        var build = require(testPath);
+        let build = require(testPath);
         build({}).then(function () {
             test.equal(copyMock.callCount, 0);
             test.equal(browserifyMock.callCount, 0);
@@ -84,7 +84,7 @@ module.exports = {
 
     'no dist option does not call any modules and still resolves': function (test) {
         test.expect(6);
-        var build = require(testPath);
+        let build = require(testPath);
         build({}).then(function () {
             test.equal(copyMock.callCount, 0);
             test.equal(browserifyMock.callCount, 0);
@@ -98,7 +98,7 @@ module.exports = {
 
     'no files option does not call any modules and still resolves': function (test) {
         test.expect(6);
-        var build = require(testPath);
+        let build = require(testPath);
         build({}).then(function () {
             test.equal(copyMock.callCount, 0);
             test.equal(browserifyMock.callCount, 0);
@@ -112,10 +112,10 @@ module.exports = {
 
     'only files with .js extensions get passed to browserify': function (test) {
         test.expect(2);
-        var build = require(testPath);
-        var filesOption = {};
-        var htmlDest = "dest/index.html";
-        var jsDest = "dest/app.js";
+        let build = require(testPath);
+        let filesOption = {};
+        let htmlDest = "dest/index.html";
+        let jsDest = "dest/app.js";
         filesOption[htmlDest] = ['my/index.html'];
         filesOption[jsDest] = ["my/blah.js"];
         build({files: filesOption, dist: {}}).then(function () {
@@ -127,10 +127,10 @@ module.exports = {
 
     'non-js files get passed to copy': function (test) {
         test.expect(2);
-        var build = require(testPath);
-        var filesOption = {};
-        var htmlDest = "dest/index.html";
-        var jsDest = "dest/app.js";
+        let build = require(testPath);
+        let filesOption = {};
+        let htmlDest = "dest/index.html";
+        let jsDest = "dest/app.js";
         filesOption[htmlDest] = ['my/index.html'];
         filesOption[jsDest] = ["my/blah.js"];
         build({files: filesOption, dist: {}}).then(function () {
@@ -142,8 +142,8 @@ module.exports = {
 
     'minifyFiles option gets passed to minify module': function (test) {
         test.expect(1);
-        var build = require(testPath);
-        var options = {"blah": 2};
+        let build = require(testPath);
+        let options = {"blah": 2};
         build({minifyFiles: options, dist: {}, files: {}}).then(function () {
             test.deepEqual(minifyMock.args[0][0].files, options);
             test.done();
@@ -152,8 +152,8 @@ module.exports = {
 
     'bannerFiles option gets passed as first argument to banner module': function (test) {
         test.expect(1);
-        var build = require(testPath);
-        var options = {"blah": 2};
+        let build = require(testPath);
+        let options = {"blah": 2};
         build({bannerFiles: options, dist: {}, files: {}}).then(function () {
             test.deepEqual(bannerMock.args[0], [options]);
             test.done();
@@ -162,7 +162,7 @@ module.exports = {
 
     'server module gets called when a local env option gets passed': function (test) {
         test.expect(1);
-        var build = require(testPath);
+        let build = require(testPath);
         build({env: 'local', dist: {}, files: {}}).then(function () {
             test.equal(serverConstructorMock.callCount, 1);
             test.done();
@@ -171,7 +171,7 @@ module.exports = {
 
     'server module does NOT get called when no env option is passed': function (test) {
         test.expect(1);
-        var build = require(testPath);
+        let build = require(testPath);
         build({dist: {}, files: {}}).then(function () {
             test.equal(serverConstructorMock.callCount, 0);
             test.done();
@@ -180,7 +180,7 @@ module.exports = {
 
     'should instantiate server and call its start method when "local" env option is passed': function (test) {
         test.expect(1);
-        var build = require(testPath);
+        let build = require(testPath);
         build({env: 'local', dist: {}, files: {}}).then(function () {
             test.equal(serverMock.start.callCount, 1);
             test.done();
@@ -189,7 +189,7 @@ module.exports = {
 
     'server module does NOT get instantiated when a "production" env option gets passed': function (test) {
         test.expect(1);
-        var build = require(testPath);
+        let build = require(testPath);
         build({env: 'production', dist: {}, files: {}}).then(function () {
             test.equal(serverConstructorMock.callCount, 0);
             test.done();
@@ -197,10 +197,10 @@ module.exports = {
     },
 
     'should perform a "production" build even if "prod" is passed (deprecation check)': function (test) {
-        var build = require(testPath);
-        var filesOption = {};
-        var htmlDest = "dest/index.html";
-        var jsDest = "dest/app.js";
+        let build = require(testPath);
+        let filesOption = {};
+        let htmlDest = "dest/index.html";
+        let jsDest = "dest/app.js";
         filesOption[htmlDest] = ['my/index.html'];
         filesOption[jsDest] = ["my/blah.js"];
         build({env: 'prod', files: filesOption, dist: {}}).then(function () {
@@ -211,10 +211,10 @@ module.exports = {
     },
 
     'should pass browserify options to browserify': function (test) {
-        var build = require(testPath);
-        var filesOption = {};
-        var htmlDest = "dest/index.html";
-        var jsDest = "dest/app.js";
+        let build = require(testPath);
+        let filesOption = {};
+        let htmlDest = "dest/index.html";
+        let jsDest = "dest/app.js";
         filesOption[htmlDest] = ['my/index.html'];
         filesOption[jsDest] = ["my/blah.js"];
         build({

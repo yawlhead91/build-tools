@@ -1,10 +1,10 @@
 'use strict';
-var git = require('gitty');
-var Promise = require('promise');
-var bump = require('./bump');
-var _ = require('underscore');
-var semver = require('semver');
-var prompt = require('./prompt');
+let git = require('gitty');
+let Promise = require('promise');
+let bump = require('./bump');
+let _ = require('underscore');
+let semver = require('semver');
+let prompt = require('./prompt');
 
 /**
  * Ups the current package to a new version, prompts user for commit message, then makes a commit locally.
@@ -15,7 +15,7 @@ var prompt = require('./prompt');
  * @type {exports}
  */
 module.exports = function (type, options={}) {
-    var localRepo = git(process.cwd()),
+    let localRepo = git(process.cwd()),
         newVersionNum;
 
     type = type || 'patch';
@@ -26,8 +26,8 @@ module.exports = function (type, options={}) {
 
     options.commitMessage = options.commitMessage || '';
 
-    var getEditedFiles = function () {
-        var files = [];
+    let getEditedFiles = function () {
+        let files = [];
         return new Promise(function (resolve, reject) {
             localRepo.status(function (err, status) {
                 if (err) return reject(err);
@@ -41,7 +41,7 @@ module.exports = function (type, options={}) {
         });
     };
 
-    var stageFiles = function (files) {
+    let stageFiles = function (files) {
         console.log('staging files...');
         return new Promise(function (resolve, reject) {
             localRepo.add(files, function (err) {
@@ -52,7 +52,7 @@ module.exports = function (type, options={}) {
         });
     };
 
-    var commit = function (message) {
+    let commit = function (message) {
         console.log('committing locally...');
         return new Promise(function (resolve, reject) {
             localRepo.commit(message, function (err) {
@@ -63,7 +63,7 @@ module.exports = function (type, options={}) {
         });
     };
 
-    var createTag = function (version) {
+    let createTag = function (version) {
         console.log('creating tag...');
         return new Promise(function (resolve, reject) {
             localRepo.createTag(version, function (err) {
@@ -74,7 +74,7 @@ module.exports = function (type, options={}) {
         });
     };
 
-    var pushTag = function (version) {
+    let pushTag = function (version) {
         console.log('pushing new tag to remote...');
         return new Promise(function (resolve, reject) {
             localRepo.push('origin', version, function (err) {
@@ -85,7 +85,7 @@ module.exports = function (type, options={}) {
         });
     };
 
-    var merge = function (branch, version) {
+    let merge = function (branch, version) {
         console.log('attempting to merge new version into ' + branch + '...');
         return new Promise(function (resolve, reject) {
             // get current branch so we can navigate back to it when done
@@ -111,7 +111,7 @@ module.exports = function (type, options={}) {
         });
     };
 
-    var bumpFiles = function () {
+    let bumpFiles = function () {
         if (newVersionNum) {
             return Promise.resolve(newVersionNum);
         } else {

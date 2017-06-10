@@ -1,9 +1,9 @@
 'use strict';
-var Promise = require('promise');
-var fs = require('fs-extra');
-var utils = require('./utils');
-var uglify = require("uglify-js").minify;
-var _ = require('underscore');
+let Promise = require('promise');
+let fs = require('fs-extra');
+let utils = require('./utils');
+let uglify = require("uglify-js").minify;
+let _ = require('underscore');
 
 /**
  * Uglifies files.
@@ -12,10 +12,10 @@ var _ = require('underscore');
  * @returns {Promise}
  */
 module.exports = function (options) {
-    var result;
+    let result;
     // TODO: this currently only assumes ONE set of files are being uglified, will break if there are more!
     // Change to accommodate multiple bundle building when necessary
-    var promises = [];
+    let promises = [];
 
     if (!options.files) {
         // no files passed!

@@ -1,13 +1,13 @@
 'use strict';
-var Promise = require('promise');
-var fs = require('fs-extra');
+let Promise = require('promise');
+let fs = require('fs-extra');
 /**
  * Removes a directory (and its contents) or file.
  * @param {string|Array} paths - Cleans a path
  * @returns {Promise}
  */
 module.exports = function (paths) {
-    var promises = [];
+    let promises = [];
 
     if (!paths || !paths.length) {
         return Promise.resolve();

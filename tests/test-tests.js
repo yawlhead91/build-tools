@@ -1,12 +1,12 @@
 'use strict';
-var testPath = './../src/test';
-var sinon = require('sinon');
+let testPath = './../src/test';
+let sinon = require('sinon');
 
 module.exports = {
 
     'calling test with a configuration with empty tests resolves immediately': function (test) {
         test.expect(1);
-        var srcTest = require(testPath);
+        let srcTest = require(testPath);
         srcTest().then(function () {
             test.ok('true');
             test.done();
@@ -15,7 +15,7 @@ module.exports = {
 
     'calling test with empty object resolves immediately': function (test) {
         test.expect(1);
-        var srcTest = require(testPath);
+        let srcTest = require(testPath);
         srcTest({}).then(function () {
             test.ok('true');
             test.done();
@@ -24,7 +24,7 @@ module.exports = {
 
     'calling test with object with src files sends correct files to test': function (test) {
         test.expect(1);
-        var srcTest = require(testPath);
+        let srcTest = require(testPath);
         srcTest({
             files: { 'dist/scroll.js': [ 'src/scroll.js' ] },
             requires: null,

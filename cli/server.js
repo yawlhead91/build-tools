@@ -1,8 +1,8 @@
 'use strict';
-var nopt = require('nopt');
-var path = require('path');
-var Server = require('./../src/server');
-var utils = require('./../src/utils');
+let nopt = require('nopt');
+let path = require('path');
+let Server = require('./../src/server');
+let utils = require('./../src/utils');
 
 function isObjectEmpty(object) {
     return !object || !Object.keys(object).length;
@@ -12,10 +12,10 @@ function isObjectEmpty(object) {
  * Runs server.
  */
 module.exports = function (args) {
-    var config = utils.getConfig() || {};
+    let config = utils.getConfig() || {};
     args = args || [];
 
-    var options = nopt({
+    let options = nopt({
         port: [Number, null],
         staticDir: [String, null],
         middleware: [path],
@@ -23,7 +23,7 @@ module.exports = function (args) {
         hostname: [String, null]
     }, {}, args, 0);
 
-    var env = options.argv.remain[0] || process.env.NODE_ENV || 'production';
+    let env = options.argv.remain[0] || process.env.NODE_ENV || 'production';
 
     if (config[env]) {
         config = config[env];

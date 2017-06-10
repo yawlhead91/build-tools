@@ -8,7 +8,7 @@ module.exports = {
      * @param {object} [options] - Options to be passed to event
      */
     createEvent: function (name, options) {
-        var event;
+        let event;
         options = options || {};
         options.bubbles = options.bubbles || true;
         options.cancelable = options.cancelable|| true;
@@ -24,7 +24,7 @@ module.exports = {
      * @returns {HTMLElement} - Returns and html element node
      */
     createHtmlElement: function (html) {
-        var tempParentEl,
+        let tempParentEl,
             el;
         if (html) {
             html = this.trim(html);

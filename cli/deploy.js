@@ -1,18 +1,18 @@
 'use strict';
-var nopt = require('nopt');
-var path = require('path');
-var deploy = require('./../src/deploy');
-var _ = require('underscore');
-var utils = require('./../src/utils');
+let nopt = require('nopt');
+let path = require('path');
+let deploy = require('./../src/deploy');
+let _ = require('underscore');
+let utils = require('./../src/utils');
 
 /**
  * Runs server.
  */
 module.exports = function (args) {
 
-    var config = utils.getConfig() || {};
+    let config = utils.getConfig() || {};
 
-    var options = nopt({
+    let options = nopt({
         hostname: [String],
         username: [String],
         protocol: [String, null],
@@ -22,8 +22,8 @@ module.exports = function (args) {
         path: [path]
     }, {}, args, 0);
 
-    var env = options.argv.remain[0] || process.env.NODE_ENV || 'development';
-    var envConfig = config[env] || {};
+    let env = options.argv.remain[0] || process.env.NODE_ENV || 'development';
+    let envConfig = config[env] || {};
     options = _.extend(envConfig.deploy || config.deploy || {}, options);
     return deploy(options);
 };

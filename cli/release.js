@@ -1,18 +1,18 @@
 "use strict";
-var test = require('./../src/test');
-var version = require('./../src/version');
-var bump = require('./../src/bump');
-var build = require('./../src/build');
-var fs = require('fs-extra');
-var GitHubApi = require('github');
-var nopt = require('nopt');
-var utils = require('./../src/utils');
-var prompt = require('./../src/prompt');
-var git = require('gitty');
-var log = require('colog');
-var cmd = require('node-cmd');
-var spawn = require('child_process').spawn;
-var Promise = require('bluebird');
+let test = require('./../src/test');
+let version = require('./../src/version');
+let bump = require('./../src/bump');
+let build = require('./../src/build');
+let fs = require('fs-extra');
+let GitHubApi = require('github');
+let nopt = require('nopt');
+let utils = require('./../src/utils');
+let prompt = require('./../src/prompt');
+let git = require('gitty');
+let log = require('colog');
+let cmd = require('node-cmd');
+let spawn = require('child_process').spawn;
+let Promise = require('bluebird');
 
 const HELPER_TEXT = '\n' +
     '\n' +
@@ -24,8 +24,8 @@ const HELPER_TEXT = '\n' +
  * @returns {Promise}
  */
 module.exports = function (args) {
-    var config = utils.getConfig() || {};
-    var githubConfig = config.github || {};
+    let config = utils.getConfig() || {};
+    let githubConfig = config.github || {};
     args = args || [];
 
     let options = nopt({

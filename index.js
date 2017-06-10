@@ -1,8 +1,8 @@
 'use strict';
-var glob = require('glob');
-var path = require('path');
+let glob = require('glob');
+let path = require('path');
 
-var exports = {},
+let exports = {},
     key;
 glob.sync(__dirname + '/src/*.js').forEach(function (p) {
     key = path.basename(p, '.js');

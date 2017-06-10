@@ -1,8 +1,8 @@
 'use strict';
-var Promise = require('promise');
-var fs = require('fs-extra');
-var semver = require('semver');
-var _ = require('underscore');
+let Promise = require('promise');
+let fs = require('fs-extra');
+let semver = require('semver');
+let _ = require('underscore');
 
 /**
  * Bumps up the versions of all package files.
@@ -12,13 +12,13 @@ var _ = require('underscore');
  */
 module.exports = function (type) {
 
-    var promises = [],
+    let promises = [],
         files = ['package.json'];
 
     type = type || 'patch';
 
-    var validateFiles = function (files) {
-        var fileMaps = {},
+    let validateFiles = function (files) {
+        let fileMaps = {},
             absolutePath,
             contents;
         files.forEach(function (path) {
@@ -39,7 +39,7 @@ module.exports = function (type) {
         return fileMaps;
     };
 
-    var nextVersion,
+    let nextVersion,
         prevVersion;
     _.each(validateFiles(files), function (map, path) {
         promises.push(new Promise(function (resolve, reject) {

@@ -1,16 +1,16 @@
 'use strict';
-var testPath = './../src/version';
-var mockery = require('mockery');
-var sinon = require('sinon');
-var Promise = require('promise');
+let testPath = './../src/version';
+let mockery = require('mockery');
+let sinon = require('sinon');
+let Promise = require('promise');
 
-var gitMock;
-var localRepoMock;
-var bumpStub;
-var promptMock;
-var bumpStubPromise;
+let gitMock;
+let localRepoMock;
+let bumpStub;
+let promptMock;
+let bumpStubPromise;
 
-var allowables = ['util', testPath, 'promise', './bump', 'semver'];
+let allowables = ['util', testPath, 'promise', './bump', 'semver'];
 
 module.exports = {
 
@@ -39,9 +39,9 @@ module.exports = {
         mockery.registerMock('./bump', bumpStub);
         mockery.registerAllowables(allowables);
 
-        var versionType = 'minor';
-        var currentBranch = 'master';
-        var statusResp = {
+        let versionType = 'minor';
+        let currentBranch = 'master';
+        let statusResp = {
             staged: [],
             unstaged: [],
             untracked: []
@@ -49,7 +49,7 @@ module.exports = {
         localRepoMock.status.onFirstCall().yields(null, statusResp);
         localRepoMock.add.yields(null); // staged files success
         localRepoMock.commit.yields(null); // commit success
-        var getBranchesResp = {current: currentBranch};
+        let getBranchesResp = {current: currentBranch};
         localRepoMock.getBranches.yields(null, getBranchesResp); // return current branch
         localRepoMock.checkout.yields(null); // checkout success
         localRepoMock.merge.yields(null); // merge success
@@ -72,7 +72,7 @@ module.exports = {
 
     'calling version() designates the current working directory as the repo': function (test) {
         test.expect(1);
-        var version = require(testPath);
+        let version = require(testPath);
         version();
         test.equal(gitMock.args[0][0], process.cwd(), 'git was initialized with current directory as its repo');
         test.done();
@@ -80,11 +80,11 @@ module.exports = {
 
     'calling version() with a clean working directory calls correct git methods': function (test) {
         test.expect(9);
-        var version = require(testPath);
-        var versionType = 'minor';
-        var newVersionNumber = '0.2.5';
-        var currentBranch = 'master';
-        var afterBumpStatus = {
+        let version = require(testPath);
+        let versionType = 'minor';
+        let newVersionNumber = '0.2.5';
+        let currentBranch = 'master';
+        let afterBumpStatus = {
             staged: [],
             unstaged: [ { file: 'package.json', status: 'modified' } ],
             untracked: []
@@ -92,7 +92,7 @@ module.exports = {
         localRepoMock.status.onFirstCall().yields(null, afterBumpStatus); // return status after package.json file has been bumped
         localRepoMock.add.yields(null); // staged files success
         localRepoMock.commit.yields(null); // commit success
-        var getBranchesResp = {current: currentBranch};
+        let getBranchesResp = {current: currentBranch};
         localRepoMock.getBranches.yields(null, getBranchesResp); // return current branch
         localRepoMock.checkout.yields(null); // checkout success
         localRepoMock.merge.yields(null); // merge success
@@ -115,11 +115,11 @@ module.exports = {
 
     'calling version() with a clean working directory calls correct git methods with "v" prefix': function (test) {
         test.expect(3);
-        var version = require(testPath);
-        var versionType = 'minor';
-        var newVersionNumber = '0.2.5';
-        var currentBranch = 'master';
-        var afterBumpStatus = {
+        let version = require(testPath);
+        let versionType = 'minor';
+        let newVersionNumber = '0.2.5';
+        let currentBranch = 'master';
+        let afterBumpStatus = {
             staged: [],
             unstaged: [ { file: 'package.json', status: 'modified' } ],
             untracked: []
@@ -127,7 +127,7 @@ module.exports = {
         localRepoMock.status.onFirstCall().yields(null, afterBumpStatus); // return status after package.json file has been bumped
         localRepoMock.add.yields(null); // staged files success
         localRepoMock.commit.yields(null); // commit success
-        var getBranchesResp = {current: currentBranch};
+        let getBranchesResp = {current: currentBranch};
         localRepoMock.getBranches.yields(null, getBranchesResp); // return current branch
         localRepoMock.checkout.yields(null); // checkout success
         localRepoMock.merge.yields(null); // merge success
@@ -144,7 +144,7 @@ module.exports = {
 
     'does not call "prompt" when a commitMessage is supplied': function (test) {
         test.expect(1);
-        var version = require(testPath);
+        let version = require(testPath);
         bumpStubPromise.resolve('0.0.0');
         version('patch', {commitMessage: 'booyah'}).then(function () {
             test.equal(promptMock.callCount, 0);
@@ -154,8 +154,8 @@ module.exports = {
 
     'calls "prompt" with tagNumber as "defaultText" when commitMessage is NOT supplied': function (test) {
         test.expect(1);
-        var version = require(testPath);
-        var versionNum = '0.0.0';
+        let version = require(testPath);
+        let versionNum = '0.0.0';
         bumpStubPromise.resolve(versionNum);
         version('patch').then(function () {
             test.equal(promptMock.args[0][0].defaultText, 'v' + versionNum);
