@@ -1,7 +1,7 @@
 {
   "name": "build-tools",
   "description": "A set of CLI commands to develop, package, and release web apps that use ES6",
-  "version": "7.0.0",
+  "version": "7.0.1",
   "homepage": "https://github.com/mkay581/build-tools",
   "author": {
     "name": "Mark Kennedy",
@@ -55,6 +55,7 @@
     "nopt": "^4.0.1",
     "phantomjs-prebuilt": "^2.1.14",
     "promise": "^7.1.1",
+    "qunit-phantomjs-runner": "^2.3.0",
     "replace": "^0.3.0",
     "scp2": "^0.5.0",
     "semver": "^5.3.0",
