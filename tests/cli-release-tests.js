@@ -1,7 +1,7 @@
 'use strict';
 let sinon = require('sinon');
 let mockery = require('mockery');
-let Promise = require('bluebird');
+let bluebird = require('bluebird');
 let releasePath = './../cli/release';
 let testMock;
 let buildMock;
@@ -16,19 +16,17 @@ let logMock;
 let npmPublishMock;
 let spawnMock;
 let spawnChildProcessMock;
+let localRepoMock;
+let gitMock;
+
 let allowables = [
     './../../cli/release',
-    'bluebird'
+    'bluebird',
+    'util',
+    'promise',
+    './bump',
+    'semver'
 ];
-
-function createPromise () {
-    let obj = {};
-    obj.promise = new Promise((resolve, reject) => {
-        obj.resolve = resolve;
-        obj.reject = reject;
-    });
-    return obj;
-}
 
 module.exports = {
 
@@ -48,7 +46,7 @@ module.exports = {
             authenticate: sinon.stub(),
             repos: {
                 createRelease: sinon.stub().yields(null, {})
-            }
+            },
         };
         githubApiMock.authenticate.returns(true);
         githubConstructor = sinon.stub().returns(githubApiMock);
@@ -64,7 +62,7 @@ module.exports = {
         mockery.registerMock('../log', logMock);
         mockery.registerMock('./../src/version', versionMock);
         spawnChildProcessMock = {
-            on: sinon.stub().yields(),
+            on: sinon.stub().yields(0),
             stdout: {
                 on: sinon.stub()
             },
@@ -82,6 +80,38 @@ module.exports = {
             getConfig: sinon.stub()
         };
         mockery.registerMock('./../src/utils', utilsMock);
+
+        localRepoMock = {
+            status: sinon.stub(),
+            getBranches: sinon.stub(),
+            checkout: sinon.stub(),
+            merge: sinon.stub(),
+            push: sinon.stub(),
+            add: sinon.stub(),
+            commit: sinon.stub(),
+            createTag: sinon.stub(),
+            name: 'my-repo'
+        };
+        gitMock = sinon.stub().returns(localRepoMock);
+        mockery.registerMock('gitty', gitMock);
+        mockery.registerAllowables(allowables);
+
+        let currentBranch = 'master';
+        let statusResp = {
+            staged: [],
+            unstaged: [],
+            untracked: []
+        };
+        localRepoMock.status.onFirstCall().yields(null, statusResp);
+        localRepoMock.status.onSecondCall().yields(null, statusResp);
+        localRepoMock.add.yields(null); // staged files success
+        localRepoMock.commit.yields(null); // commit success
+        let getBranchesResp = {current: currentBranch};
+        localRepoMock.getBranches.yields(null, getBranchesResp); // return current branch
+        localRepoMock.checkout.yields(null); // checkout success
+        localRepoMock.merge.yields(null); // merge success
+        localRepoMock.push.yields(null); // push branch success
+        localRepoMock.createTag.yields(null); // create tag success
         cb();
     },
 
@@ -323,30 +353,7 @@ module.exports = {
         });
     },
 
-    'should pass updated version number from bump to version function': function (test) {
-        test.expect(1);
-        let newVersionNbr = "9.95.0";
-        promptMock.returns(Promise.resolve('blah'));
-        bumpMock.returns(Promise.resolve(newVersionNbr));
-        let release = require(releasePath);
-        release().then(function () {
-            test.deepEqual(versionMock.args[0][0], newVersionNbr);
-            test.done();
-        });
-    },
-
-    'should pass correct commit message from release notes in prompt to version function': function (test) {
-        test.expect(1);
-        let testNotes = 'blah';
-        promptMock.returns(Promise.resolve(testNotes));
-        let release = require(releasePath);
-        release().then(function () {
-            test.deepEqual(versionMock.args[0][1].commitMessage, testNotes);
-            test.done();
-        });
-    },
-
-    'calls github authenticate with appropriate options': function (test) {
+    'calls github authenticate with appropriate options when a github token is used': function (test) {
         test.expect(2);
         let token = 'uebyx';
         mockConfig = {github: {token: token}};
@@ -484,6 +491,16 @@ module.exports = {
         });
     },
 
+    'rejects promise if npm publish command fails with an error code': function (test) {
+        test.expect(1);
+        spawnChildProcessMock.on.yields(2);
+        let release = require(releasePath);
+        release().catch(function () {
+            test.ok(true);
+            test.done();
+        });
+    },
+
     'creates a release and pushes it Github when an authorized token is used': function (test) {
         test.expect(5);
         let token = 'uebyx';
@@ -516,20 +533,6 @@ module.exports = {
         let release = require(releasePath);
         release().then(function () {
             test.ok(bumpMock.calledWith('patch'));
-            test.done();
-        });
-    },
-
-    'creates a new git version when an authorized token is used': function (test) {
-        test.expect(1);
-        let token = 'uebyx';
-        let newVersion = '0.1.3';
-        bumpMock.returns(Promise.resolve(newVersion));
-        mockConfig = {github: {token: token}};
-        utilsMock.getConfig.returns(mockConfig);
-        let release = require(releasePath);
-        release().then(function () {
-            test.ok(versionMock.calledWith(newVersion));
             test.done();
         });
     },
@@ -630,6 +633,118 @@ module.exports = {
         let release = require(releasePath);
         release().catch(function () {
             test.equal(logMock.error.args[0][1], 'Release cannot be created due to a test failure.');
+            test.done();
+        });
+    },
+
+    'calling release() designates the current working directory as the repo': function (test) {
+        test.expect(1);
+        let release = require(releasePath);
+        release();
+        test.equal(gitMock.args[0][0], process.cwd(), 'git was initialized with current directory as its repo');
+        test.done();
+    },
+
+    'calling release() with a clean working directory in master bumps version in package.json file, stages it, creates new version tag, and pushes new tag to remote repo': function (test) {
+        test.expect(4);
+        let versionType = 'minor';
+        let newVersionNumber = '0.2.5';
+        let currentBranch = 'master';
+        let afterBumpStatus = {
+            staged: [],
+            unstaged: [ { file: 'package.json', status: 'modified' } ],
+            untracked: []
+        };
+        localRepoMock.status.onSecondCall().yields(null, afterBumpStatus); // return status after package.json file has been bumped
+        localRepoMock.add.yields(null); // staged files success
+        localRepoMock.commit.yields(null); // commit success
+        let getBranchesResp = {current: currentBranch};
+        localRepoMock.getBranches.yields(null, getBranchesResp); // return current branch
+        localRepoMock.checkout.yields(null); // checkout success
+        localRepoMock.merge.yields(null); // merge success
+        localRepoMock.push.yields(null); // push branch success
+        localRepoMock.createTag.yields(null); // create tag success
+        bumpMock.returns(Promise.resolve(newVersionNumber));
+        let release = require(releasePath);
+        release([versionType]).then(function () {
+            test.equal(bumpMock.args[0][0], versionType, 'bump was called with correct version type passed');
+            test.deepEqual(localRepoMock.add.getCall(0).args[0], ['package.json'], 'bumped file was staged correctly');
+            test.ok(localRepoMock.push.getCall(0).calledWith('origin', 'v' + newVersionNumber), 'tag was pushed to correct origin branch');
+            test.ok(localRepoMock.push.getCall(1).calledWith('origin', currentBranch), 'branch was pushed to remote');
+            test.done();
+        });
+    },
+
+    'calling release() with a clean working directory a non-master branch bumps version in package.json file, stages it, commits it, merges contents into master, creates new version tag, and pushes new tag to remote repo': function (test) {
+        test.expect(8);
+        let release = require(releasePath);
+        let versionType = 'minor';
+        let newVersionNumber = '0.2.5';
+        let currentBranch = 'my-branch';
+        let productionBranch = 'master';
+        let afterBumpStatus = {
+            staged: [],
+            unstaged: [ { file: 'package.json', status: 'modified' } ],
+            untracked: []
+        };
+        localRepoMock.status.onSecondCall().yields(null, afterBumpStatus); // return status after package.json file has been bumped
+        localRepoMock.add.yields(null); // staged files success
+        localRepoMock.commit.yields(null); // commit success
+        let getBranchesResp = {current: currentBranch};
+        localRepoMock.getBranches.yields(null, getBranchesResp); // return current branch
+        localRepoMock.checkout.yields(null); // checkout success
+        localRepoMock.merge.yields(null); // merge success
+        localRepoMock.push.yields(null); // push branch success
+        localRepoMock.createTag.yields(null); // create tag success
+        bumpMock.returns(Promise.resolve(newVersionNumber));
+        let releaseMessage = 'my release worked';
+        promptMock.returns(Promise.resolve(releaseMessage));
+        release([versionType]).then(function () {
+            test.equal(bumpMock.args[0][0], versionType, 'bump was called with correct version type passed');
+            test.deepEqual(localRepoMock.add.args[0][0], ['package.json'], 'bumped file was staged correctly');
+            test.equal(localRepoMock.commit.args[0][0], `${newVersionNumber}\n\n${releaseMessage}`, 'commit was created using version number for commit title along with release message');
+            test.equal(localRepoMock.checkout.args[0][0], productionBranch, 'production branch was checked out');
+            test.ok(localRepoMock.push.getCall(0).calledWith('origin', 'v' + newVersionNumber), 'new version tag was pushed to remote');
+            test.equal(localRepoMock.push.args[1][0], 'origin', 'production branch was pushed to remote');
+            test.equal(localRepoMock.checkout.args[1][0], currentBranch, 'correct branch was checked backed out');
+            test.ok(localRepoMock.push.getCall(2).calledWith('origin', currentBranch), 'current branches contents where pushed to remote');
+            test.done();
+        });
+    },
+
+    'prompts user for version commit message': function (test) {
+        test.expect(1);
+        let release = require(releasePath);
+        release().then(function () {
+            test.equal(promptMock.callCount, 1);
+            test.done();
+        });
+    },
+
+    'does not attempt to checkout to master or merge into master if already on master branch': function (test) {
+        test.expect(2);
+        let release = require(releasePath);
+        let versionType = 'minor';
+        let newVersionNumber = '0.2.5';
+        let currentBranch = 'master';
+        let afterBumpStatus = {
+            staged: [],
+            unstaged: [ { file: 'package.json', status: 'modified' } ],
+            untracked: []
+        };
+        localRepoMock.status.onSecondCall().yields(null, afterBumpStatus); // return status after package.json file has been bumped
+        localRepoMock.add.yields(null); // staged files success
+        localRepoMock.commit.yields(null); // commit success
+        let getBranchesResp = {current: currentBranch};
+        localRepoMock.getBranches.yields(null, getBranchesResp); // return current branch
+        localRepoMock.checkout.yields(null); // checkout success
+        localRepoMock.merge.yields(null); // merge success
+        localRepoMock.push.yields(null); // push branch success
+        localRepoMock.createTag.yields(null); // create tag success
+        bumpMock.returns(Promise.resolve(newVersionNumber));
+        release([versionType]).then(function () {
+            test.ok(localRepoMock.checkout.neverCalledWith('master'));
+            test.ok(localRepoMock.merge.neverCalledWith('master'));
             test.done();
         });
     },

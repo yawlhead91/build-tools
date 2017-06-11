@@ -1,33 +1,12 @@
-'use strict';
-let version = require('./../src/version');
-let git = require('gitty');
+let log = require('../log');
 
 /**
  * Bumps the version of the npm package, commits it as an
  * entry and pushes it both locally and remotely to the master branch repo.
  * @param args - The cli arguments
+ * @deprecated since 7.1.0
  * @returns {*}
  */
 module.exports = function (args) {
-
-    let localRepo = git(process.cwd());
-
-    let ensureCleanWorkingDirectory = function () {
-        return new Promise(function (resolve, reject) {
-            localRepo.status(function (err, status) {
-                if (err) return reject(err);
-                if (status && !status.staged.length && !status.unstaged.length && !status.untracked.length) {
-                    resolve();
-                } else {
-                    // working directory is dirty! so bail
-                    console.error('Your working directory must be clean before you ' +
-                        'can create a new version of your package');
-                    reject();
-                }
-            });
-        });
-    };
-    return ensureCleanWorkingDirectory().then(function () {
-        return version(args[0]);
-    });
+    log.warn('version', 'The version command has been deprecated, please see the "release" command which may better suit your needs.')
 };

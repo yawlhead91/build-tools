@@ -1,5 +1,4 @@
 let test = require('./../src/test');
-let version = require('./../src/version');
 let bump = require('./../src/bump');
 let build = require('./../src/build');
 let fs = require('fs-extra');
@@ -7,11 +6,13 @@ let GitHubApi = require('github');
 let nopt = require('nopt');
 let utils = require('./../src/utils');
 let prompt = require('./../src/prompt');
-let git = require('gitty');
+let gitty = require('gitty');
 let log = require('../log');
 let cmd = require('node-cmd');
 let spawn = require('child_process').spawn;
-let Promise = require('bluebird');
+let _ = require('underscore');
+let semver = require('semver');
+let bluebird = require('bluebird');
 
 const HELPER_TEXT = '\n' +
     '\n' +
@@ -41,6 +42,7 @@ module.exports = function (args) {
 
     // if there is no production-level config, assume root-level config is production
     let envConfig = config[env] || config || {};
+    let repo = gitty(process.cwd());
 
     let github = new GitHubApi({
         protocol: "https",
@@ -49,8 +51,8 @@ module.exports = function (args) {
     });
 
     let publishToNpm = function (version) {
-        return new Promise((resolve) => {
-            let cmd = spawn('npm', ['publish']);
+        let cmd = spawn('npm', ['publish']);
+        return new Promise((resolve, reject) => {
 
             cmd.stdout.on('data', (data) => {
                 log.info(`${data}`);
@@ -62,11 +64,12 @@ module.exports = function (args) {
 
             cmd.on('close', (code) => {
                 if (code !== 0) {
-                    log.error('', `Couldn't publish to NPM due to a conflict or error. You'll now have to fix conflicts and run "npm publish" manually, sorry.`)
+                    let error = new Error(`Couldn't publish to NPM due to a conflict or error. You'll now have to fix conflicts and run "npm publish" manually, sorry.`);
+                    reject(error);
                 } else {
-                    log.info('', `Published release ${version} to NPM!`);
+                    log.info('publish', `Published release ${version} to NPM!`);
+                    resolve();
                 }
-                resolve();
             });
         });
     };
@@ -88,59 +91,154 @@ module.exports = function (args) {
                 if (err) {
                     reject(err);
                 }
-                log.info('', `Published release ${tagName} to Github!`);
+                log.info('publish', `Published release ${tagName} to Github!`);
                 resolve(res);
             });
         });
     };
 
+    let commit = function (message) {
+        log.info('commit', 'committing locally...');
+        return new Promise(function (resolve, reject) {
+            repo.commit(message, function (err) {
+                if (err) {return reject(err);}
+                log.info('commit', 'committing completed!');
+                resolve();
+            });
+        });
+    };
 
-    let nextVersion;
+    let createTag = function (version) {
+        log.info('commit', 'creating tag...');
+        return new Promise(function (resolve, reject) {
+            repo.createTag(version, function (err) {
+                if (err) {return reject(err);}
+                log.info('commit', 'tag creation completed!');
+                resolve();
+            });
+        });
+    };
+
+    let pushTag = function (version) {
+        log.info('push', 'pushing new tag to remote...');
+        return new Promise(function (resolve, reject) {
+            repo.push('origin', version, function (err) {
+                if (err) {return reject(err);}
+                log.info('push', 'tag pushed to remote completed!');
+                resolve();
+            });
+        });
+    };
+
+    let merge = function (branch, version) {
+        log.info('checkout', 'attempting to merge new version into ' + branch + '...');
+        return new Promise(function (resolve, reject) {
+            repo.getBranches(function (err, branches) {
+                if (err) {return reject(err);}
+                log.info('checkout', `checking out ${branch}...`);
+                repo.checkout(branch, function (err) {
+                    if (err) {return reject(err);}
+                    log.info('merge', `merging ${branches.current} into ${branch}...`);
+                    repo.merge(branches.current, function (err) {
+                        if (err) {return reject(err);}
+                        log.info('push', `pushing contents of ${branch} to remote...`);
+                        repo.push('origin', branch, function (err) {
+                            if (err) {return reject(err);}
+                            resolve();
+                        });
+                    });
+                });
+            });
+        });
+    };
+
+    let getBumpedUnstagedFiles = function () {
+        let files = [];
+        return new Promise(function (resolve, reject) {
+            repo.status(function (err, status) {
+                if (err) {return reject(err);}
+                // only return unstaged files because that should
+                // be the only thing that was modified due to bumping
+                status.unstaged.forEach(function (obj) {
+                    files.push(obj.file);
+                });
+                resolve(files);
+            });
+        });
+    };
+
+    let stageBumpedFiles = function (files) {
+        log.info('commit', 'staging files...');
+        return new Promise(function (resolve, reject) {
+            repo.add(files, function (err) {
+                if (err) {return reject(err);}
+                log.info('commit', 'staging files completed!');
+                resolve();
+            });
+        });
+    };
+
+    let ensureCleanWorkingDirectory = function () {
+        return new Promise(function (resolve, reject) {
+            repo.status(function (err, status) {
+                if (err) {
+                    return reject(err);
+                }
+                if (status && !status.staged.length && !status.unstaged.length && !status.untracked.length) {
+                    resolve();
+                } else {
+                    // working directory is dirty! so bail
+                    let err = new Error ('Your working directory must be clean before you ' +
+                        'can create a new release of your package');
+                    reject(err);
+                }
+            });
+        });
+    };
+
     let runTests = function () {
         let testConfigs = envConfig.tests || [];
         if (!Array.isArray(testConfigs)) {
             testConfigs = [testConfigs];
         }
-        return Promise.mapSeries(testConfigs, (testConfig) => {
+        return bluebird.mapSeries(testConfigs, (testConfig) => {
             let testIds = Object.keys(testConfig);
-            return Promise.mapSeries(testIds, (testId) => {
+            return bluebird.mapSeries(testIds, (testId) => {
                 let options = testConfig[testId];
                 options.browserifyOptions = options.browserifyOptions || testConfig.browserifyOptions;
                 options.id = testId;
                 options.env = env;
                 return test(options);
             });
+        }).catch((err) => {
+            err = new Error('Release cannot be created due to a test failure.');
+            return Promise.reject(err);
         });
     };
 
-    let githubAuthenticated = false;
-    return runTests()
-        .catch((err) => {
-            err = new Error('Release cannot be created due to a test failure.');
-            log.error('', err.message);
-            throw err;
-        })
+    let release = {};
+    return ensureCleanWorkingDirectory()
+        .then(() => runTests())
         .then(() => {
             if (!githubConfig.token) {
                 log.warn('', 'There is no github token set in configuration. Release will not be created on github.');
                 return;
             }
-            githubAuthenticated = github.authenticate({
+            release.authenticated = github.authenticate({
                 type: 'oauth',
                 token: githubConfig.token
             });
-            if (!githubAuthenticated) {
+            if (!release.authenticated) {
                 throw new Error('The github token used to create the release is not authorized. Please check the github token used.');
             }
         })
-        .then(function () {
-            return bump(semVersionType);
-        })
+        .then(() => bump(semVersionType))
         .then(function (version) {
             if (!version) {
                 throw new Error('Cannot bump you must have a version number specified in your package.json file');
             } else {
-                nextVersion = version;
+                release.version = version;
+                release.tag = `v${version}`;
             }
         })
         .then(() => {
@@ -149,28 +247,55 @@ module.exports = function (args) {
             });
             return build(buildConfig);
         })
-        .then(() => {
-            return prompt({guidanceText: HELPER_TEXT});
-        })
+        .then(() => prompt({guidanceText: HELPER_TEXT}))
         .then((releaseNotes) => {
             if (!releaseNotes || !releaseNotes.trim()) {
                 let err = new Error('Release aborted.');
                 err.abort = true;
                 throw err;
             }
-            return version(nextVersion, {commitMessage: releaseNotes}).then(() => {
-                return releaseNotes;
-            });
+            release.notes = releaseNotes;
         })
-        .then((releaseNotes) => {
-            if (githubConfig.token && githubAuthenticated) {
-                let localRepo = githubConfig.repo || git(process.cwd());
-                return uploadRelease(localRepo.name, 'v' + nextVersion, releaseNotes);
-            }
+        .then(() => getBumpedUnstagedFiles())
+        .then((files) => {
+            return stageBumpedFiles(files);
         })
         .then(() => {
-            return publishToNpm(nextVersion);
+            if (release.notes) {
+                release.notes = '\n\n' + release.notes;
+            }
+            release.notes = release.version + release.notes;
+            return commit(release.notes);
         })
+        .then(() => createTag(release.tag))
+        .then(() => pushTag(release.tag))
+        .then(function () {
+            return bluebird.promisify(repo.getBranches)().then((branches) => {
+                // if user didn't start the release on production branch
+                // switch to it, merge contents there, then switch back to original branch
+                if (branches.current !== 'master') {
+                    return merge('master', release.tag).then(() => {
+                        return bluebird.promisify(repo.checkout)(branches.current).then(() => {
+                            log.info('checkout', 'switched back to original branch');
+                            return branches;
+                        });
+                    });
+                }
+                return branches;
+            });
+        })
+        .then((branches) => {
+            // push original branch contents to github
+            return bluebird.promisify(repo.push)('origin', branches.current).then(() => {
+                log.info('push', `pushing contents of current branch (${branches.current}) to remote!`);
+            });
+        })
+        .then(() => {
+            if (githubConfig.token && release.authenticated) {
+                return uploadRelease(repo.name, 'v' + release.version, release.notes);
+            }
+        })
+        .then(() => publishToNpm(release.version))
         .catch((err) => {
             if (err.abort) {
                 log.info('', err.message);
