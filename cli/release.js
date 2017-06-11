@@ -270,12 +270,12 @@ module.exports = function (args) {
         .then(() => createTag(release.tag))
         .then(() => pushTag(release.tag))
         .then(function () {
-            return bluebird.promisify(repo.getBranches)().then((branches) => {
+            return bluebird.promisify(repo.getBranches, {context: repo})().then((branches) => {
                 // if user didn't start the release on production branch
                 // switch to it, merge contents there, then switch back to original branch
                 if (branches.current !== 'master') {
                     return merge('master', release.tag).then(() => {
-                        return bluebird.promisify(repo.checkout)(branches.current).then(() => {
+                        return bluebird.promisify(repo.checkout, {context: repo})(branches.current).then(() => {
                             log.info('checkout', 'switched back to original branch');
                             return branches;
                         });
