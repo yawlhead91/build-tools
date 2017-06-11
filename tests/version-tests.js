@@ -30,6 +30,7 @@ module.exports = {
         gitMock = sinon.stub().returns(localRepoMock);
         mockery.registerMock('gitty', gitMock);
         promptMock = sinon.stub();
+        promptMock.returns(Promise.resolve(''));
         mockery.registerMock('./prompt', promptMock);
         bumpStubPromise = {};
         bumpStub = sinon.stub().returns(new Promise((resolve, reject) => {
@@ -130,7 +131,7 @@ module.exports = {
         localRepoMock.createTag.yields(null); // create tag success
         bumpStubPromise.resolve(newVersionNumber);
         version(versionType).then(function () {
-            test.equal(localRepoMock.commit.args[0][0], 'v' + newVersionNumber, 'staged files were committed successfully');
+            test.equal(localRepoMock.commit.args[0][0], newVersionNumber, 'staged files were committed successfully');
             test.equal(localRepoMock.createTag.args[0][0], 'v' + newVersionNumber, 'correct tag version was created');
             test.equal(localRepoMock.push.args[0][1], 'v' + newVersionNumber, 'correct tag was pushed');
             test.done();
@@ -164,7 +165,7 @@ module.exports = {
         version(versionType).then(function () {
             test.equal(bumpStub.args[0][0], versionType, 'bump was called with correct version type passed');
             test.deepEqual(localRepoMock.add.args[0][0], ['package.json'], 'bumped file was staged correctly');
-            test.equal(localRepoMock.commit.args[0][0], releaseMessage, 'release message was used to commit staged files');
+            test.equal(localRepoMock.commit.args[0][0], `${newVersionNumber}\n\n${releaseMessage}`, 'commit was created using version number for commit title along with release message');
             test.equal(localRepoMock.checkout.args[0][0], productionBranch, 'production branch was checked out');
             test.ok(localRepoMock.push.getCall(0).calledWith('origin', 'v' + newVersionNumber), 'new version tag was pushed to remote');
             test.equal(localRepoMock.push.args[1][0], 'origin', 'production branch was pushed to remote');
@@ -184,13 +185,24 @@ module.exports = {
         });
     },
 
-    'calls "prompt" with tagNumber as "defaultText" when commitMessage is NOT supplied': function (test) {
+    'prompts user for version commit message': function (test) {
         test.expect(1);
         let version = require(testPath);
         let versionNum = '0.0.0';
         bumpStubPromise.resolve(versionNum);
         version('patch').then(function () {
-            test.equal(promptMock.args[0][0].defaultText, 'v' + versionNum);
+            test.equal(promptMock.callCount, 1);
+            test.done();
+        });
+    },
+
+    'does not prompt user for version commit message if when commit message is already supplied': function (test) {
+        test.expect(1);
+        let version = require(testPath);
+        let versionNum = '0.0.0';
+        bumpStubPromise.resolve(versionNum);
+        version('patch', {commitMessage: 'my commit message'}).then(function () {
+            test.equal(promptMock.callCount, 0);
             test.done();
         });
     },

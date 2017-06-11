@@ -8,21 +8,16 @@ let bluebird = require('bluebird');
 
 /**
  * Ups the current package to a new version, prompts user for commit message, then makes a commit locally.
- * @param {string|number} [type] - a valid semver string (defaults to patch) or the new version number to use
+ * @param {string} [versionType] - a valid semver type (defaults to patch)
  * @param {Object} [options] - Set of options
  * @param {String} [options.commitMessage] -- If not specified, will prompt user for commit message
  * @returns {Promise} Returns a promise that resolves when completed
  * @type {exports}
  */
-module.exports = function (type, options = {}) {
-    let localRepo = git(process.cwd()),
-        newVersionNum;
+module.exports = function (versionType, options = {}) {
+    let localRepo = git(process.cwd());
 
-    type = type || 'patch';
-
-    if (semver.valid(type)) {
-        newVersionNum = type;
-    }
+    versionType = versionType || 'patch';
 
     options.commitMessage = options.commitMessage || '';
 
@@ -107,18 +102,12 @@ module.exports = function (type, options = {}) {
         });
     };
 
-    let bumpFiles = function () {
-        if (newVersionNum) {
-            return Promise.resolve(newVersionNum);
-        } else {
-            return bump(type);
-        }
-    };
-
     let tagNumber;
-    return bumpFiles()
-        .then(function (newVersionNbr) {
-            tagNumber = 'v' + newVersionNbr;
+    let newVersionNum;
+    return bump(versionType)
+        .then(function (version) {
+            tagNumber = 'v' + version;
+            newVersionNum = version;
             return getEditedFiles();
         })
         .then(function (editedFiles) {
@@ -128,10 +117,13 @@ module.exports = function (type, options = {}) {
             if (options.commitMessage) {
                 return options.commitMessage;
             }
-            return prompt({defaultText: tagNumber});
+            return prompt({defaultText: ''});
         })
         .then((commitMessage) => {
-            commitMessage = commitMessage || tagNumber;
+            if (commitMessage) {
+                commitMessage = '\n\n' + commitMessage;
+            }
+            commitMessage = newVersionNum + commitMessage;
             return commit(commitMessage);
         })
         .then(() => {
@@ -146,11 +138,9 @@ module.exports = function (type, options = {}) {
                 // switch to it, merge contents there, then switch back to original branch
                 if (branches.current !== 'master') {
                     return merge('master', tagNumber).then(() => {
-                        return bluebird.promisify(localRepo.getBranches)().then((branches) => {
-                            return bluebird.promisify(localRepo.checkout)(branches.current).then(() => {
-                                log.info('checkout', 'switched back to original branch');
-                                return branches;
-                            });
+                        return bluebird.promisify(localRepo.checkout)(branches.current).then(() => {
+                            log.info('checkout', 'switched back to original branch');
+                            return branches;
                         });
                     });
                 }

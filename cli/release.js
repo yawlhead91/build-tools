@@ -16,6 +16,7 @@ let Promise = require('bluebird');
 const HELPER_TEXT = '\n' +
     '\n' +
     '# Please enter the release notes/changelog message for this release above.\n' +
+    '# No need to enter the version number, it will automatically be added to the commit later.\n' +
     '# These lines will be ignored. Erasing all lines (including these ones) will abort the release.';
 
 /**
