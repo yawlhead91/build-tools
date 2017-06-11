@@ -286,7 +286,7 @@ module.exports = function (args) {
         })
         .then((branches) => {
             // push original branch contents to github
-            return bluebird.promisify(repo.push)('origin', branches.current).then(() => {
+            return bluebird.promisify(repo.push, {context: repo})('origin', branches.current).then(() => {
                 log.info('push', `pushing contents of current branch (${branches.current}) to remote!`);
             });
         })
