@@ -1,4 +1,5 @@
 let sass = require('node-sass');
+let bluebird = require('bluebird');
 let _ = require('underscore');
 let fs = require('fs-extra');
 let path = require("path");
@@ -90,16 +91,16 @@ module.exports = function (options) {
 
     console.log('sassifying all files...');
     let destPaths = _.keys(options.files);
-    return Promise.each(destPaths, function (destPath) {
+    return bluebird.each(destPaths, function (destPath) {
         // only sass the first main file (all other files should be used as
         // @imports inside of the main file), which is the point of using sass in the first place,
         let sourceFile = options.files[destPath][0];
         return sassifyFile(sourceFile, destPath);
     }).then(function () {
         if (options.watch) {
-            return Promise.each(destPaths, function (destPath) {
+            return bluebird.each(destPaths, function (destPath) {
                 let srcPaths = options.files[destPath];
-                return Promise.each(srcPaths, function (srcPath) {
+                return bluebird.each(srcPaths, function (srcPath) {
                     watchFile(srcPath, destPath);
                 });
             });
