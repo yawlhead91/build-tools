@@ -1,4 +1,3 @@
-'use strict';
 let sinon = require('sinon');
 let testPath = './../src/copy';
 let mockery = require('mockery');
@@ -8,7 +7,7 @@ let globMock;
 let chokidarMock;
 let chokidarInstance;
 
-let allowables = ['util', testPath, 'promise', 'async-promises'];
+let allowables = ['util', testPath, 'async-promises'];
 
 module.exports = {
 

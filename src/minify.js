@@ -1,5 +1,3 @@
-'use strict';
-let Promise = require('promise');
 let fs = require('fs-extra');
 let utils = require('./utils');
 let uglify = require("uglify-js").minify;

@@ -23,7 +23,6 @@ let allowables = [
     './../../cli/release',
     'bluebird',
     'util',
-    'promise',
     './bump',
     'semver'
 ];

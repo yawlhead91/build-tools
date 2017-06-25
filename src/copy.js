@@ -1,7 +1,6 @@
-'use strict';
 let fs = require('fs-extra');
 let _ = require('underscore');
-let Promise = require('bluebird');
+let bluebird = require('bluebird');
 let glob = require('glob-promise');
 let path = require('path');
 let chokidar = require('chokidar');
@@ -104,9 +103,9 @@ module.exports = function (options) {
         });
     }
 
-    return Promise.each(Object.keys(options.files), function (destPath) {
+    return bluebird.each(Object.keys(options.files), function (destPath) {
         let srcFilePaths = options.files[destPath];
-        return Promise.each(srcFilePaths, function (path) {
+        return bluebird.each(srcFilePaths, function (path) {
             return glob(path).then(function (paths) {
                 // re-assign new globberred paths
                 options.files[destPath] = paths;

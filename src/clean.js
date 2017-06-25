@@ -1,5 +1,3 @@
-'use strict';
-let Promise = require('promise');
 let fs = require('fs-extra');
 /**
  * Removes a directory (and its contents) or file.

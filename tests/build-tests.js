@@ -1,8 +1,6 @@
-'use strict';
 let testPath = './../src/build';
 let sinon = require('sinon');
 let mockery = require('mockery');
-let Promise = require('promise');
 
 let copyMock;
 let browserifyMock;
@@ -14,7 +12,6 @@ let serverConstructorMock;
 let allowables = [
     'util',
     testPath,
-    'promise',
     './bump'
 ];
 

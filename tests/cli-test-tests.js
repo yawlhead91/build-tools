@@ -1,10 +1,10 @@
 'use strict';
 let sinon = require('sinon');
 let mockery = require('mockery');
-let Promise = require('bluebird');
 let testStub;
 let allowables = [
     'nopt',
+    'bluebird',
     'path',
 ];
 let utilsMock;

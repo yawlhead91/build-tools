@@ -1,4 +1,3 @@
-'use strict';
 let testPath = './../src/banner';
 let sinon = require('sinon');
 

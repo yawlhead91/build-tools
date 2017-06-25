@@ -1,6 +1,3 @@
-'use strict';
-
-let Promise = require('promise');
 let _ = require('underscore');
 let fs = require('fs-extra');
 let glob = require('glob');

@@ -1,4 +1,3 @@
-'use strict';
 let _ = require('underscore');
 let fs = require('fs');
 let Client = require('scp2').Client;

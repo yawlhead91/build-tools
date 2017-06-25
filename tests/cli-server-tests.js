@@ -1,7 +1,6 @@
 'use strict';
 let sinon = require('sinon');
 let mockery = require('mockery');
-let Promise = require("promise");
 let serverMock;
 let serverConstructor;
 let utilsMock;

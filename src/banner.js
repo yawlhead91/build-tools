@@ -1,8 +1,6 @@
-'use strict';
 
 let fs = require('fs-extra');
 let glob = require('glob');
-let Promise = require('promise');
 
 /**
  * Creates a banner for a set of files.

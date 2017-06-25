@@ -1,5 +1,3 @@
-'use strict';
-let Promise = require('promise');
 let utils = require('./utils');
 let banner = require('./banner');
 let minify = require('./minify');

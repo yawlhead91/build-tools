@@ -1,4 +1,3 @@
-'use strict';
 let nopt = require('nopt');
 let path = require('path');
 let deploy = require('./../src/deploy');

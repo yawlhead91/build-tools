@@ -1,6 +1,4 @@
-"use strict";
 let sass = require('node-sass');
-let Promise = require('bluebird');
 let _ = require('underscore');
 let fs = require('fs-extra');
 let path = require("path");

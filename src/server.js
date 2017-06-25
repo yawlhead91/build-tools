@@ -1,6 +1,3 @@
-'use strict';
-
-let Promise = require('promise');
 let express = require('express');
 let serveStatic = require('serve-static');
 let _ = require('underscore');
@@ -20,7 +17,7 @@ class Server {
      * @returns {Promise}
      */
     constructor (options) {
-        
+
         options = _.extend({
             port: 7000,
             hostname: 'localhost',
@@ -29,7 +26,7 @@ class Server {
             middleware: null,
             onServerEnd: null
         }, options);
-        
+
         this.options = options;
 
         this.sockets = []; // keep track of sockets so we can destroy when done
@@ -38,7 +35,7 @@ class Server {
         if (this.options.middleware) {
             try {
                 if (typeof this.options.middleware !== 'function') {
-                    this.options.middleware = require(path.resolve(process.cwd(), this.options.middleware))
+                    this.options.middleware = require(path.resolve(process.cwd(), this.options.middleware));
                 }
             } catch (err) {
                 console.error(err);

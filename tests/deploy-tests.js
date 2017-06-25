@@ -1,4 +1,3 @@
-'use strict';
 let sinon = require('sinon');
 let deployPath = './../src/deploy';
 let mockery = require('mockery');

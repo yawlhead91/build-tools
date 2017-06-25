@@ -1,4 +1,3 @@
-"use strict";
 let fs = require('fs-extra');
 let editor = require('editor');
 

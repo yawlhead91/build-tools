@@ -9,7 +9,7 @@ let Server;
 let expressConstructorMock;
 let serverMock;
 
-let allowables = ['util', serverPath, 'promise', 'underscore'];
+let allowables = ['util', serverPath, 'underscore'];
 
 module.exports = {
 

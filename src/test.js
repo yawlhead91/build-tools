@@ -1,8 +1,5 @@
-'use strict';
-
 let fs = require('fs-extra');
 let spawn = require('child_process').spawn;
-let Promise = require('promise');
 let express = require('express');
 let serveStatic = require('serve-static');
 let path = require('path');

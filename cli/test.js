@@ -1,8 +1,7 @@
-'use strict';
 let test = require('./../src/test');
 let utils = require('./../src/utils');
 let nopt = require('nopt');
-let Promise = require('bluebird');
+let bluebird = require('bluebird');
 
 /**
  * Runs tests.
@@ -61,9 +60,9 @@ module.exports = function (args) {
     };
     let keepAlive = server && determineKeepAlive();
 
-    return Promise.mapSeries(testConfigs, (testConfig) => {
+    return bluebird.mapSeries(testConfigs, (testConfig) => {
         let testIds = Object.keys(testConfig);
-        return Promise.mapSeries(testIds, (testId) => {
+        return bluebird.mapSeries(testIds, (testId) => {
             let options = testConfig[testId];
             options.browserifyOptions = options.browserifyOptions || testConfig.browserifyOptions;
             options.id = testId;

@@ -1,7 +1,5 @@
-'use strict';
 let sinon = require('sinon');
 let mockery = require('mockery');
-let Promise = require('bluebird');
 let buildPath = './../cli/build';
 let testMock, buildMock, utilsMock;
 let allowables = ['./../../cli/build', 'bluebird'];

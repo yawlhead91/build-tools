@@ -1,10 +1,9 @@
-'use strict';
 let build = require('./../src/build');
 let nopt = require('nopt');
 let path = require('path');
 let utils = require('./../src/utils');
 let test = require('./../src/test');
-let Promise = require('bluebird');
+let bluebird = require('bluebird');
 
 /**
  * Builds files specified in config file into the destination folder.
@@ -45,7 +44,7 @@ module.exports = function (args) {
     let runTest = function (testConfig) {
         testConfig = testConfig || {};
         let testIds = Object.keys(testConfig);
-        return Promise.mapSeries(testIds, (id) => {
+        return bluebird.mapSeries(testIds, (id) => {
             let options = testConfig[id];
             options.id = id;
             return test(options);
@@ -58,7 +57,7 @@ module.exports = function (args) {
             testConfigs = [testConfigs];
         }
         if (testConfigs.length) {
-            return Promise.mapSeries(testConfigs, (config) => {
+            return bluebird.mapSeries(testConfigs, (config) => {
                return runTest(config);
             });
         } else {

@@ -7,7 +7,7 @@ let fsMock;
 let packageJSONMock;
 let packageLockJSONMock;
 
-let allowables = [bumpPath, 'underscore', 'promise', 'semver'];
+let allowables = [bumpPath, 'underscore', 'semver'];
 
 module.exports = {
 
