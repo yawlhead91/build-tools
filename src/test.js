@@ -115,13 +115,12 @@ module.exports = function(options) {
             promise = runMochaTest();
         }
 
-        return new Promise(function (resolve) {
+        return new Promise(function (resolve, reject) {
             promise.then(resolve);
             promise.catch(function (err) {
                 // still resolve with the error code even though we have error to ensure
                 // processes that follow still have a chance to run
-                console.log(err);
-                resolve(err);
+                reject(err);
             });
         });
 
