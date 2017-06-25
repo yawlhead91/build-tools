@@ -189,8 +189,12 @@ module.exports = function(options) {
                 // dont run test automatically if the intent is to keep the
                 // connection alive for local development in a browser etc
                 if (!options.keepalive) {
-                    return test().then(() => {
-                        return server.stop();
+                    return test()
+                        .catch(() => {
+                            process.exit(1);
+                        })
+                        .then(() => {
+                            return server.stop();
                     });
                 }
             });
