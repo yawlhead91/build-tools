@@ -115,14 +115,7 @@ module.exports = function(options) {
             promise = runMochaTest();
         }
 
-        return new Promise(function (resolve, reject) {
-            promise.then(resolve);
-            promise.catch(function (err) {
-                // still resolve with the error code even though we have error to ensure
-                // processes that follow still have a chance to run
-                reject(err);
-            });
-        });
+        return promise;
 
     }
 
@@ -187,13 +180,18 @@ module.exports = function(options) {
             return server.start().then(() => {
                 // dont run test automatically if the intent is to keep the
                 // connection alive for local development in a browser etc
+                let error;
                 if (!options.keepalive) {
                     return test()
-                        .catch(() => {
-                            process.exit(1);
+                        .catch((e) => {
+                            error = e;
                         })
                         .then(() => {
-                            return server.stop();
+                            return server.stop().then(() => {
+                                if (error) {
+                                    throw new Error(error);
+                                }
+                            });
                     });
                 }
             });

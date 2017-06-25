@@ -69,6 +69,8 @@ module.exports = function (args) {
             options.keepalive = keepAlive;
             return test(options);
         });
+    }).catch(() => {
+        process.exit(1);
     });
 
 };
