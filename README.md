@@ -239,6 +239,8 @@ Which will run your tests in the browser located at http://localhost:7755.
 
 The `release` command offers a quick way to create, package, and publish a version of your project to both Github and NPM.
 
+__NOTE: Before using the `release` command, you must be [logged into NPM](https://docs.npmjs.com/cli/adduser) if you'd like your package to automatically be published.__
+
 ```
 bt release [SEMVER]
 ```
